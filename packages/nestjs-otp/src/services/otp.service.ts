@@ -178,6 +178,12 @@ export class OtpService implements OtpServiceInterface {
     const repoProxy = new RepositoryProxy<OtpInterface>(assignmentRepo);
 
     try {
+      // TODO: check 
+      // seetings - garbage collection
+      /**
+       * 
+      **/
+      
       await repoProxy.repository(queryOptions).delete(id);
     } catch (e) {
       throw new ReferenceMutateException(assignmentRepo.metadata.targetName, {

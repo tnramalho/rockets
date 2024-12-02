@@ -23,6 +23,7 @@ export { UserInterface } from './user/interfaces/user.interface';
 export { UserCreatableInterface } from './user/interfaces/user-creatable.interface';
 export { UserUpdatableInterface } from './user/interfaces/user-updatable.interface';
 export { UserOwnableInterface } from './user/interfaces/user-ownable.interface';
+export { UserAuthenticatedEventPayloadInterface } from './user/interfaces/user-authenticated-event-payload.interface';
 
 export { FederatedInterface } from './federated/interfaces/federated.interface';
 export { FederatedCreatableInterface } from './federated/interfaces/federated-creatable.interface';

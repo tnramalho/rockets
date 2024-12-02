@@ -40,5 +40,11 @@ export abstract class UserPostgresEntity
   @Column({ type: 'text', nullable: true, default: null })
   passwordSalt: string | null = null;
 
+  /**
+   * Last login
+   */
+  @Column({ type: 'timestamp', nullable: true, default: null })
+  lastLogin: Date | null = null;
+
   userPasswordHistory?: UserPasswordHistoryEntityInterface;
 }

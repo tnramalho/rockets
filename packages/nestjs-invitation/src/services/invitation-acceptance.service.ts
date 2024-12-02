@@ -119,6 +119,7 @@ export class InvitationAcceptanceService extends BaseService<InvitationEntityInt
    */
   async sendEmail(email: string): Promise<void> {
     const { from } = this.settings.email;
+    // TODO: this would be the welcome email?
     const { subject, fileName } =
       this.settings.email.templates.invitationAccepted;
 

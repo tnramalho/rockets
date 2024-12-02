@@ -37,5 +37,11 @@ export abstract class UserSqliteEntity
   @Column({ type: 'text', nullable: true, default: null })
   passwordSalt: string | null = null;
 
+  /**
+   * Last login
+   */
+  @Column({ type: 'datetime', nullable: true, default: null })
+  lastLogin: Date | null = null;
+
   userPasswordHistory?: UserPasswordHistoryEntityInterface;
 }

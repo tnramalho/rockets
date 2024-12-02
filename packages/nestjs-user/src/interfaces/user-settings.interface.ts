@@ -6,9 +6,13 @@ import {
   InvitationAcceptedEventPayloadInterface,
   InvitationGetUserEventPayloadInterface,
   InvitationGetUserEventResponseInterface,
+  UserAuthenticatedEventPayloadInterface,
 } from '@concepta/ts-common';
 
 export interface UserSettingsInterface {
+  userAuthenticatedRequestEvent?: EventClassInterface<
+    EventAsyncInterface<UserAuthenticatedEventPayloadInterface, boolean>
+  >;
   invitationRequestEvent?: EventClassInterface<
     EventAsyncInterface<InvitationAcceptedEventPayloadInterface, boolean>
   >;

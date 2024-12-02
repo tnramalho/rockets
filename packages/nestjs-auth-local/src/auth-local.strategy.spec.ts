@@ -13,6 +13,7 @@ import { ReferenceIdInterface } from '@concepta/ts-core';
 import { AuthLocalValidateUserInterface } from './interfaces/auth-local-validate-user.interface';
 import { InvalidCredentialsException } from './exceptions/invalid-credentials.exception';
 import { InvalidLoginDataException } from './exceptions/invalid-login-data.exception';
+import { EventDispatchService } from '@concepta/nestjs-event';
 
 describe(AuthLocalStrategy.name, () => {
   const USERNAME = 'username';
@@ -24,6 +25,7 @@ describe(AuthLocalStrategy.name, () => {
   let validateUserService: AuthLocalValidateUserServiceInterface;
   let passwordValidationService: PasswordValidationService;
   let authLocalStrategy: AuthLocalStrategy;
+  let eventDispatchService: EventDispatchService;
 
   beforeEach(async () => {
     settings = mock<Partial<AuthLocalSettingsInterface>>({
@@ -38,7 +40,8 @@ describe(AuthLocalStrategy.name, () => {
       userLookUpService,
       passwordValidationService,
     );
-    authLocalStrategy = new AuthLocalStrategy(settings, validateUserService);
+    eventDispatchService = mock<EventDispatchService>()
+    authLocalStrategy = new AuthLocalStrategy(settings, validateUserService, eventDispatchService);
 
     user = new UserFixture();
     user.id = randomUUID();
@@ -50,7 +53,7 @@ describe(AuthLocalStrategy.name, () => {
     settings = mock<Partial<AuthLocalSettingsInterface>>({
       loginDto: undefined,
     });
-    authLocalStrategy = new AuthLocalStrategy(settings, validateUserService);
+    authLocalStrategy = new AuthLocalStrategy(settings, validateUserService, eventDispatchService);
     expect(true).toBeTruthy();
   });
 
@@ -121,7 +124,7 @@ describe(AuthLocalStrategy.name, () => {
         usernameField: USERNAME,
         passwordField: PASSWORD,
       });
-      authLocalStrategy = new AuthLocalStrategy(settings, validateUserService);
+      authLocalStrategy = new AuthLocalStrategy(settings, validateUserService, eventDispatchService);
       const t = () => authLocalStrategy['assertSettings']();
       expect(t).toThrowError();
     });
@@ -132,7 +135,7 @@ describe(AuthLocalStrategy.name, () => {
         usernameField: undefined,
         passwordField: PASSWORD,
       });
-      authLocalStrategy = new AuthLocalStrategy(settings, validateUserService);
+      authLocalStrategy = new AuthLocalStrategy(settings, validateUserService, eventDispatchService);
       const t = () => authLocalStrategy['assertSettings']();
       expect(t).toThrowError();
     });
@@ -143,7 +146,7 @@ describe(AuthLocalStrategy.name, () => {
         usernameField: USERNAME,
         passwordField: undefined,
       });
-      authLocalStrategy = new AuthLocalStrategy(settings, validateUserService);
+      authLocalStrategy = new AuthLocalStrategy(settings, validateUserService, eventDispatchService);
       const t = () => authLocalStrategy['assertSettings']();
       expect(t).toThrowError();
     });

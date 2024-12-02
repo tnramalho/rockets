@@ -14,6 +14,9 @@ import { AuthLocalSettingsInterface } from './interfaces/auth-local-settings.int
 import { AuthLocalValidateUserServiceInterface } from './interfaces/auth-local-validate-user-service.interface';
 import { InvalidCredentialsException } from './exceptions/invalid-credentials.exception';
 import { InvalidLoginDataException } from './exceptions/invalid-login-data.exception';
+import { QueryOptionsInterface } from '@concepta/typeorm-common';
+import { UserAuthenticatedEventAsync } from './events/user-authenticated.event';
+import { EventDispatchService } from '@concepta/nestjs-event';
 
 /**
  * Define the Local strategy using passport.
@@ -35,6 +38,7 @@ export class AuthLocalStrategy extends PassportStrategyFactory<Strategy>(
     private settings: AuthLocalSettingsInterface,
     @Inject(AUTH_LOCAL_MODULE_VALIDATE_USER_SERVICE_TOKEN)
     private validateUserService: AuthLocalValidateUserServiceInterface,
+    private readonly eventDispatchService: EventDispatchService,
   ) {
     super({
       usernameField: settings?.usernameField,
@@ -82,6 +86,7 @@ export class AuthLocalStrategy extends PassportStrategyFactory<Strategy>(
       throw new InvalidCredentialsException({ originalError: e });
     }
 
+    this.dispatchEvent(validatedUser);
     return validatedUser;
   }
 
@@ -114,5 +119,21 @@ export class AuthLocalStrategy extends PassportStrategyFactory<Strategy>(
     }
 
     return { loginDto, usernameField, passwordField };
+  }
+
+  protected async dispatchEvent(
+    userDto: ReferenceIdInterface,
+    queryOptions?: QueryOptionsInterface,
+  ): Promise<boolean> {
+    const invitationAcceptedEventAsync = new UserAuthenticatedEventAsync({
+      user: userDto,
+      queryOptions,
+    });
+
+    const eventResult = await this.eventDispatchService.async(
+      invitationAcceptedEventAsync,
+    );
+
+    return eventResult.every((it) => it === true);
   }
 }
