@@ -45,8 +45,11 @@ export class LoggerRequestInterceptor implements NestInterceptor<Response> {
     // format the request message
     const message = MessageFormatUtil.formatRequestMessage(req);
 
-    // log the incoming request
-    this.loggerService.log(message);
+    const className = context.getClass().name;
+    const handlerName = context.getHandler().name;
+  
+    // Log the class and method names
+    this.loggerService.log(`${className}.${handlerName}: ${message}`);
 
     return next.handle().pipe(
       tap(() => this.responseSuccess(req, res, startDate)),
