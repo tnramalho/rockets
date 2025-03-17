@@ -1,22 +1,92 @@
 # Rockets Architecture Guide
 
-This document outlines the architectural patterns and best practices used throughout the Rockets project. Rockets is a collection of libraries designed with low coupling, where dependencies between modules are typically injected through settings to allow overriding.
+This document outlines the architectural patterns and best practices used throughout the Rockets project. Rockets follows a modular, clean architecture approach with emphasis on:
+- Separation of concerns
+- Domain-driven design
+- SOLID principles
+- Clean code practices
+- Testability and maintainability
 
 ## Table of Contents
 
 1. [Project Structure](#1-project-structure)
+   - Directory Organization
+   - Naming Conventions
+   - Module Pattern
+   - Module Definition
+   - Provider Pattern
+
 2. [CRUD Pattern](#2-crud-pattern)
+   - Controller Design
+   - Service Layer
+   - Repository Pattern
+   - Data Transfer Objects
+   - Validation
+
 3. [Exception Handling](#3-exception-handling)
+   - Custom Exceptions
+   - Error Hierarchy
+   - Error Handling Strategy
+   - Logging Pattern
+   - HTTP Status Codes
+
 4. [Service Patterns](#4-service-patterns)
+   - Base Service Pattern
+   - Lookup & Mutate Pattern
+   - Query Builder Pattern
+   - Service Composition
+   - Service Lifecycle
+
 5. [Interface Patterns](#5-interface-patterns)
+   - Entity Interfaces
+   - Service Interfaces
+   - DTO Interfaces
+   - Repository Interfaces
+   - Type Safety
+
 6. [Testing Patterns](#6-testing-patterns)
+   - Unit Testing
+   - Integration Testing
+   - E2E Testing
+   - Test Fixtures
+   - Test Data Management
+
 7. [Factory and Seeder Patterns](#7-factory-and-seeder-patterns)
+   - Factory Pattern
+   - Seeder Pattern
+   - Factory Dependencies
+   - Data Generation
+   - Test Data Management
+
 8. [Configuration Pattern](#8-configuration-pattern)
+   - Environment Configuration
+   - Module Configuration
+   - Dynamic Configuration
+   - Configuration Validation
+   - Secret Management
+
 9. [Best Practices](#9-best-practices)
+   - Code Organization
+   - Dependency Injection
+   - Error Handling
+   - Security
+   - Performance
+   - Documentation
+   - Testing
+   - Code Style
+   - Version Control
+   - Monitoring
 
 ## 1. Project Structure
 
-Each module in Rockets follows a consistent structure:
+### Directory Organization
+Each module in Rockets follows a domain-driven structure where related functionality is grouped together. This organization promotes:
+- High cohesion within modules
+- Low coupling between modules
+- Clear separation of concerns
+- Easy navigation and maintenance
+
+The structure follows this pattern:
 
 ```
 packages/nestjs-{module-name}/src/
@@ -37,14 +107,327 @@ packages/nestjs-{module-name}/src/
 ```
 
 ### Naming Conventions
+Consistent naming is crucial for maintainability and readability. Follow these patterns:
 - Files: kebab-case (e.g., `user-crud.service.ts`)
 - Classes: PascalCase (e.g., `UserCrudService`)
 - Interfaces: PascalCase with Interface suffix (e.g., `UserEntityInterface`)
 - Constants: UPPER_SNAKE_CASE (e.g., `USER_MODULE_USER_ENTITY_KEY`)
 
+### Module Pattern
+Modules are the building blocks of the application. Each module should:
+- Be self-contained
+- Have clear boundaries
+- Follow the Single Responsibility Principle
+- Use dependency injection for flexibility
+
+```ts
+/**
+ * User Module
+ */
+@Module({})
+export class UserModule extends UserModuleClass {
+  static register(options: UserOptions): DynamicModule {
+    return super.register(options);
+  }
+
+  static registerAsync(options: UserAsyncOptions): DynamicModule {
+    return super.registerAsync(options);
+  }
+
+  static forRoot(options: UserOptions): DynamicModule {
+    return super.register({ ...options, global: true });
+  }
+
+  static forRootAsync(options: UserAsyncOptions): DynamicModule {
+    return super.registerAsync({ ...options, global: true });
+  }
+}
+
+```
+
+## Module Definition 
+
+```ts
+
+export const {
+  ConfigurableModuleClass: UserModuleClass,
+  OPTIONS_TYPE: USER_OPTIONS_TYPE,
+  ASYNC_OPTIONS_TYPE: User_ASYNC_OPTIONS_TYPE,
+} = new ConfigurableModuleBuilder<UserOptionsInterface>({
+  moduleName: 'User',
+  optionsInjectionToken: RAW_OPTIONS_TOKEN,
+})
+  .setExtras<UserOptionsExtrasInterface>({ global: false }, definitionTransform)
+  .build();
+
+export type UserOptions = Omit<typeof USER_OPTIONS_TYPE, 'global'>;
+export type UserAsyncOptions = Omit<typeof User_ASYNC_OPTIONS_TYPE, 'global'>;
+
+
+function definitionTransform(
+  definition: DynamicModule,
+  extras: UserOptionsExtrasInterface,
+): DynamicModule {
+  const { providers = [], imports = [] } = definition;
+  const { controllers, global = false, entities } = extras;
+
+  if (!entities) {
+    throw new Error('You must provide the entities option');
+  }
+
+  return {
+    ...definition,
+    global,
+    imports: createUserImports({ imports, entities }),
+    providers: createUserProviders({ providers }),
+    controllers: createUserControllers({ controllers }),
+    exports: [ConfigModule, RAW_OPTIONS_TOKEN, ...createUserExports()],
+  };
+}
+/**
+ * Creates the imports array for the User module.
+ * The module can receive additional imports through parameters and combines them
+ * with the required internal imports like ConfigModule and TypeOrmExtModule.
+ * 
+ * @param options Object containing optional imports array and required entities
+ */
+export function createUserImports(
+  options: Pick<DynamicModule, 'imports'> & UserEntitiesOptionsInterface,
+): Required<Pick<DynamicModule, 'imports'>>['imports'] {
+  return [
+    ...(options.imports ?? []),
+    ConfigModule.forFeature(userDefaultConfig),
+    TypeOrmExtModule.forFeature(options.entities),
+  ];
+}
+/**
+ * Creates the providers array for a module.
+ * By default, it includes static providers like CrudService, domain-specific services, etc.
+ * However, the module is flexible and allows overriding any service through options.
+ * This enables customization by providing custom implementations of services when needed.
+ * 
+ * For example, you could provide a custom LookupService implementation:
+ * ```ts
+ * SomeModule.register({
+ *   lookupService: new CustomLookupService()
+ * })
+ * ```
+ * 
+ * @param options Object containing optional provider overrides and additional providers
+ */
+
+export function createUserProviders(options: {
+  overrides?: UserOptions;
+  providers?: Provider[];
+}): Provider[] {
+  return [
+    ...(options.providers ?? []),
+    UserCrudService,
+    createUserSettingsProvider(options.overrides),
+    createUserLookupServiceProvider(options.overrides),
+    createUserMutateServiceProvider(options.overrides),
+    createUserAccessQueryServiceProvider(options.overrides),
+  ];
+}
+/**
+ * Creates an array of exports for the module.
+ * The exports array determines which providers will be available to other modules that import this one.
+ * By default, it exports core services and tokens that other modules commonly need access to:
+ * - Settings token for module configuration
+ * - Lookup service for read operations
+ * - Mutate service for write operations  
+ * - CRUD service for full CRUD operations
+ * - Access query service for authorization
+ *
+ * This allows other modules to import and use these services while maintaining encapsulation
+ * of internal implementation details.
+ */
+
+export function createUserExports(): Required<
+  Pick<DynamicModule, 'exports'>
+>['exports'] {
+  return [
+    USER_MODULE_SETTINGS_TOKEN,
+    UserLookupService,
+    UserMutateService,
+    UserCrudService,
+    UserAccessQueryService,
+  ];
+}
+/**
+ * Creates an array of controllers for the module.
+ * This follows the common pattern used across the project's modules for controller configuration:
+ * 
+ * - Accepts optional overrides through options object
+ * - Provides default controllers if no overrides specified
+ * - Allows full customization by passing custom controllers
+ * - Supports disabling controllers by passing empty array
+ * 
+ * This pattern is consistent across different module types, for example:
+ * ```ts
+ * // User module
+ * UserModule.register({
+ *   controllers: [CustomUserController]
+ * })
+ *
+ * ```
+ * The consistent pattern makes the modules predictable and easier to configure
+ * while maintaining flexibility for different use cases.
+ */
+
+
+export function createUserControllers(
+  overrides: Pick<UserOptions, 'controllers'> = {},
+): DynamicModule['controllers'] {
+  return overrides?.controllers !== undefined
+    ? overrides.controllers
+    : [UserController];
+}
+
+/**
+ * Creates providers for the User module.
+ * This follows the standard pattern used across the project for provider configuration:
+ * 
+ * - Accepts optional overrides through options object
+ * - Creates core providers like settings, repositories, and services
+ * - Allows overriding individual providers through options
+ * - Maintains consistent provider structure across modules
+ * 
+ * Example usage:
+ * ```ts
+ * UserModule.register({
+ *   userLookupService: CustomLookupService,
+ *   userMutateService: CustomMutateService
+ * })
+ * ```
+ * 
+ * The providers follow the project's service pattern of separating:
+ * - Settings providers for module configuration
+ * - Repository providers for data access
+ * - Service providers split into lookup and mutate
+ */
+export function createUserProviders(
+  options: Pick<UserOptions, 'overrides'> = {},
+): Required<Pick<DynamicModule, 'providers'>>['providers'] {
+  return [
+    createUserSettingsProvider(options.overrides),
+    createUserLookupServiceProvider(options.overrides),
+    createUserMutateServiceProvider(options.overrides),
+    createUserCrudServiceProvider(options.overrides),
+    createUserAccessQueryServiceProvider(options.overrides),
+    createUserRepositoryProvider(options.overrides),
+  ];
+}
+
+/**
+ * Creates a settings provider for the User module.
+ * This follows the settings provider pattern used across the project:
+ * - Takes module options and creates a settings provider
+ * - Uses a settings token to inject settings across the module
+ * - Allows overriding settings through options
+ * - Provides type safety through interfaces
+ */
+export function createUserSettingsProvider(
+  optionsOverrides?: UserOptions,
+): Provider {
+  return createSettingsProvider<UserSettingsInterface, UserOptionsInterface>({
+    settingsToken: USER_MODULE_SETTINGS_TOKEN,
+    optionsToken: RAW_OPTIONS_TOKEN,
+    settingsKey: userDefaultConfig.KEY,
+    optionsOverrides,
+  });
+}
+
+/**
+ * Creates a lookup service provider for the User module.
+ * This follows the lookup service pattern:
+ * - Handles read operations for user entities
+ * - Injects the repository for data access
+ * - Allows overriding the service through options
+ * - Uses dependency injection for required dependencies
+ * - Maintains separation between read and write operations
+ */
+export function createUserLookupServiceProvider(
+  optionsOverrides?: UserOptions,
+): Provider {
+  return {
+    provide: UserLookupService,
+    inject: [
+      RAW_OPTIONS_TOKEN,
+      getDynamicRepositoryToken(USER_MODULE_USER_ENTITY_KEY),
+    ],
+    useFactory: async (
+      options: UserOptionsInterface,
+      userRepo: Repository<UserEntityInterface>,
+    ) =>
+      optionsOverrides?.userLookupService ??
+      options.userLookupService ??
+      new UserLookupService(userRepo),
+  };
+}
+
+/**
+ * Creates a mutate service provider for the User module.
+ * This follows the mutate service pattern:
+ * - Handles write operations for user entities
+ * - Injects repository and required services
+ * - Allows overriding through module options
+ * - Separates mutation logic from lookup operations
+ * - Handles complex operations like password hashing
+ */
+export function createUserMutateServiceProvider(
+  optionsOverrides?: UserOptions,
+): Provider {
+  return {
+    provide: UserMutateService,
+    inject: [
+      RAW_OPTIONS_TOKEN,
+      getDynamicRepositoryToken(USER_MODULE_USER_ENTITY_KEY),
+      UserPasswordService,
+    ],
+    useFactory: async (
+      options: UserOptionsInterface,
+      userRepo: Repository<UserEntityInterface>,
+      userPasswordService: UserPasswordService,
+    ) =>
+      optionsOverrides?.userMutateService ??
+      options.userMutateService ??
+      new UserMutateService(userRepo, userPasswordService),
+  };
+}
+
+/**
+ * Creates an access query service provider for the User module.
+ * This follows the query service pattern:
+ * - Handles specialized query operations
+ * - Focuses on access control and authentication
+ * - Allows custom query implementation through options
+ * - Separates query logic from core CRUD operations
+ * - Maintains single responsibility principle
+ */
+export function createUserAccessQueryServiceProvider(
+  optionsOverrides?: UserOptions,
+): Provider {
+  return {
+    provide: UserAccessQueryService,
+    inject: [RAW_OPTIONS_TOKEN, UserPasswordService],
+    useFactory: async (options: UserOptionsInterface) =>
+      optionsOverrides?.userAccessQueryService ??
+      options.userAccessQueryService ??
+      new UserAccessQueryService(),
+  };
+}
+
+```
 ## 2. CRUD Pattern
 
-### Controller Pattern
+### Controller Design
+Controllers handle HTTP requests and should:
+- Follow REST principles
+- Use proper HTTP methods
+- Implement proper validation
+- Handle errors gracefully
+- Document endpoints using OpenAPI/Swagger
 
 ```typescript
 // File: packages/nestjs-user/src/controllers/user-crud.controller.ts
@@ -57,15 +440,22 @@ import { UserCreateDto } from '../dto/user-create.dto';
 import { UserUpdateDto } from '../dto/user-update.dto';
 
 @CrudController({
-  path: 'users',
+  path: 'users', // Use plural form for REST endpoints
   model: {
-    type: UserDto,
-    paginatedType: UserPaginatedDto,
+    type: UserDto, // Use for single resource responses
+    paginatedType: UserPaginatedDto, // Use for paginated list responses
   },
   params: {
-    id: { field: 'id', type: 'string', primary: true }
+    id: { field: 'id', type: 'string', primary: true } // Define primary key for single resource operations
   }
 })
+// When to use:
+// - Use @CrudController when you need standard CRUD operations (Create, Read, Update, Delete)
+// - Use model.type for single resource serialization (GET /users/:id, POST /users, etc)
+// - Use model.paginatedType for list responses that require pagination (GET /users?page=1)
+// - Use params to define route parameters and their mapping to entity fields
+// - Set params.disabled: true to exclude params from query building (like in cache example)
+// - Use join for eager loading of related entities in responses
 export class UserCrudController {
   constructor(
     @Inject(USER_MODULE_USER_CRUD_SERVICE_TOKEN)
@@ -113,6 +503,167 @@ export class CacheCrudController extends CrudBaseController<
 }
 ```
 
+if we need yo create a controller with all methods, we can use the following pattern:
+
+```ts
+
+/**
+ * User controller.
+ */
+@CrudController({
+  path: 'user',
+  model: {
+    type: UserDto,
+    paginatedType: UserPaginatedDto,
+  },
+})
+@AccessControlQuery({
+  service: UserAccessQueryService,
+})
+@ApiTags('user')
+export class UserController
+  implements
+    CrudControllerInterface<
+      UserEntityInterface,
+      UserCreatableInterface,
+      UserUpdatableInterface
+    >
+{
+  /**
+   * Constructor.
+   *
+   * @param userCrudService - instance of the user crud service
+   * @param userPasswordService - instance of user password service
+   */
+  constructor(
+    private userCrudService: UserCrudService,
+    private userPasswordService: UserPasswordService,
+  ) {}
+
+  /**
+   * Get many
+   *
+   * @param crudRequest - the CRUD request object
+   */
+  @CrudReadMany()
+  @AccessControlReadMany(UserResource.Many)
+  async getMany(@CrudRequest() crudRequest: CrudRequestInterface) {
+    return this.userCrudService.getMany(crudRequest);
+  }
+
+  /**
+   * Get one
+   *
+   * @param crudRequest - the CRUD request object
+   */
+  @CrudReadOne()
+  @AccessControlReadOne(UserResource.One)
+  async getOne(@CrudRequest() crudRequest: CrudRequestInterface) {
+    return this.userCrudService.getOne(crudRequest);
+  }
+
+  /**
+   * Create many
+   *
+   * @param crudRequest - the CRUD request object
+   * @param userCreateManyDto - user create many dto
+   */
+  @CrudCreateMany()
+  @AccessControlCreateMany(UserResource.Many)
+  async createMany(
+    @CrudRequest() crudRequest: CrudRequestInterface,
+    @CrudBody() userCreateManyDto: UserCreateManyDto,
+  ) {
+    // the final data
+    const hashed = [];
+
+    // loop all dtos
+    for (const userCreateDto of userCreateManyDto.bulk) {
+      // hash it
+      hashed.push(await this.userPasswordService.setPassword(userCreateDto));
+    }
+
+    // call crud service to create
+    return this.userCrudService.createMany(crudRequest, { bulk: hashed });
+  }
+
+  /**
+   * Create one
+   *
+   * @param crudRequest - the CRUD request object
+   * @param userCreateDto - user create dto
+   */
+  @CrudCreateOne()
+  @AccessControlCreateOne(UserResource.One)
+  async createOne(
+    @CrudRequest() crudRequest: CrudRequestInterface,
+    @CrudBody() userCreateDto: UserCreateDto,
+  ) {
+    // call crud service to create
+    return this.userCrudService.createOne(
+      crudRequest,
+      await this.userPasswordService.setPassword(userCreateDto),
+    );
+  }
+
+  /**
+   * Update one
+   *
+   * @param crudRequest - the CRUD request object
+   * @param userUpdateDto - user update dto
+   */
+  @CrudUpdateOne()
+  @AccessControlUpdateOne(UserResource.One)
+  async updateOne(
+    @CrudRequest() crudRequest: CrudRequestInterface,
+    @CrudBody() userUpdateDto: UserUpdateDto,
+    @Param('id') userId?: string,
+    @AuthUser() authorizededUser?: AuthenticatedUserInterface,
+  ) {
+    let hashedObject: Partial<PasswordStorageInterface>;
+
+    try {
+      hashedObject = await this.userPasswordService.setPassword(
+        userUpdateDto,
+        userId,
+        authorizededUser,
+      );
+    } catch (e) {
+      if (e instanceof RuntimeException) {
+        throw e;
+      } else {
+        throw new UserBadRequestException({ originalError: e });
+      }
+    }
+
+    return this.userCrudService.updateOne(crudRequest, hashedObject);
+  }
+
+  /**
+   * Delete one
+   *
+   * @param crudRequest - the CRUD request object
+   */
+  @CrudDeleteOne()
+  @AccessControlDeleteOne(UserResource.One)
+  async deleteOne(@CrudRequest() crudRequest: CrudRequestInterface) {
+    return this.userCrudService.deleteOne(crudRequest);
+  }
+
+  /**
+   * Recover one
+   *
+   * @param crudRequest - the CRUD request object
+   */
+  @CrudRecoverOne()
+  @AccessControlRecoverOne(UserResource.One)
+  async recoverOne(@CrudRequest() crudRequest: CrudRequestInterface) {
+    return this.userCrudService.recoverOne(crudRequest);
+  }
+}
+
+```
+
 ### Service Pattern
 
 ```typescript
@@ -137,7 +688,12 @@ export class UserCrudService extends TypeOrmCrudService<UserEntityInterface> {
 
 ## 3. Exception Handling
 
-Each module should have its base exception that extends `RuntimeException`, and module-specific exceptions should extend this base:
+Exception handling should be:
+- Consistent across the application
+- Informative but secure
+- Properly logged
+- HTTP status code appropriate
+- Well-documented
 
 ```typescript
 // File: packages/nestjs-user/src/exceptions/user.exception.ts
@@ -168,11 +724,13 @@ export class UserNotFoundException extends UserException {
 
 ## 4. Service Patterns
 
-### Lookup & Mutate Pattern
+### Base Service Pattern
+Base services provide common functionality and should:
+- Implement reusable CRUD operations
+- Use generics for type safety
+- Follow DRY principle
+- Be easily extendable
 
-The project uses a clear separation between lookup (read) and mutate (write) operations through interfaces and base services:
-
-#### Lookup Interfaces
 ```typescript
 // Base lookup interface for ID-based operations
 export interface LookupIdInterface<
@@ -184,6 +742,12 @@ export interface LookupIdInterface<
 }
 
 // Example of a service interface extending multiple lookup interfaces
+// When to use:
+// - Use LookupIdInterface when you need to find entities by their unique ID
+// - Use LookupEmailInterface when email-based lookups are required (e.g. user authentication)
+// - Use LookupUsernameInterface when username-based lookups are needed (e.g. profile pages)
+// - Combine multiple lookup interfaces when an entity needs to be found through different unique identifiers
+// - Add custom lookup methods when standard lookup patterns don't cover your use case
 export interface UserLookupServiceInterface
   extends LookupIdInterface<ReferenceId, ReferenceIdInterface, QueryOptionsInterface>,
     LookupEmailInterface<ReferenceEmail, ReferenceIdInterface, QueryOptionsInterface>,
@@ -208,6 +772,13 @@ export interface UpdateOneInterface<
 }
 
 // Example of a service interface extending multiple mutate interfaces
+// When to use:
+// - Use CreateOneInterface when you need to create new entities (e.g. user registration, product creation)
+// - Use UpdateOneInterface when you need to partially update existing entities (e.g. profile updates)
+// - Use ReplaceOneInterface when you need to completely replace entities (e.g. bulk imports)
+// - Use RemoveOneInterface when you need to delete entities (e.g. account deletion)
+// - Combine multiple interfaces when your service needs different mutation capabilities
+// - Can be applied to any domain entity that requires CRUD operations (Users, Products, Orders etc)
 export interface UserMutateServiceInterface
   extends CreateOneInterface<UserCreatableInterface, UserEntityInterface>,
     UpdateOneInterface<UserUpdatableInterface & ReferenceIdInterface, UserEntityInterface>,
@@ -219,24 +790,6 @@ export interface UserMutateServiceInterface
 
 #### Base Entity Classes
 The project provides base entity classes for different database types:
-
-```typescript
-// For PostgreSQL
-export abstract class CommonPostgresEntity
-  extends AuditPostgresEntity
-  implements ReferenceIdInterface, AuditInterface {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-}
-
-// For SQLite
-export abstract class CommonSqliteEntity
-  extends AuditSqlLiteEntity
-  implements ReferenceIdInterface, AuditInterface {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-}
-```
 
 #### Implementation Example
 ```typescript
@@ -264,9 +817,13 @@ export class UserLookupService
     super(userRepo);
   }
 
-  // byId is already implemented by LookupService
+  // LookupService provides the byId method implementation since it's a common lookup pattern
+  // UserLookupServiceInterface extends additional interfaces like:
+  // - LookupEmailInterface which requires byEmail method
+  // - LookupUsernameInterface which requires byUsername method
+  // We implement those interface-specific methods here:
 
-  // Implement LookupEmailInterface
+  // Required by LookupEmailInterface
   async byEmail(
     email: ReferenceEmail,
     queryOptions?: QueryOptionsInterface,
@@ -274,7 +831,7 @@ export class UserLookupService
     return this.findOne({ where: { email } }, queryOptions);
   }
 
-  // Implement LookupUsernameInterface
+  // Required by LookupUsernameInterface  
   async byUsername(
     username: ReferenceUsername,
     queryOptions?: QueryOptionsInterface,
@@ -284,6 +841,19 @@ export class UserLookupService
 }
 
 @Injectable()
+/**
+ * User mutate service.
+ * 
+ * When to use:
+ * - Use MutateService when you need standard create/update operations
+ * - Extend this service when you need custom validation or business logic during mutations
+ * - The generic types define:
+ *   1. The entity interface (UserEntityInterface)
+ *   2. The creatable interface for create operations (UserCreatableInterface) 
+ *   3. The updatable interface for update operations (UserUpdatableInterface)
+ * - Use createDto and updateDto to define the DTOs used for validation
+ * - Inject the repository to handle database operations
+ */
 export class UserMutateService
   extends MutateService<
     UserEntityInterface,
@@ -306,6 +876,11 @@ export class UserMutateService
 ## 5. Interface Patterns
 
 ### Entity Interfaces
+Entity interfaces should:
+- Define clear contracts
+- Use proper TypeScript features
+- Be well-documented
+- Follow single responsibility principle
 
 ```typescript
 // Base entity interface
@@ -337,10 +912,18 @@ export class UserSqliteEntity
 
   @Column()
   username!: string;
-}
-```
+} 
+``` 
 
-### DTO Interfaces
+### DTO Pattern
+DTOs should:
+- Validate input/output
+- Transform data between layers
+- Hide internal implementation
+- Follow interface segregation principle
+
+we should always use interfaces to define the DTOs.
+and make all associate with interfaces to respect signature
 
 ```typescript
 // Base interface with all properties
@@ -418,9 +1001,13 @@ export class UserUpdateDto
 
 ## 6. Testing Patterns
 
-### Unit Tests
-
-Example of a service unit test:
+### Unit Testing
+Unit tests should:
+- Follow AAA pattern (Arrange, Act, Assert)
+- Test one thing at a time
+- Be independent
+- Use proper mocking
+- Cover edge cases
 
 ```typescript
 describe('YourService', () => {
@@ -448,9 +1035,13 @@ describe('YourService', () => {
 });
 ```
 
-### E2E Tests
-
-Example of an end-to-end test:
+### E2E Testing
+E2E tests should:
+- Test complete flows
+- Verify integration points
+- Use proper test data
+- Clean up after themselves
+- Be independent
 
 ```typescript
 describe('YourController (e2e)', () => {
@@ -477,8 +1068,11 @@ describe('YourController (e2e)', () => {
 ## 7. Factory and Seeder Patterns
 
 ### Factory Pattern
-
-Factories are used to generate test data and seed the database with realistic data. They extend the base `Factory` class from `@concepta/typeorm-seeding`:
+Factories should:
+- Generate consistent test data
+- Handle unique constraints
+- Be configurable
+- Follow single responsibility
 
 ```typescript
 import { Factory } from '@concepta/typeorm-seeding';
@@ -514,8 +1108,11 @@ export class UserFactory extends Factory<UserEntityInterface> {
 ```
 
 ### Seeder Pattern
-
-Seeders are used to populate the database with initial data. They extend the base `Seeder` class:
+Seeders should:
+- Initialize database with consistent data
+- Be environment-aware
+- Be idempotent
+- Handle dependencies properly
 
 ```typescript
 import { Seeder } from '@concepta/typeorm-seeding';
@@ -636,49 +1233,62 @@ export class UserModuleFixture {
 }
 ```
 
-#### Service Fixtures
-
-Service fixtures implement interfaces for testing:
-
-```typescript
-import { ValidateTokenServiceInterface } from '../interfaces/validate-token-service.interface';
-
-export class ValidateTokenServiceFixture implements ValidateTokenServiceInterface {
-  async validateToken(_payload: object): Promise<boolean> {
-    // Test implementation
-    return true;
-  }
-}
-```
-
-#### When to Create Fixtures
-
-Create fixtures in the following scenarios:
-
-1. **Entity Testing**: When you need to test entity relationships or database operations
-   - Create an entity fixture extending the SQLite variant
-   - Add test-specific relationships and columns
-
-2. **Module Testing**: When testing module configuration and dependency injection
-   - Create a module fixture with test-specific providers
-   - Use `@Global()` if the module needs to be available throughout tests
-
-3. **Service Testing**: When mocking service behavior
-   - Create service fixtures implementing the service interface
-   - Provide test-specific implementations of methods
-
-4. **Factory Testing**: When you need to create test data with specific patterns
-   - Create factory fixtures extending the base Factory class
-   - Override the main factory if needed for test-specific behavior
-
-5. **Integration Testing**: When testing multiple components together
-   - Create fixtures for all required components
-   - Use the module fixture to wire everything together
-
-## 8. Configuration Pattern
-
-// ... existing code ...
-
 ## 9. Best Practices
 
-// ... existing code ...
+1. **Code Organization**
+   - Follow SOLID principles
+   - Keep methods small and focused
+   - Use proper abstraction
+   - Maintain clear dependencies
+
+2. **Dependency Injection**
+   - Use constructor injection
+   - Follow interface segregation
+   - Avoid circular dependencies
+   - Use proper scoping
+
+3. **Error Handling**
+   - Use custom exceptions
+   - Provide meaningful messages
+   - Log appropriately
+   - Handle edge cases
+
+4. **Security**
+   - Validate all input
+   - Sanitize all output
+   - Use proper authentication
+   - Follow least privilege principle
+
+5. **Performance**
+   - Use proper indexes
+   - Implement caching
+   - Optimize queries
+   - Use pagination
+
+6. **Documentation**
+   - Use JSDoc
+   - Keep docs updated
+   - Include examples
+   - Document edge cases
+
+7. **Testing**
+   - Write comprehensive tests
+   - Use proper test doubles
+   - Test edge cases
+   - Maintain test data
+
+8. **Code Style**
+   - Follow style guide
+   - Use consistent naming
+   - Write clear comments
+   - Keep code DRY
+
+9. **Version Control**
+   - Review code
+   - Keep changes focused
+
+10. **Monitoring**
+    - Use proper logging
+    - Monitor performance
+    - Track errors
+    - Set up alerts
