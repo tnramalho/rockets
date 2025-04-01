@@ -188,7 +188,7 @@ describe('AuthenticationCombinedImportModule Integration', () => {
 
       // Get services and run common tests
       const services = commonVars(testModule);
-      commonTests(services, testModule);
+      commonTests(services);
     });
   });
 });
