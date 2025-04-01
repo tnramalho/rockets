@@ -1526,6 +1526,41 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@concepta/rockets-authentication@workspace:packages/rockets-authentication":
+  version: 0.0.0-use.local
+  resolution: "@concepta/rockets-authentication@workspace:packages/rockets-authentication"
+  dependencies:
+    "@concepta/nestjs-auth-jwt": "npm:^6.0.0-alpha.4"
+    "@concepta/nestjs-auth-refresh": "npm:^6.0.0-alpha.4"
+    "@concepta/nestjs-authentication": "npm:^6.0.0-alpha.4"
+    "@concepta/nestjs-common": "npm:^6.0.0-alpha.4"
+    "@concepta/nestjs-exception": "npm:^6.0.0-alpha.4"
+    "@concepta/nestjs-jwt": "npm:^6.0.0-alpha.4"
+    "@concepta/typeorm-common": "npm:^6.0.0-alpha.4"
+    "@nestjs/common": "npm:^10.4.1"
+    "@nestjs/config": "npm:^3.2.3"
+    "@nestjs/core": "npm:^10.4.1"
+    "@nestjs/jwt": "npm:^10.2.0"
+    "@nestjs/passport": "npm:^10.0.3"
+    "@nestjs/swagger": "npm:^7.4.0"
+    "@nestjs/testing": "npm:^10.4.1"
+    "@types/jsonwebtoken": "npm:9.0.6"
+    "@types/passport-jwt": "npm:^3.0.13"
+    "@types/passport-strategy": "npm:^0.2.38"
+    express-serve-static-core: "npm:^0.1.1"
+    jest-mock-extended: "npm:^2.0.9"
+    jsonwebtoken: "npm:^9.0.2"
+    passport: "npm:^0.7.0"
+    passport-jwt: "npm:^4.0.1"
+    passport-strategy: "npm:^1.0.0"
+  peerDependencies:
+    class-transformer: "*"
+    class-validator: "*"
+    rxjs: ^7.1.0
+    typeorm: ^0.3.0
+  languageName: unknown
+  linkType: soft
+
 "@concepta/typeorm-common@npm:^6.0.0-alpha.4, @concepta/typeorm-common@workspace:packages/typeorm-common":
   version: 0.0.0-use.local
   resolution: "@concepta/typeorm-common@workspace:packages/typeorm-common"

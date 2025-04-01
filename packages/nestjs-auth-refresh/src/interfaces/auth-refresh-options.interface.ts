@@ -1,6 +1,6 @@
 import {
   IssueTokenServiceInterface,
-  VerifyTokenService,
+  VerifyTokenServiceInterface,
 } from '@concepta/nestjs-authentication';
 import { AuthRefreshUserLookupServiceInterface } from './auth-refresh-user-lookup-service.interface';
 import { AuthRefreshSettingsInterface } from './auth-refresh-settings.interface';
@@ -19,7 +19,7 @@ export interface AuthRefreshOptionsInterface {
   /**
    * Implementation of a class to verify tokens
    */
-  verifyTokenService?: VerifyTokenService;
+  verifyTokenService?: VerifyTokenServiceInterface;
 
   /**
    * Settings
