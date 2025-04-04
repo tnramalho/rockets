@@ -151,6 +151,7 @@ export class AuthRecoveryService implements AuthRecoveryServiceInterface {
     queryOptions?: QueryOptionsInterface,
   ): Promise<ReferenceIdInterface | null> {
     // run in transaction
+    // TODO: review and try to remove entity manager
     return this.entityManagerProxy
       .transaction(queryOptions)
       .commit(async (transaction): Promise<ReferenceIdInterface | null> => {

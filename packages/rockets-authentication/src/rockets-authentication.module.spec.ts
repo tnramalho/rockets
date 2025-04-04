@@ -1,4 +1,4 @@
-import { DynamicModule, Module, ModuleMetadata } from '@nestjs/common';
+import { DynamicModule, Module, ModuleMetadata, Controller, Post, Body, Global } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { GlobalModuleFixture } from './__fixtures__/global.module.fixture';
@@ -21,13 +21,46 @@ import { VerifyTokenServiceFixture } from './__fixtures__/services/verify-token.
 import { IssueTokenServiceFixture } from './__fixtures__/services/issue-token.service.fixture';
 import { ValidateTokenServiceFixture } from './__fixtures__/services/validate-token.service.fixture';
 import { RocketsAuthenticationOptionsInterface } from './interfaces/rockets-authentication-options.interface';
-
+import { RocketsAuthUserLookupServiceInterface } from './interfaces/rockets-auth-user-lookup-service.interface';
+import { createAuthRecoveryOtpServiceProvider } from '@concepta/nestjs-auth-recovery/dist/auth-recovery.module-definition';
+import { OtpServiceFixture } from './__fixtures__/services/otp.service.fixture';
+import { EmailSendInterface } from '@concepta/nestjs-common';
+import { createEntityManagerMock, QueryOptionsInterface } from '@concepta/typeorm-common';
+import { ReferenceId, ReferenceIdInterface, ReferenceUsernameInterface } from '@concepta/nestjs-common';
+import { AuthLocalCredentialsInterface } from '@concepta/nestjs-auth-local';
+import { EmailSendOptionsInterface } from '@concepta/nestjs-common';
+import { RocketsUserMutateServiceInterface } from './interfaces/rockets-user-mutate-service.interface';
+import { getEntityManagerToken } from '@nestjs/typeorm';
 // Mock user lookup service
-const mockUserLookupService = {
-  findOne: jest.fn().mockResolvedValue({ id: '1', username: 'test' }),
+const mockUserLookupService: RocketsAuthUserLookupServiceInterface = {
   bySubject: jest.fn().mockResolvedValue({ id: '1', username: 'test' }),
+  byUsername: jest.fn().mockResolvedValue({ id: '1', username: 'test' }),
+  byId: jest.fn().mockResolvedValue({ id: '1', username: 'test' }),
+  byEmail: jest.fn().mockResolvedValue({ id: '1', username: 'test', email: 'test@example.com' }),
 };
 
+// Mock email service
+const mockEmailService: EmailSendInterface = {
+  sendMail: jest.fn().mockResolvedValue(undefined),
+};
+
+// Mock user mutate service
+const mockUserMutateService: RocketsUserMutateServiceInterface = {
+  update: jest.fn().mockResolvedValue({ id: '1', username: 'test' }),
+};
+
+
+@Global()
+@Module({
+  providers: [
+    {
+      provide: getEntityManagerToken(),
+      useFactory: createEntityManagerMock,
+    },
+  ],
+  exports: [getEntityManagerToken()],
+})
+export class TypeOrmModuleFixture {}
 // Mock configuration module
 @Module({
   providers: [
@@ -56,7 +89,7 @@ function testModuleFactory(
       MockConfigModule,
       JwtModule.forRoot({}),
       ...extraImports,
-    ],
+    ]
   };
 }
 
@@ -117,7 +150,7 @@ describe('AuthenticationCombinedImportModule Integration', () => {
       testModule = await Test.createTestingModule(
         testModuleFactory([
           RocketsAuthenticationModule.forRootAsync({
-            imports: [MockConfigModule],
+            imports: [TypeOrmModuleFixture, MockConfigModule],
             inject: [
               ConfigService,
               VerifyTokenServiceFixture,
@@ -139,6 +172,9 @@ describe('AuthenticationCombinedImportModule Integration', () => {
               },
               services: {
                 userLookupService: mockUserLookupService,
+                emailService: mockEmailService,
+                userMutateService: mockUserMutateService,
+                otpService: new OtpServiceFixture(),
                 verifyTokenService,
                 issueTokenService,
                 validateTokenService,
@@ -168,6 +204,7 @@ describe('AuthenticationCombinedImportModule Integration', () => {
       // Create test module with forRoot registration
       testModule = await Test.createTestingModule(
         testModuleFactory([
+          TypeOrmModuleFixture,
           RocketsAuthenticationModule.forRoot({
             jwt: {
               settings: {
@@ -178,6 +215,9 @@ describe('AuthenticationCombinedImportModule Integration', () => {
             },
             services: {
               userLookupService: mockUserLookupService,
+              emailService: mockEmailService,
+              userMutateService: mockUserMutateService,
+              otpService: new OtpServiceFixture(),
               verifyTokenService: new VerifyTokenServiceFixture(),
               issueTokenService: new IssueTokenServiceFixture(),
               validateTokenService: new ValidateTokenServiceFixture(),
@@ -189,6 +229,43 @@ describe('AuthenticationCombinedImportModule Integration', () => {
       // Get services and run common tests
       const services = commonVars(testModule);
       commonTests(services);
+    });
+  });
+
+  describe('with custom refresh controller', () => {
+    let testModule: TestingModule;
+
+    it('should use custom refresh controller when provided', async () => {
+      // Create test module with custom refresh controller
+      testModule = await Test.createTestingModule(
+        testModuleFactory(
+          [
+            TypeOrmModuleFixture,
+            RocketsAuthenticationModule.forRoot({
+              jwt: {
+                settings: {
+                  access: { secret: 'test-secret' },
+                  default: { secret: 'test-secret' },
+                  refresh: { secret: 'test-secret' },
+                },
+              },
+              services: {
+                userLookupService: mockUserLookupService,
+                emailService: mockEmailService,
+                userMutateService: mockUserMutateService,
+                otpService: new OtpServiceFixture(),
+                verifyTokenService: new VerifyTokenServiceFixture(),
+                issueTokenService: new IssueTokenServiceFixture(),
+                validateTokenService: new ValidateTokenServiceFixture(),
+              },
+            }),
+          ],
+        ),
+      ).compile();
+
+      // Verify that the refresh guard is still present
+      const authRefreshGuard = testModule.get(AuthRefreshGuard);
+      expect(authRefreshGuard).toBeDefined();
     });
   });
 });
