@@ -23,6 +23,7 @@ import { EmailSendInterface } from '@concepta/nestjs-common';
 import { AuthVerifyOptionsInterface } from '@concepta/nestjs-auth-verify/dist/interfaces/auth-verify-options.interface';
 import { AuthRecoveryNotificationServiceInterface } from '@concepta/nestjs-auth-recovery/dist/interfaces/auth-recovery-notification.service.interface';
 import { RocketsNotificationServiceInterface } from './rockets-auth-notification.service.interface';
+import { AuthLocalValidateUserServiceInterface } from '@concepta/nestjs-auth-local';
 
 /**
  * Combined options interface for the AuthenticationCombinedModule
@@ -113,6 +114,7 @@ export interface RocketsAuthenticationOptionsInterface {
     verifyTokenService: VerifyTokenServiceInterface;
     issueTokenService: IssueTokenServiceInterface;
     validateTokenService: ValidateTokenServiceInterface;
+    validateUserService?: AuthLocalValidateUserServiceInterface;
 
     /**
      * JWT services used in JwtModule
