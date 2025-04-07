@@ -23,7 +23,6 @@ import { AuthLocalOptionsInterface } from '@concepta/nestjs-auth-local/dist/inte
 import { AuthPasswordController } from './controllers/auth/auth-password.controller';
 import { AuthTokenRefreshController } from './controllers/auth/auth-refresh.controller';
 import { AuthRecoveryOptionsInterface } from '@concepta/nestjs-auth-recovery/dist/interfaces/auth-recovery-options.interface';
-import { AUTH_LOCAL_MODULE_ISSUE_TOKEN_SERVICE_TOKEN } from './rockets-authentication.constants';
 import { AuthVerifyModule, AuthVerifyUserMutateServiceInterface } from '@concepta/nestjs-auth-verify';
 import { AuthVerifyOptionsInterface } from '@concepta/nestjs-auth-verify/dist/interfaces/auth-verify-options.interface';
 import { AuthRecoveryUserMutateServiceInterface } from '@concepta/nestjs-auth-recovery/dist/interfaces/auth-recovery-user-mutate.service.interface';

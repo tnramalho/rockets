@@ -5,6 +5,12 @@ import { RocketsAuthenticationModule } from './rockets-authentication.module';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@concepta/nestjs-jwt';
 import { AuthJwtGuard } from '@concepta/nestjs-auth-jwt';
+import { EmailSendInterface } from '@concepta/nestjs-common';
+import { RocketsUserMutateServiceInterface } from './interfaces/rockets-user-mutate-service.interface';
+import { OtpServiceFixture } from './__fixtures__/services/otp.service.fixture';
+import { VerifyTokenServiceFixture } from './__fixtures__/services/verify-token.service.fixture';
+import { IssueTokenServiceFixture } from './__fixtures__/services/issue-token.service.fixture';
+import { ValidateTokenServiceFixture } from './__fixtures__/services/validate-token.service.fixture';
 
 // Test controller with protected route
 @Controller('test')
@@ -22,6 +28,16 @@ const mockUserLookupService = {
   bySubject: jest.fn().mockResolvedValue({ id: '1', username: 'test' }),
   byUsername: jest.fn().mockResolvedValue({ id: '1', username: 'test' }),
   byEmail: jest.fn().mockResolvedValue({ id: '1', username: 'test' }),
+};
+
+// Mock email service
+const mockEmailService: EmailSendInterface = {
+  sendMail: jest.fn().mockResolvedValue(undefined),
+};
+
+// Mock user mutate service
+const mockUserMutateService: RocketsUserMutateServiceInterface = {
+  update: jest.fn().mockResolvedValue({ id: '1', username: 'test' }),
 };
 
 // Mock configuration module
@@ -60,6 +76,12 @@ describe('RocketsAuthentication (e2e)', () => {
           },
           services: {
             userLookupService: mockUserLookupService,
+            emailService: mockEmailService,
+            userMutateService: mockUserMutateService,
+            otpService: new OtpServiceFixture(),
+            verifyTokenService: new VerifyTokenServiceFixture(),
+            issueTokenService: new IssueTokenServiceFixture(),
+            validateTokenService: new ValidateTokenServiceFixture(),
           },
         }),
       ],

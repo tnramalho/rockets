@@ -16,8 +16,7 @@ import {
   AuthenticationJwtResponseDto,
   AuthPublic,
 } from '@concepta/nestjs-authentication';
-import { AuthRefreshDto, AuthRefreshGuard } from '@concepta/nestjs-auth-refresh';
-import { AUTH_REFRESH_MODULE_ISSUE_SERVICE_TOKEN } from '../../rockets-authentication.constants';
+import { AuthRefreshDto, AuthRefreshGuard, AuthRefreshIssueTokenService } from '@concepta/nestjs-auth-refresh';
 
 /**
  * Auth Local controller
@@ -28,7 +27,7 @@ import { AUTH_REFRESH_MODULE_ISSUE_SERVICE_TOKEN } from '../../rockets-authentic
 @ApiTags('token')
 export class AuthTokenRefreshController {
   constructor(
-    @Inject(AUTH_REFRESH_MODULE_ISSUE_SERVICE_TOKEN)
+    @Inject(AuthRefreshIssueTokenService)
     private issueTokenService: IssueTokenServiceInterface,
   ) {}
 

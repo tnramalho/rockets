@@ -15,8 +15,7 @@ import {
   AuthenticationJwtResponseDto,
   AuthPublic,
 } from '@concepta/nestjs-authentication';
-import { AuthLocalGuard, AuthLocalLoginDto } from '@concepta/nestjs-auth-local';
-import { AUTH_LOCAL_MODULE_ISSUE_TOKEN_SERVICE_TOKEN } from '../../rockets-authentication.constants';
+import { AuthLocalGuard, AuthLocalIssueTokenService, AuthLocalLoginDto } from '@concepta/nestjs-auth-local';
 
 /**
  * Auth Local controller
@@ -27,7 +26,7 @@ import { AUTH_LOCAL_MODULE_ISSUE_TOKEN_SERVICE_TOKEN } from '../../rockets-authe
 @ApiTags('token')
 export class AuthPasswordController {
   constructor(
-    @Inject(AUTH_LOCAL_MODULE_ISSUE_TOKEN_SERVICE_TOKEN)
+    @Inject(AuthLocalIssueTokenService)
     private issueTokenService: IssueTokenServiceInterface,
   ) {}
 
