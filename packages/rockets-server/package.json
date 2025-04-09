@@ -1,5 +1,5 @@
 {
-  "name": "@concepta/rockets-authentication",
+  "name": "@concepta/rockets-server",
   "version": "7.0.0-alpha.1",
   "description": "Rockets NestJS Authentication",
   "main": "dist/index.js",

@@ -16,27 +16,23 @@ import {
 import { AuthJwtGuard, AuthJwtStrategy } from '@concepta/nestjs-auth-jwt';
 import { AuthRefreshStrategy } from '@concepta/nestjs-auth-refresh/dist/auth-refresh.strategy';
 import { AuthRefreshGuard } from '@concepta/nestjs-auth-refresh';
-import { RocketsAuthenticationModule } from './rockets-authentication.module';
+import { RocketsServerModule } from './rockets-server.module';
 import { VerifyTokenServiceFixture } from './__fixtures__/services/verify-token.service.fixture';
 import { IssueTokenServiceFixture } from './__fixtures__/services/issue-token.service.fixture';
 import { ValidateTokenServiceFixture } from './__fixtures__/services/validate-token.service.fixture';
-import { RocketsAuthenticationOptionsInterface } from './interfaces/rockets-authentication-options.interface';
-import { RocketsAuthUserLookupServiceInterface } from './interfaces/rockets-auth-user-lookup-service.interface';
-import { createAuthRecoveryOtpServiceProvider } from '@concepta/nestjs-auth-recovery/dist/auth-recovery.module-definition';
+import { RocketsServerOptionsInterface } from './interfaces/rockets-server-options.interface';
 import { OtpServiceFixture } from './__fixtures__/services/otp.service.fixture';
 import { EmailSendInterface } from '@concepta/nestjs-common';
-import { createEntityManagerMock, QueryOptionsInterface } from '@concepta/typeorm-common';
-import { ReferenceId, ReferenceIdInterface, ReferenceUsernameInterface } from '@concepta/nestjs-common';
-import { AuthLocalCredentialsInterface } from '@concepta/nestjs-auth-local';
-import { EmailSendOptionsInterface } from '@concepta/nestjs-common';
-import { RocketsUserMutateServiceInterface } from './interfaces/rockets-user-mutate-service.interface';
+import { createEntityManagerMock } from '@concepta/typeorm-common';
+import { RocketsServerUserMutateServiceInterface } from './interfaces/rockets-server-user-mutate-service.interface';
 import { getEntityManagerToken } from '@nestjs/typeorm';
 import { UserFixture } from './__fixtures__/user/user.entity.fixture';
 import { UserPasswordHistoryEntityFixture } from './__fixtures__/user/user-password-history.entity.fixture';
 import { UserProfileEntityFixture } from './__fixtures__/user/user-profile.entity.fixture';
 import { ormConfig } from './__fixtures__/ormconfig.fixture';
+import { RocketsServerUserLookupServiceInterface } from './interfaces/rockets-server-user-lookup-service.interface';
 // Mock user lookup service
-const mockUserLookupService: RocketsAuthUserLookupServiceInterface = {
+const mockUserLookupService: RocketsServerUserLookupServiceInterface = {
   bySubject: jest.fn().mockResolvedValue({ id: '1', username: 'test' }),
   byUsername: jest.fn().mockResolvedValue({ id: '1', username: 'test' }),
   byId: jest.fn().mockResolvedValue({ id: '1', username: 'test' }),
@@ -49,7 +45,7 @@ const mockEmailService: EmailSendInterface = {
 };
 
 // Mock user mutate service
-const mockUserMutateService: RocketsUserMutateServiceInterface = {
+const mockUserMutateService: RocketsServerUserMutateServiceInterface = {
   update: jest.fn().mockResolvedValue({ id: '1', username: 'test' }),
 };
 
@@ -153,7 +149,7 @@ describe('AuthenticationCombinedImportModule Integration', () => {
       // Create test module with forRootAsync registration
       testModule = await Test.createTestingModule(
         testModuleFactory([
-          RocketsAuthenticationModule.forRootAsync({
+          RocketsServerModule.forRootAsync({
             imports: [TypeOrmModuleFixture, MockConfigModule],
             inject: [
               ConfigService,
@@ -177,7 +173,7 @@ describe('AuthenticationCombinedImportModule Integration', () => {
               verifyTokenService: VerifyTokenServiceFixture,
               issueTokenService: IssueTokenServiceFixture,
               validateTokenService: ValidateTokenServiceFixture,
-            ): RocketsAuthenticationOptionsInterface => ({
+            ): RocketsServerOptionsInterface => ({
               typeorm: ormConfig,
               jwt: {
                 settings: {
@@ -221,7 +217,7 @@ describe('AuthenticationCombinedImportModule Integration', () => {
       testModule = await Test.createTestingModule(
         testModuleFactory([
           TypeOrmModuleFixture,
-          RocketsAuthenticationModule.forRoot({
+          RocketsServerModule.forRoot({
             typeorm: ormConfig,
             jwt: {
               settings: {
@@ -269,7 +265,7 @@ describe('AuthenticationCombinedImportModule Integration', () => {
         testModuleFactory(
           [
             TypeOrmModuleFixture,
-            RocketsAuthenticationModule.forRoot({
+            RocketsServerModule.forRoot({
               typeorm: ormConfig,
               jwt: {
                 settings: {

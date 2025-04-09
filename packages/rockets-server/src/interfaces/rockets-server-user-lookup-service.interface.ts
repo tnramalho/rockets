@@ -13,7 +13,7 @@ import {
 } from '@concepta/nestjs-common';
 import { QueryOptionsInterface } from '@concepta/typeorm-common';
 
-export interface RocketsAuthUserLookupServiceInterface
+export interface RocketsServerUserLookupServiceInterface
   extends LookupSubjectInterface<
     ReferenceSubject,
     ReferenceIdInterface,

@@ -6,10 +6,10 @@ import {
   ReferenceIdInterface,
 } from '@concepta/nestjs-common';
 import { OtpInterface } from '@concepta/nestjs-common';
-import { RocketsOtpServiceInterface } from '../../interfaces/rockets-otp-service.interface';
+import { RocketsServerOtpServiceInterface } from '../../interfaces/rockets-server-otp-service.interface';
 
 @Injectable()
-export class OtpServiceFixture implements RocketsOtpServiceInterface {
+export class OtpServiceFixture implements RocketsServerOtpServiceInterface {
   async create({ otp }: OtpCreateParamsInterface): Promise<OtpInterface> {
     const { assignee, category, type } = otp;
     return {

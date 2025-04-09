@@ -1,12 +1,12 @@
 import { INestApplication, Module, Controller, Get, UseGuards } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
-import { RocketsAuthenticationModule } from './rockets-authentication.module';
+import { RocketsServerModule } from './rockets-server.module';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@concepta/nestjs-jwt';
 import { AuthJwtGuard } from '@concepta/nestjs-auth-jwt';
 import { EmailSendInterface } from '@concepta/nestjs-common';
-import { RocketsUserMutateServiceInterface } from './interfaces/rockets-user-mutate-service.interface';
+import { RocketsServerUserMutateServiceInterface } from './interfaces/rockets-server-user-mutate-service.interface';
 import { OtpServiceFixture } from './__fixtures__/services/otp.service.fixture';
 import { VerifyTokenServiceFixture } from './__fixtures__/services/verify-token.service.fixture';
 import { IssueTokenServiceFixture } from './__fixtures__/services/issue-token.service.fixture';
@@ -37,7 +37,7 @@ const mockEmailService: EmailSendInterface = {
 };
 
 // Mock user mutate service
-const mockUserMutateService: RocketsUserMutateServiceInterface = {
+const mockUserMutateService: RocketsServerUserMutateServiceInterface = {
   update: jest.fn().mockResolvedValue({ id: '1', username: 'test' }),
 };
 
@@ -59,7 +59,7 @@ const mockUserMutateService: RocketsUserMutateServiceInterface = {
 })
 class MockConfigModule {}
 
-describe('RocketsAuthentication (e2e)', () => {
+describe('RocketsServer (e2e)', () => {
   let app: INestApplication;
   let jwtService: JwtService;
 
@@ -67,7 +67,7 @@ describe('RocketsAuthentication (e2e)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
         MockConfigModule,
-        RocketsAuthenticationModule.forRoot({
+        RocketsServerModule.forRoot({
           typeorm: ormConfig,
           jwt: {
             settings: {

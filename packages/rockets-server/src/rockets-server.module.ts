@@ -4,7 +4,7 @@ import {
   AuthenticationCombinedAsyncOptions,
   AuthenticationCombinedOptions,
   AuthenticationModuleClass,
-} from './rockets-authentication.module-definition';
+} from './rockets-server.module-definition';
 
 /**
  * Combined authentication module that provides all authentication options features
@@ -16,7 +16,7 @@ import {
  * - AuthRefreshModule: For refresh token handling (optional)
  */
 @Module({})
-export class RocketsAuthenticationModule extends AuthenticationModuleClass {
+export class RocketsServerModule extends AuthenticationModuleClass {
   static forRoot(options: AuthenticationCombinedOptions): DynamicModule {
     return super.register({ ...options, global: true });
   }

@@ -4,7 +4,7 @@ import { InternalServerErrorException, Logger } from '@nestjs/common';
 
 import { ExtractJwt } from 'passport-jwt';
 
-import { ROCKETS_AUTHENTICATION_MODULE_OPTIONS_DEFAULT_SETTINGS_TOKEN } from '../rockets-authentication.constants';
+import { ROCKETS_SERVER_MODULE_OPTIONS_DEFAULT_SETTINGS_TOKEN } from '../rockets-server.constants';
 import { AuthenticationSettingsInterface } from '@concepta/nestjs-authentication/dist/interfaces/authentication-settings.interface';
 import { JwtSettingsInterface } from '@concepta/nestjs-jwt/dist/interfaces/jwt-settings.interface';
 import { AuthJwtSettingsInterface } from '@concepta/nestjs-auth-jwt/dist/interfaces/auth-jwt-settings.interface';
@@ -20,7 +20,7 @@ import {
  * This combines all authentication-related configurations into a single namespace.
  */
 export const authenticationOptionsDefaultConfig = registerAs(
-  ROCKETS_AUTHENTICATION_MODULE_OPTIONS_DEFAULT_SETTINGS_TOKEN,
+  ROCKETS_SERVER_MODULE_OPTIONS_DEFAULT_SETTINGS_TOKEN,
   () => {
     // Core configuration
     const authentication: AuthenticationSettingsInterface = {

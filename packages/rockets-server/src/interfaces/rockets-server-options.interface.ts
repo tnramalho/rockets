@@ -9,7 +9,7 @@ import {
   JwtVerifyTokenServiceInterface,
 } from '@concepta/nestjs-jwt';
 import { JwtOptions } from '@concepta/nestjs-jwt/dist/jwt.module-definition';
-import { RocketsAuthUserLookupServiceInterface } from './rockets-auth-user-lookup-service.interface';
+import { RocketsServerUserLookupServiceInterface } from './rockets-server-user-lookup-service.interface';
 import {
   AuthenticationOptionsInterface,
   IssueTokenServiceInterface,
@@ -17,14 +17,13 @@ import {
 } from '@concepta/nestjs-authentication';
 import { AuthLocalOptionsInterface } from '@concepta/nestjs-auth-local/dist/interfaces/auth-local-options.interface';
 import { AuthRecoveryOptionsInterface } from '@concepta/nestjs-auth-recovery/dist/interfaces/auth-recovery-options.interface';
-import { RocketsOtpServiceInterface } from './rockets-otp-service.interface';
-import { RocketsUserMutateServiceInterface } from './rockets-user-mutate-service.interface';
+import { RocketsServerOtpServiceInterface } from './rockets-server-otp-service.interface';
+import { RocketsServerUserMutateServiceInterface } from './rockets-server-user-mutate-service.interface';
 import { EmailSendInterface } from '@concepta/nestjs-common';
 import { AuthVerifyOptionsInterface } from '@concepta/nestjs-auth-verify/dist/interfaces/auth-verify-options.interface';
-import { AuthRecoveryNotificationServiceInterface } from '@concepta/nestjs-auth-recovery/dist/interfaces/auth-recovery-notification.service.interface';
-import { RocketsNotificationServiceInterface } from './rockets-auth-notification.service.interface';
+import { RocketsServerNotificationServiceInterface } from './rockets-server-notification.service.interface';
 import { AuthLocalValidateUserServiceInterface } from '@concepta/nestjs-auth-local';
-import { UserLookupServiceInterface, UserMutateServiceInterface, UserPasswordServiceInterface } from '@concepta/nestjs-user';
+import { UserPasswordServiceInterface } from '@concepta/nestjs-user';
 import { UserOptionsInterface } from '@concepta/nestjs-user/dist/interfaces/user-options.interface';
 import { CanAccess } from '@concepta/nestjs-access-control';
 import { PasswordOptionsInterface } from '@concepta/nestjs-password';
@@ -34,7 +33,7 @@ import { UserPasswordHistoryServiceInterface } from '@concepta/nestjs-user/dist/
 /**
  * Combined options interface for the AuthenticationCombinedModule
  */
-export interface RocketsAuthenticationOptionsInterface {
+export interface RocketsServerOptionsInterface {
   /**
    * Core Authentication module options
    * Used in: AuthenticationModule.forRootAsync
@@ -96,7 +95,7 @@ export interface RocketsAuthenticationOptionsInterface {
      * Used in: AuthJwtModule, AuthRefreshModule, AuthLocalModule, AuthRecoveryModule
      * Required: true
      */
-    userLookupService: RocketsAuthUserLookupServiceInterface;
+    userLookupService: RocketsServerUserLookupServiceInterface;
 
     /**
      * Email service for notifications
@@ -110,7 +109,7 @@ export interface RocketsAuthenticationOptionsInterface {
      * Used in: AuthRecoveryModule
      * Required: true
      */
-    userMutateService: RocketsUserMutateServiceInterface;
+    userMutateService: RocketsServerUserMutateServiceInterface;
     
     /**
      * Notification service for sending recovery notifications
@@ -118,14 +117,14 @@ export interface RocketsAuthenticationOptionsInterface {
      * Used in: AuthRecoveryModule
      * Required: false
      */
-    notificationService?: RocketsNotificationServiceInterface;
+    notificationService?: RocketsServerNotificationServiceInterface;
     
     /**
      * OTP service for verification flows
      * Used in: AuthRecoveryModule
      * Required: true
      */
-    otpService: RocketsOtpServiceInterface;
+    otpService: RocketsServerOtpServiceInterface;
 
     /**
      * Core authentication services used in AuthenticationModule

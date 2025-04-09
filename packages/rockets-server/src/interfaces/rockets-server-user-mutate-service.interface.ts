@@ -7,7 +7,7 @@ import {
 import { PasswordPlainInterface } from '@concepta/nestjs-common';
 import { QueryOptionsInterface } from '@concepta/typeorm-common';
 
-export interface RocketsUserMutateServiceInterface
+export interface RocketsServerUserMutateServiceInterface
   extends UpdateOneInterface<
     ReferenceIdInterface & PasswordPlainInterface & ReferenceActiveInterface,
     ReferenceIdInterface & ReferenceEmailInterface & ReferenceActiveInterface,

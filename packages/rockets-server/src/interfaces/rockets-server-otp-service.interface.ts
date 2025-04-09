@@ -4,7 +4,7 @@ import {
   OtpValidateInterface,
 } from '@concepta/nestjs-common';
 
-export interface RocketsOtpServiceInterface
+export interface RocketsServerOtpServiceInterface
   extends OtpCreateInterface,
     OtpValidateInterface,
     OtpClearInterface {}
