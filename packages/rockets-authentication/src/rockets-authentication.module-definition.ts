@@ -7,15 +7,13 @@ import { ConfigModule } from '@nestjs/config';
 import { authenticationOptionsDefaultConfig } from './config/rockets-authentication-options-default.config';
 import { AuthenticationModule } from '@concepta/nestjs-authentication';
 import { AuthLocalModule } from '@concepta/nestjs-auth-local';
-import { AuthRecoveryModule } from '@concepta/nestjs-auth-recovery';
-
+import { AuthRecoveryController, AuthRecoveryModule } from '@concepta/nestjs-auth-recovery';
 import { JwtModule } from '@concepta/nestjs-jwt';
-
 import { AuthJwtModule } from '@concepta/nestjs-auth-jwt';
 import { AuthRefreshModule } from '@concepta/nestjs-auth-refresh';
+import { UserModule, UserLookupServiceInterface, UserMutateServiceInterface } from '@concepta/nestjs-user';
 import { RocketsAuthenticationOptionsExtrasInterface } from './interfaces/rockets-authentication-options-extras.interface';
 import { RocketsAuthenticationOptionsInterface } from './interfaces/rockets-authentication-options.interface';
-
 import { AuthJwtOptionsInterface } from '@concepta/nestjs-auth-jwt/dist/interfaces/auth-jwt-options.interface';
 import { AuthRefreshOptionsInterface } from '@concepta/nestjs-auth-refresh/dist/interfaces/auth-refresh-options.interface';
 import { JwtOptionsInterface } from '@concepta/nestjs-jwt/dist/interfaces/jwt-options.interface';
@@ -26,6 +24,11 @@ import { AuthRecoveryOptionsInterface } from '@concepta/nestjs-auth-recovery/dis
 import { AuthVerifyModule, AuthVerifyUserMutateServiceInterface } from '@concepta/nestjs-auth-verify';
 import { AuthVerifyOptionsInterface } from '@concepta/nestjs-auth-verify/dist/interfaces/auth-verify-options.interface';
 import { AuthRecoveryUserMutateServiceInterface } from '@concepta/nestjs-auth-recovery/dist/interfaces/auth-recovery-user-mutate.service.interface';
+import { AuthSignupController } from './controllers/auth/auth-signup.controller';
+import { AuthUserController } from './controllers/user/auth-user.controller';
+import { UserEntitiesOptionsInterface } from '@concepta/nestjs-user/dist/interfaces/user-entities-options.interface';
+import { PasswordModule } from '@concepta/nestjs-password';
+import { TypeOrmExtModule } from '@concepta/nestjs-typeorm-ext';
 
 const RAW_OPTIONS_TOKEN = Symbol(
   '__ROCKETS_AUTHENTICATION_MODULE_RAW_OPTIONS_TOKEN__',
@@ -63,12 +66,15 @@ function definitionTransform(
   extras: RocketsAuthenticationOptionsExtrasInterface,
 ): DynamicModule {
   const { imports = [], providers = [], exports = [] } = definition;
-  const { controllers } = extras;
+  const {
+    entities,
+    controllers
+  } = extras;
 
   return {
     ...definition,
     global: extras.global,
-    imports: createAuthenticationOptionsImports({ imports }),
+    imports: createAuthenticationOptionsImports({ imports, entities }),
     controllers: createAuthenticationOptionsControllers({ controllers }),
     providers: createAuthenticationOptionsProviders({ providers }),
     exports: createAuthenticationOptionsExports({ exports }),
@@ -82,8 +88,11 @@ export function createAuthenticationOptionsControllers(options: {
     ? options.controllers
     :
     [
+      AuthSignupController,
+      AuthUserController,
       AuthPasswordController,
-      AuthTokenRefreshController
+      AuthTokenRefreshController,
+      AuthRecoveryController,
     ];
 }
 
@@ -92,6 +101,7 @@ export function createAuthenticationOptionsControllers(options: {
  */
 export function createAuthenticationOptionsImports(options: {
   imports: DynamicModule['imports'],
+  entities?: UserEntitiesOptionsInterface['entities'],
 }): DynamicModule['imports'] {
   return [
     ...(options.imports || []),
@@ -154,7 +164,6 @@ export function createAuthenticationOptionsImports(options: {
     }),
     AuthRefreshModule.forRootAsync({
       inject: [RAW_OPTIONS_TOKEN],
-      //TODO: make sure do clear initial controller
       controllers: [],
       useFactory: (
         options: RocketsAuthenticationOptionsInterface,
@@ -175,6 +184,7 @@ export function createAuthenticationOptionsImports(options: {
     }),
     AuthLocalModule.forRootAsync({
       inject: [RAW_OPTIONS_TOKEN],
+      controllers: [],
       useFactory: (
         options: RocketsAuthenticationOptionsInterface,
       ): AuthLocalOptionsInterface => {
@@ -195,6 +205,7 @@ export function createAuthenticationOptionsImports(options: {
     }),
     AuthRecoveryModule.forRootAsync({
       inject: [RAW_OPTIONS_TOKEN],
+      controllers: [],
       useFactory: (
         options: RocketsAuthenticationOptionsInterface,
       ): AuthRecoveryOptionsInterface => {
@@ -208,9 +219,7 @@ export function createAuthenticationOptionsImports(options: {
           userLookupService:
             options.authRecovery?.userLookupService ||
             options.services?.userLookupService,
-          userMutateService:
-            (options.authRecovery?.userMutateService ||
-            options.services.userMutateService) as AuthRecoveryUserMutateServiceInterface,
+          userMutateService: options.services.userMutateService,
           entityManagerProxy: options.authRecovery?.entityManagerProxy,
           notificationService:
             options.authRecovery?.notificationService ||
@@ -221,6 +230,7 @@ export function createAuthenticationOptionsImports(options: {
     }),
     AuthVerifyModule.forRootAsync({
       inject: [RAW_OPTIONS_TOKEN],
+      controllers: [],
       useFactory: (
         options: RocketsAuthenticationOptionsInterface,
       ): AuthVerifyOptionsInterface => {
@@ -234,10 +244,9 @@ export function createAuthenticationOptionsImports(options: {
           userLookupService:
             options.authVerify?.userLookupService ||
             options.services?.userLookupService,
-          // TODO: this user mutate service does not require password, but the one from recovery does
           userMutateService:
-            (options.authVerify?.userMutateService ||
-            options.services?.userMutateService) as AuthVerifyUserMutateServiceInterface,
+            options.authVerify?.userMutateService ||
+            options.services?.userMutateService,
           entityManagerProxy: options.authVerify?.entityManagerProxy,
           notificationService:
             options.authVerify?.notificationService ||
@@ -245,6 +254,35 @@ export function createAuthenticationOptionsImports(options: {
           settings: options.authVerify?.settings,
         };
       },
+    }),
+    PasswordModule.forRootAsync({
+      inject: [RAW_OPTIONS_TOKEN],
+      useFactory: (options: RocketsAuthenticationOptionsInterface) => {
+        return {
+          settings: options.password?.settings,
+        };
+      }
+    }),
+    TypeOrmExtModule.forRootAsync({
+      inject: [RAW_OPTIONS_TOKEN],
+      useFactory: (options: RocketsAuthenticationOptionsInterface) => {
+        return options.typeorm;
+      }
+    }),
+    UserModule.forRootAsync({
+      inject: [RAW_OPTIONS_TOKEN],
+      controllers: [],
+      useFactory: (options: RocketsAuthenticationOptionsInterface) => {
+        return {
+          settings: options.user?.settings,
+          userLookupService: options.user?.userLookupService || options.services?.userLookupService as UserLookupServiceInterface,
+          userMutateService: options.user?.userMutateService || options.services?.userMutateService as UserMutateServiceInterface,
+          userPasswordService: options.user?.userPasswordService || options.services?.userPasswordService,
+          userAccessQueryService: options.user?.userAccessQueryService || options.services?.userAccessQueryService,
+          userPasswordHistoryService: options.user?.userPasswordHistoryService || options.services?.userPasswordHistoryService,
+        };
+      },
+      entities: options.entities,
     }),
   ];
 }

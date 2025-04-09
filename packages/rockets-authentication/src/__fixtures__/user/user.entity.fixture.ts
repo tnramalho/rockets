@@ -1,8 +1,9 @@
-import { ReferenceIdInterface } from '@concepta/nestjs-common';
-import { Entity } from 'typeorm';
+import { UserSqliteEntity } from '@concepta/nestjs-user';
+import { Entity, OneToOne } from 'typeorm';
+import { UserProfileEntityFixture } from './user-profile.entity.fixture';
 
 @Entity()
-export class UserFixture implements ReferenceIdInterface {
-  id!: string;
-  username!: string;
+export class UserFixture extends UserSqliteEntity {
+  @OneToOne(() => UserProfileEntityFixture, (userProfile) => userProfile.user)
+  userProfile?: UserProfileEntityFixture;
 }

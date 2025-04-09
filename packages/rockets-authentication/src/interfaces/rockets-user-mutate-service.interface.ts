@@ -12,4 +12,14 @@ export interface RocketsUserMutateServiceInterface
     ReferenceIdInterface & PasswordPlainInterface & ReferenceActiveInterface,
     ReferenceIdInterface & ReferenceEmailInterface & ReferenceActiveInterface,
     QueryOptionsInterface
-  > {}
+  > {
+  update(
+    object: ReferenceIdInterface & ReferenceActiveInterface,
+    options?: QueryOptionsInterface
+  ): Promise<ReferenceIdInterface & ReferenceEmailInterface & ReferenceActiveInterface>;
+  
+  update(
+    object: ReferenceIdInterface & PasswordPlainInterface,
+    options?: QueryOptionsInterface
+  ): Promise<ReferenceIdInterface & ReferenceEmailInterface & ReferenceActiveInterface>;
+}

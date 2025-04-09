@@ -11,6 +11,7 @@ import { OtpServiceFixture } from './__fixtures__/services/otp.service.fixture';
 import { VerifyTokenServiceFixture } from './__fixtures__/services/verify-token.service.fixture';
 import { IssueTokenServiceFixture } from './__fixtures__/services/issue-token.service.fixture';
 import { ValidateTokenServiceFixture } from './__fixtures__/services/validate-token.service.fixture';
+import { ormConfig } from './__fixtures__/ormconfig.fixture';
 
 // Test controller with protected route
 @Controller('test')
@@ -67,6 +68,7 @@ describe('RocketsAuthentication (e2e)', () => {
       imports: [
         MockConfigModule,
         RocketsAuthenticationModule.forRoot({
+          typeorm: ormConfig,
           jwt: {
             settings: {
               access: { secret: 'test-secret' },

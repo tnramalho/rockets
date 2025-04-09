@@ -24,6 +24,12 @@ import { AuthVerifyOptionsInterface } from '@concepta/nestjs-auth-verify/dist/in
 import { AuthRecoveryNotificationServiceInterface } from '@concepta/nestjs-auth-recovery/dist/interfaces/auth-recovery-notification.service.interface';
 import { RocketsNotificationServiceInterface } from './rockets-auth-notification.service.interface';
 import { AuthLocalValidateUserServiceInterface } from '@concepta/nestjs-auth-local';
+import { UserLookupServiceInterface, UserMutateServiceInterface, UserPasswordServiceInterface } from '@concepta/nestjs-user';
+import { UserOptionsInterface } from '@concepta/nestjs-user/dist/interfaces/user-options.interface';
+import { CanAccess } from '@concepta/nestjs-access-control';
+import { PasswordOptionsInterface } from '@concepta/nestjs-password';
+import { TypeOrmExtOptions } from '@concepta/nestjs-typeorm-ext';
+import { UserPasswordHistoryServiceInterface } from '@concepta/nestjs-user/dist/interfaces/user-password-history-service.interface';
 
 /**
  * Combined options interface for the AuthenticationCombinedModule
@@ -65,7 +71,21 @@ export interface RocketsAuthenticationOptionsInterface {
    */
   refresh?: AuthRefreshOptions;
   
+  /**
+   * Auth Verify module options
+   * Used in: AuthVerifyModule.forRootAsync
+   */
   authVerify?: AuthVerifyOptionsInterface;
+
+  /**
+   * User module options
+   * Used in: UserModule.forRootAsync
+   */
+  user?: UserOptionsInterface;
+
+  password?: PasswordOptionsInterface;
+
+  typeorm: TypeOrmExtOptions,
 
   /**
    * Core services used across different modules
@@ -125,5 +145,14 @@ export interface RocketsAuthenticationOptionsInterface {
     jwtRefreshService?: JwtServiceInterface;
     jwtIssueTokenService?: JwtIssueTokenServiceInterface;
     jwtVerifyTokenService?: JwtVerifyTokenServiceInterface;
+
+    /**
+     * User module services
+     * Used in: UserModule
+     * Required: false
+     */
+    userPasswordService?: UserPasswordServiceInterface;
+    userPasswordHistoryService?: UserPasswordHistoryServiceInterface;
+    userAccessQueryService?: CanAccess;
   };
 }

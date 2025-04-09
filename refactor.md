@@ -4,8 +4,18 @@ This document analyzes the implementation status of the authentication API endpo
 
 ## Endpoints We Can Create with Existing Modules
 
+Auth/
+
+  token/ post
+  recover/ post
+  signup/ user post
+  user/ user get
+  user/ user patch
+
+- MCP
+
 ### Authentication Endpoints
-1. `/token` (POST)
+[ok] 1. `/token` (POST)
    - Description: Core authentication endpoint that issues access and refresh tokens based on different grant types (password, refresh_token, PKCE, ID token)
    - Status: Partially Implemented
    - Existing Components:
@@ -33,7 +43,7 @@ This document analyzes the implementation status of the authentication API endpo
    - Missing Features:
      - Magic link implementation
 
-4. `/signup` (POST)
+[ok] 4. `/signup` (POST)
    - Description: User registration endpoint supporting email signup with optional password
    - Status: Partially Implemented
    - Existing Components:
@@ -43,7 +53,7 @@ This document analyzes the implementation status of the authentication API endpo
    - Missing Features:
      - PKCE support
 
-5. `/recover` (POST)
+[ok] 5. `/recover` (POST)
    - Description: Initiates password recovery process by sending recovery instructions to user's email
    - Status: Implemented
    - Existing Components:

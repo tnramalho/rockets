@@ -21,7 +21,7 @@ import { AuthRefreshDto, AuthRefreshGuard, AuthRefreshIssueTokenService } from '
 /**
  * Auth Local controller
  */
-@Controller('auth/token/refresh')
+@Controller('token/refresh')
 @UseGuards(AuthRefreshGuard)
 @AuthPublic()
 @ApiTags('token')

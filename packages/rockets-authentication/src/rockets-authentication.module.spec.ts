@@ -31,6 +31,10 @@ import { AuthLocalCredentialsInterface } from '@concepta/nestjs-auth-local';
 import { EmailSendOptionsInterface } from '@concepta/nestjs-common';
 import { RocketsUserMutateServiceInterface } from './interfaces/rockets-user-mutate-service.interface';
 import { getEntityManagerToken } from '@nestjs/typeorm';
+import { UserFixture } from './__fixtures__/user/user.entity.fixture';
+import { UserPasswordHistoryEntityFixture } from './__fixtures__/user/user-password-history.entity.fixture';
+import { UserProfileEntityFixture } from './__fixtures__/user/user-profile.entity.fixture';
+import { ormConfig } from './__fixtures__/ormconfig.fixture';
 // Mock user lookup service
 const mockUserLookupService: RocketsAuthUserLookupServiceInterface = {
   bySubject: jest.fn().mockResolvedValue({ id: '1', username: 'test' }),
@@ -157,12 +161,24 @@ describe('AuthenticationCombinedImportModule Integration', () => {
               IssueTokenServiceFixture,
               ValidateTokenServiceFixture,
             ],
+            entities: {
+              user: {
+                entity: UserFixture,
+              },
+              "user-password-history": {
+                entity: UserPasswordHistoryEntityFixture
+              },
+              "user-profile": {
+                entity: UserProfileEntityFixture
+              }
+            },
             useFactory: (
               configService: ConfigService,
               verifyTokenService: VerifyTokenServiceFixture,
               issueTokenService: IssueTokenServiceFixture,
               validateTokenService: ValidateTokenServiceFixture,
             ): RocketsAuthenticationOptionsInterface => ({
+              typeorm: ormConfig,
               jwt: {
                 settings: {
                   access: { secret: configService.get('jwt.secret') },
@@ -178,7 +194,7 @@ describe('AuthenticationCombinedImportModule Integration', () => {
                 verifyTokenService,
                 issueTokenService,
                 validateTokenService,
-              },
+              }
             }),
           }),
         ]),
@@ -206,6 +222,7 @@ describe('AuthenticationCombinedImportModule Integration', () => {
         testModuleFactory([
           TypeOrmModuleFixture,
           RocketsAuthenticationModule.forRoot({
+            typeorm: ormConfig,
             jwt: {
               settings: {
                 access: { secret: 'test-secret-forroot' },
@@ -221,6 +238,17 @@ describe('AuthenticationCombinedImportModule Integration', () => {
               verifyTokenService: new VerifyTokenServiceFixture(),
               issueTokenService: new IssueTokenServiceFixture(),
               validateTokenService: new ValidateTokenServiceFixture(),
+            },
+            entities: {
+              user: {
+                entity: UserFixture,
+              },
+              "user-password-history": {
+                entity: UserPasswordHistoryEntityFixture
+              },
+              "user-profile": {
+                entity: UserProfileEntityFixture
+              }
             },
           }),
         ]),
@@ -242,6 +270,7 @@ describe('AuthenticationCombinedImportModule Integration', () => {
           [
             TypeOrmModuleFixture,
             RocketsAuthenticationModule.forRoot({
+              typeorm: ormConfig,
               jwt: {
                 settings: {
                   access: { secret: 'test-secret' },
@@ -257,6 +286,17 @@ describe('AuthenticationCombinedImportModule Integration', () => {
                 verifyTokenService: new VerifyTokenServiceFixture(),
                 issueTokenService: new IssueTokenServiceFixture(),
                 validateTokenService: new ValidateTokenServiceFixture(),
+              },
+              entities: {
+                user: {
+                  entity: UserFixture,
+                },
+                "user-password-history": {
+                  entity: UserPasswordHistoryEntityFixture
+                },
+                "user-profile": {
+                  entity: UserProfileEntityFixture
+                }
               },
             }),
           ],
