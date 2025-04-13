@@ -1,9 +1,9 @@
 import { DynamicModule, Module } from '@nestjs/common';
 
 import {
-  AuthenticationCombinedAsyncOptions,
-  AuthenticationCombinedOptions,
-  AuthenticationModuleClass,
+  RocketsServerAsyncOptions,
+  RocketsServerOptions,
+  RocketsServerModuleClass,
 } from './rockets-server.module-definition';
 
 /**
@@ -16,14 +16,12 @@ import {
  * - AuthRefreshModule: For refresh token handling (optional)
  */
 @Module({})
-export class RocketsServerModule extends AuthenticationModuleClass {
-  static forRoot(options: AuthenticationCombinedOptions): DynamicModule {
+export class RocketsServerModule extends RocketsServerModuleClass {
+  static forRoot(options: RocketsServerOptions): DynamicModule {
     return super.register({ ...options, global: true });
   }
 
-  static forRootAsync(
-    options: AuthenticationCombinedAsyncOptions,
-  ): DynamicModule {
+  static forRootAsync(options: RocketsServerAsyncOptions): DynamicModule {
     return super.registerAsync({
       ...options,
       global: true,

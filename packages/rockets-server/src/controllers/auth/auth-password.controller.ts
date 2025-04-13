@@ -15,7 +15,11 @@ import {
   AuthenticationJwtResponseDto,
   AuthPublic,
 } from '@concepta/nestjs-authentication';
-import { AuthLocalGuard, AuthLocalIssueTokenService, AuthLocalLoginDto } from '@concepta/nestjs-auth-local';
+import {
+  AuthLocalGuard,
+  AuthLocalIssueTokenService,
+  AuthLocalLoginDto,
+} from '@concepta/nestjs-auth-local';
 
 /**
  * Auth Local controller

@@ -2,6 +2,7 @@ import { DataSourceOptions } from 'typeorm';
 import { UserFixture } from './user/user.entity.fixture';
 import { UserProfileEntityFixture } from './user/user-profile.entity.fixture';
 import { UserPasswordHistoryEntityFixture } from './user/user-password-history.entity.fixture';
+import { UserOtpEntityFixture } from './user/user-otp-entity.fixture';
 
 export const ormConfig: DataSourceOptions = {
   type: 'sqlite',
@@ -11,5 +12,6 @@ export const ormConfig: DataSourceOptions = {
     UserFixture,
     UserProfileEntityFixture,
     UserPasswordHistoryEntityFixture,
+    UserOtpEntityFixture,
   ],
 };

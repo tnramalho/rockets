@@ -11,12 +11,15 @@ import {
 } from '@concepta/nestjs-common';
 import {
   IssueTokenServiceInterface,
-  IssueTokenService,
   AuthUser,
   AuthenticationJwtResponseDto,
   AuthPublic,
 } from '@concepta/nestjs-authentication';
-import { AuthRefreshDto, AuthRefreshGuard, AuthRefreshIssueTokenService } from '@concepta/nestjs-auth-refresh';
+import {
+  AuthRefreshDto,
+  AuthRefreshGuard,
+  AuthRefreshIssueTokenService,
+} from '@concepta/nestjs-auth-refresh';
 
 /**
  * Auth Local controller

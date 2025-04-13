@@ -1,42 +1,47 @@
-import { DynamicModule, Module, ModuleMetadata, Controller, Post, Body, Global } from '@nestjs/common';
+import {
+  JwtIssueTokenService,
+  JwtModule,
+  JwtService,
+  JwtVerifyTokenService,
+} from '@concepta/nestjs-jwt';
+import { DynamicModule, Global, Module, ModuleMetadata } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { GlobalModuleFixture } from './__fixtures__/global.module.fixture';
-import {
-  JwtModule,
-  JwtService,
-  JwtIssueTokenService,
-  JwtVerifyTokenService,
-} from '@concepta/nestjs-jwt';
 
+import { AuthJwtGuard, AuthJwtStrategy } from '@concepta/nestjs-auth-jwt';
+import { AuthRefreshGuard } from '@concepta/nestjs-auth-refresh';
+import { AuthRefreshStrategy } from '@concepta/nestjs-auth-refresh/dist/auth-refresh.strategy';
 import {
   IssueTokenService,
   VerifyTokenService,
 } from '@concepta/nestjs-authentication';
-import { AuthJwtGuard, AuthJwtStrategy } from '@concepta/nestjs-auth-jwt';
-import { AuthRefreshStrategy } from '@concepta/nestjs-auth-refresh/dist/auth-refresh.strategy';
-import { AuthRefreshGuard } from '@concepta/nestjs-auth-refresh';
-import { RocketsServerModule } from './rockets-server.module';
-import { VerifyTokenServiceFixture } from './__fixtures__/services/verify-token.service.fixture';
-import { IssueTokenServiceFixture } from './__fixtures__/services/issue-token.service.fixture';
-import { ValidateTokenServiceFixture } from './__fixtures__/services/validate-token.service.fixture';
-import { RocketsServerOptionsInterface } from './interfaces/rockets-server-options.interface';
-import { OtpServiceFixture } from './__fixtures__/services/otp.service.fixture';
 import { EmailSendInterface } from '@concepta/nestjs-common';
 import { createEntityManagerMock } from '@concepta/typeorm-common';
-import { RocketsServerUserMutateServiceInterface } from './interfaces/rockets-server-user-mutate-service.interface';
 import { getEntityManagerToken } from '@nestjs/typeorm';
-import { UserFixture } from './__fixtures__/user/user.entity.fixture';
+import { ormConfig } from './__fixtures__/ormconfig.fixture';
+import { IssueTokenServiceFixture } from './__fixtures__/services/issue-token.service.fixture';
+import { OtpServiceFixture } from './__fixtures__/services/otp.service.fixture';
+import { ValidateTokenServiceFixture } from './__fixtures__/services/validate-token.service.fixture';
+import { VerifyTokenServiceFixture } from './__fixtures__/services/verify-token.service.fixture';
+import { UserOtpEntityFixture } from './__fixtures__/user/user-otp-entity.fixture';
 import { UserPasswordHistoryEntityFixture } from './__fixtures__/user/user-password-history.entity.fixture';
 import { UserProfileEntityFixture } from './__fixtures__/user/user-profile.entity.fixture';
-import { ormConfig } from './__fixtures__/ormconfig.fixture';
+import { UserFixture } from './__fixtures__/user/user.entity.fixture';
+import { RocketsServerOptionsInterface } from './interfaces/rockets-server-options.interface';
 import { RocketsServerUserLookupServiceInterface } from './interfaces/rockets-server-user-lookup-service.interface';
+import { RocketsServerUserMutateServiceInterface } from './interfaces/rockets-server-user-mutate-service.interface';
+import { RocketsServerModule } from './rockets-server.module';
 // Mock user lookup service
 const mockUserLookupService: RocketsServerUserLookupServiceInterface = {
   bySubject: jest.fn().mockResolvedValue({ id: '1', username: 'test' }),
   byUsername: jest.fn().mockResolvedValue({ id: '1', username: 'test' }),
   byId: jest.fn().mockResolvedValue({ id: '1', username: 'test' }),
-  byEmail: jest.fn().mockResolvedValue({ id: '1', username: 'test', email: 'test@example.com' }),
+  byEmail: jest.fn().mockResolvedValue({
+    id: '1',
+    username: 'test',
+    email: 'test@example.com',
+  }),
 };
 
 // Mock email service
@@ -48,7 +53,6 @@ const mockEmailService: EmailSendInterface = {
 const mockUserMutateService: RocketsServerUserMutateServiceInterface = {
   update: jest.fn().mockResolvedValue({ id: '1', username: 'test' }),
 };
-
 
 @Global()
 @Module({
@@ -89,7 +93,7 @@ function testModuleFactory(
       MockConfigModule,
       JwtModule.forRoot({}),
       ...extraImports,
-    ]
+    ],
   };
 }
 
@@ -157,17 +161,7 @@ describe('AuthenticationCombinedImportModule Integration', () => {
               IssueTokenServiceFixture,
               ValidateTokenServiceFixture,
             ],
-            entities: {
-              user: {
-                entity: UserFixture,
-              },
-              "user-password-history": {
-                entity: UserPasswordHistoryEntityFixture
-              },
-              "user-profile": {
-                entity: UserProfileEntityFixture
-              }
-            },
+
             useFactory: (
               configService: ConfigService,
               verifyTokenService: VerifyTokenServiceFixture,
@@ -184,14 +178,22 @@ describe('AuthenticationCombinedImportModule Integration', () => {
               },
               services: {
                 userLookupService: mockUserLookupService,
-                emailService: mockEmailService,
+                mailerService: mockEmailService,
                 userMutateService: mockUserMutateService,
                 otpService: new OtpServiceFixture(),
                 verifyTokenService,
                 issueTokenService,
                 validateTokenService,
-              }
+              },
             }),
+            entities: {
+              user: {
+                entity: UserFixture,
+              },
+              userOtp: {
+                entity: UserOtpEntityFixture,
+              },
+            },
           }),
         ]),
       ).compile();
@@ -228,7 +230,7 @@ describe('AuthenticationCombinedImportModule Integration', () => {
             },
             services: {
               userLookupService: mockUserLookupService,
-              emailService: mockEmailService,
+              mailerService: mockEmailService,
               userMutateService: mockUserMutateService,
               otpService: new OtpServiceFixture(),
               verifyTokenService: new VerifyTokenServiceFixture(),
@@ -239,12 +241,9 @@ describe('AuthenticationCombinedImportModule Integration', () => {
               user: {
                 entity: UserFixture,
               },
-              "user-password-history": {
-                entity: UserPasswordHistoryEntityFixture
+              userOtp: {
+                entity: UserOtpEntityFixture,
               },
-              "user-profile": {
-                entity: UserProfileEntityFixture
-              }
             },
           }),
         ]),
@@ -262,41 +261,41 @@ describe('AuthenticationCombinedImportModule Integration', () => {
     it('should use custom refresh controller when provided', async () => {
       // Create test module with custom refresh controller
       testModule = await Test.createTestingModule(
-        testModuleFactory(
-          [
-            TypeOrmModuleFixture,
-            RocketsServerModule.forRoot({
-              typeorm: ormConfig,
-              jwt: {
-                settings: {
-                  access: { secret: 'test-secret' },
-                  default: { secret: 'test-secret' },
-                  refresh: { secret: 'test-secret' },
-                },
+        testModuleFactory([
+          TypeOrmModuleFixture,
+          RocketsServerModule.forRoot({
+            typeorm: ormConfig,
+            jwt: {
+              settings: {
+                access: { secret: 'test-secret' },
+                default: { secret: 'test-secret' },
+                refresh: { secret: 'test-secret' },
               },
-              services: {
-                userLookupService: mockUserLookupService,
-                emailService: mockEmailService,
-                userMutateService: mockUserMutateService,
-                otpService: new OtpServiceFixture(),
-                verifyTokenService: new VerifyTokenServiceFixture(),
-                issueTokenService: new IssueTokenServiceFixture(),
-                validateTokenService: new ValidateTokenServiceFixture(),
+            },
+            services: {
+              mailerService: mockEmailService,
+              userMutateService: mockUserMutateService,
+              otpService: new OtpServiceFixture(),
+              verifyTokenService: new VerifyTokenServiceFixture(),
+              issueTokenService: new IssueTokenServiceFixture(),
+              validateTokenService: new ValidateTokenServiceFixture(),
+            },
+            entities: {
+              user: {
+                entity: UserFixture,
               },
-              entities: {
-                user: {
-                  entity: UserFixture,
-                },
-                "user-password-history": {
-                  entity: UserPasswordHistoryEntityFixture
-                },
-                "user-profile": {
-                  entity: UserProfileEntityFixture
-                }
+              userPasswordHistory: {
+                entity: UserPasswordHistoryEntityFixture,
               },
-            }),
-          ],
-        ),
+              userProfile: {
+                entity: UserProfileEntityFixture,
+              },
+              userOtp: {
+                entity: UserOtpEntityFixture,
+              },
+            },
+          }),
+        ]),
       ).compile();
 
       // Verify that the refresh guard is still present

@@ -61,4 +61,4 @@ export class AuthUserController {
   ): Promise<UserEntityInterface> {
     return this.userMutateService.update({ id, ...userUpdateDto });
   }
-} 
+}

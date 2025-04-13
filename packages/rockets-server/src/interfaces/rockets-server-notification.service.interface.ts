@@ -2,6 +2,5 @@ import { AuthRecoveryNotificationServiceInterface } from '@concepta/nestjs-auth-
 import { AuthVerifyNotificationServiceInterface } from '@concepta/nestjs-auth-verify/dist/interfaces/auth-verify-notification.service.interface';
 
 export interface RocketsServerNotificationServiceInterface
-  extends AuthRecoveryNotificationServiceInterface, AuthVerifyNotificationServiceInterface {
-  
-}
+  extends AuthRecoveryNotificationServiceInterface,
+    AuthVerifyNotificationServiceInterface {}

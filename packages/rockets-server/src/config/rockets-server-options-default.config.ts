@@ -13,6 +13,8 @@ import {
   JwtConfigUndefinedException,
   JwtFallbackConfigUndefinedException,
 } from '@concepta/nestjs-jwt';
+import { RocketsServerSettingsInterface } from '../interfaces/rockets-server-settings.interface';
+import { formatTokenUrl } from '../rockets-server.utils';
 
 /**
  * Authentication combined configuration
@@ -21,7 +23,7 @@ import {
  */
 export const authenticationOptionsDefaultConfig = registerAs(
   ROCKETS_SERVER_MODULE_OPTIONS_DEFAULT_SETTINGS_TOKEN,
-  () => {
+  (): RocketsServerSettingsInterface => {
     // Core configuration
     const authentication: AuthenticationSettingsInterface = {
       enableGuards: true,
@@ -64,6 +66,24 @@ export const authenticationOptionsDefaultConfig = registerAs(
     };
 
     return {
+      email: {
+        from: 'from',
+        baseUrl: 'baseUrl',
+        tokenUrlFormatter: formatTokenUrl,
+        templates: {
+          sendOtp: {
+            fileName: __dirname + '/../assets/send-otp.template.hbs',
+            subject: 'Your One Time Password',
+          },
+        },
+      },
+      otp: {
+        assignment: 'userOtp',
+        category: 'auth-login',
+        type: 'uuid',
+        expiresIn: '1h',
+      },
+
       // Core authentication settings
       authentication,
 
@@ -71,10 +91,10 @@ export const authenticationOptionsDefaultConfig = registerAs(
       jwt,
 
       // Auth JWT settings
-      authJwt: authJwt as AuthJwtSettingsInterface,
+      authJwt: authJwt,
 
       // Refresh settings
-      refresh: refresh as AuthRefreshSettingsInterface,
+      refresh: refresh,
     };
   },
 );

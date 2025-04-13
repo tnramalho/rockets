@@ -1,11 +1,6 @@
 import { UserMutateService } from '@concepta/nestjs-user';
 import { AuthPublic } from '@concepta/nestjs-authentication';
-import {
-  Body,
-  Controller,
-  Inject,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Inject, Post } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -40,4 +35,4 @@ export class AuthSignupController {
   ): Promise<UserEntityInterface> {
     return this.userMutateService.create(userCreateDto);
   }
-} 
+}

@@ -1,4 +1,10 @@
-import { AuthRecoveryRecoverLoginDto, AuthRecoveryRecoverPasswordDto, AuthRecoveryService, AuthRecoveryServiceInterface, AuthRecoveryUpdatePasswordDto } from '@concepta/nestjs-auth-recovery';
+import {
+  AuthRecoveryRecoverLoginDto,
+  AuthRecoveryRecoverPasswordDto,
+  AuthRecoveryService,
+  AuthRecoveryServiceInterface,
+  AuthRecoveryUpdatePasswordDto,
+} from '@concepta/nestjs-auth-recovery';
 import { AuthRecoveryOtpInvalidException } from '@concepta/nestjs-auth-verify';
 import { AuthPublic } from '@concepta/nestjs-authentication';
 import {
@@ -67,7 +73,7 @@ export class AuthRecoveryController {
   @ApiOkResponse()
   @ApiNotFoundResponse()
   @Get('/passcode/:passcode')
-    // TODO: do we actually need this? since we already gonna validate on next endpoint
+  // TODO: do we actually need this? since we already gonna validate on next endpoint
   async validatePasscode(@Param('passcode') passcode: string): Promise<void> {
     // TODO: do we need to add email to validate? or valid token
     const otp = await this.authRecoveryService.validatePasscode(passcode);

@@ -1,4 +1,10 @@
-import { INestApplication, Module, Controller, Get, UseGuards } from '@nestjs/common';
+import {
+  INestApplication,
+  Module,
+  Controller,
+  Get,
+  UseGuards,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { RocketsServerModule } from './rockets-server.module';
@@ -12,12 +18,22 @@ import { VerifyTokenServiceFixture } from './__fixtures__/services/verify-token.
 import { IssueTokenServiceFixture } from './__fixtures__/services/issue-token.service.fixture';
 import { ValidateTokenServiceFixture } from './__fixtures__/services/validate-token.service.fixture';
 import { ormConfig } from './__fixtures__/ormconfig.fixture';
+import {
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
 // Test controller with protected route
 @Controller('test')
+@ApiTags('test')
 @UseGuards(AuthJwtGuard)
 export class TestController {
   @Get('protected')
+  @ApiOkResponse({
+    description: 'Successfully accessed protected route',
+  })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized access' })
   async getProtected(): Promise<{ message: string }> {
     return { message: 'This is a protected route' };
   }
@@ -78,7 +94,7 @@ describe('RocketsServer (e2e)', () => {
           },
           services: {
             userLookupService: mockUserLookupService,
-            emailService: mockEmailService,
+            mailerService: mockEmailService,
             userMutateService: mockUserMutateService,
             otpService: new OtpServiceFixture(),
             verifyTokenService: new VerifyTokenServiceFixture(),
@@ -124,9 +140,7 @@ describe('RocketsServer (e2e)', () => {
     });
 
     it('should reject access to protected route without token', async () => {
-      await request(app.getHttpServer())
-        .get('/test/protected')
-        .expect(401);
+      await request(app.getHttpServer()).get('/test/protected').expect(401);
     });
 
     it('should reject access to protected route with invalid token', async () => {
@@ -135,6 +149,5 @@ describe('RocketsServer (e2e)', () => {
         .set('Authorization', 'Bearer invalid-token')
         .expect(401);
     });
-
   });
-}); 
+});

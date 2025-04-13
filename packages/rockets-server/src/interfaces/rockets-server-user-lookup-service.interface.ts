@@ -15,23 +15,20 @@ import { QueryOptionsInterface } from '@concepta/typeorm-common';
 
 export interface RocketsServerUserLookupServiceInterface
   extends LookupSubjectInterface<
-    ReferenceSubject,
-    ReferenceIdInterface,
-    QueryOptionsInterface
-  >,
-  LookupUsernameInterface<
-    ReferenceUsername,
-    AuthLocalCredentialsInterface,
-    QueryOptionsInterface
-  >,
-  LookupIdInterface<
-    ReferenceId,
-    ReferenceIdInterface,
-    QueryOptionsInterface
-  >,
-  LookupEmailInterface<
-    ReferenceEmail,
-    ReferenceIdInterface & ReferenceUsernameInterface,
-    QueryOptionsInterface
-  > 
-  {}{ }
+      ReferenceSubject,
+      ReferenceIdInterface,
+      QueryOptionsInterface
+    >,
+    LookupUsernameInterface<
+      ReferenceUsername,
+      AuthLocalCredentialsInterface,
+      QueryOptionsInterface
+    >,
+    LookupIdInterface<ReferenceId, ReferenceIdInterface, QueryOptionsInterface>,
+    LookupEmailInterface<
+      ReferenceEmail,
+      ReferenceIdInterface & ReferenceUsernameInterface,
+      QueryOptionsInterface
+    > {}
+{
+}
