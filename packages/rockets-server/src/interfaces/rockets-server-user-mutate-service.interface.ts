@@ -1,29 +1,42 @@
 import {
-  ReferenceActiveInterface,
-  ReferenceEmailInterface,
+  CreateOneInterface,
   ReferenceIdInterface,
+  RemoveOneInterface,
+  ReplaceOneInterface,
   UpdateOneInterface,
+  UserCreatableInterface,
+  UserUpdatableInterface,
 } from '@concepta/nestjs-common';
-import { PasswordPlainInterface } from '@concepta/nestjs-common';
+import { UserEntityInterface } from '@concepta/nestjs-user';
 import { QueryOptionsInterface } from '@concepta/typeorm-common';
 
 export interface RocketsServerUserMutateServiceInterface
-  extends UpdateOneInterface<
-    ReferenceIdInterface & PasswordPlainInterface & ReferenceActiveInterface,
-    ReferenceIdInterface & ReferenceEmailInterface & ReferenceActiveInterface,
-    QueryOptionsInterface
-  > {
-  update(
-    object: ReferenceIdInterface & ReferenceActiveInterface,
-    options?: QueryOptionsInterface,
-  ): Promise<
-    ReferenceIdInterface & ReferenceEmailInterface & ReferenceActiveInterface
-  >;
-
-  update(
-    object: ReferenceIdInterface & PasswordPlainInterface,
-    options?: QueryOptionsInterface,
-  ): Promise<
-    ReferenceIdInterface & ReferenceEmailInterface & ReferenceActiveInterface
-  >;
+  extends CreateOneInterface<UserCreatableInterface, UserEntityInterface>,
+    UpdateOneInterface<
+      UserUpdatableInterface & ReferenceIdInterface,
+      UserEntityInterface,
+      QueryOptionsInterface
+    >,
+    ReplaceOneInterface<
+      UserCreatableInterface & ReferenceIdInterface,
+      UserEntityInterface,
+      QueryOptionsInterface
+    >,
+    RemoveOneInterface<
+      UserEntityInterface,
+      UserEntityInterface,
+      QueryOptionsInterface
+    > {
+  // update(
+  //   object: ReferenceIdInterface & UserUpdatableInterface,
+  //   options?: QueryOptionsInterface,
+  // ): Promise<
+  //   ReferenceIdInterface & ReferenceEmailInterface & ReferenceActiveInterface
+  // >;
+  // update(
+  //   object: ReferenceIdInterface & UserUpdatableInterface,
+  //   options?: QueryOptionsInterface,
+  // ): Promise<
+  //   ReferenceIdInterface & ReferenceEmailInterface & ReferenceActiveInterface
+  // >;
 }

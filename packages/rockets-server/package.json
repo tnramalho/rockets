@@ -8,12 +8,18 @@
   "publishConfig": {
     "access": "public"
   },
+  "bin": {
+    "rockets-swagger": "./bin/generate-swagger.js"
+  },
   "files": [
-    "dist/**/!(*.spec|*.e2e-spec|*.fixture).{js,d.ts}"
+    "dist/**/!(*.spec|*.e2e-spec|*.fixture).{js,d.ts}",
+    "bin/generate-swagger.js",
+    "SWAGGER.md"
   ],
   "scripts": {
     "test": "jest",
-    "test:e2e": "jest --config ./jest.config-e2e.json"
+    "test:e2e": "jest --config ./jest.config-e2e.json",
+    "generate-swagger": "ts-node src/generate-swagger.ts"
   },
   "dependencies": {
     "@concepta/nestjs-access-control": "^7.0.0-alpha.1",
@@ -24,13 +30,13 @@
     "@concepta/nestjs-auth-verify": "^7.0.0-alpha.1",
     "@concepta/nestjs-authentication": "^7.0.0-alpha.1",
     "@concepta/nestjs-common": "^7.0.0-alpha.1",
-    "@concepta/nestjs-exception": "^7.0.0-alpha.1",
     "@concepta/nestjs-email": "^7.0.0-alpha.1",
+    "@concepta/nestjs-exception": "^7.0.0-alpha.1",
+    "@concepta/nestjs-jwt": "^7.0.0-alpha.1",
     "@concepta/nestjs-otp": "^7.0.0-alpha.1",
     "@concepta/nestjs-password": "^7.0.0-alpha.1",
     "@concepta/nestjs-typeorm-ext": "^7.0.0-alpha.1",
     "@concepta/nestjs-user": "^7.0.0-alpha.1",
-    "@concepta/nestjs-jwt": "^7.0.0-alpha.1",
     "@concepta/typeorm-common": "^7.0.0-alpha.1",
     "@nestjs/common": "^10.4.1",
     "@nestjs/config": "^3.2.3",
@@ -46,14 +52,15 @@
   "devDependencies": {
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/testing": "^10.4.1",
+    "@nestjs/typeorm": "^10.0.2",
     "@types/jsonwebtoken": "9.0.6",
     "@types/passport-jwt": "^3.0.13",
     "@types/passport-strategy": "^0.2.38",
     "@types/supertest": "^6.0.2",
     "express-serve-static-core": "^0.1.1",
     "jest-mock-extended": "^2.0.9",
-    "@nestjs/typeorm": "^10.0.2",
-    "supertest": "^6.3.4"
+    "supertest": "^6.3.4",
+    "ts-node": "^10.9.2"
   },
   "peerDependencies": {
     "class-transformer": "*",

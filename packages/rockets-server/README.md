@@ -32,6 +32,7 @@
 - [How to Guides](#how-to-guides)
   - [1. How to Set Up AuthenticationModule with forRoot and JwtModule from @concepta/nestjs-authentication](#1-how-to-set-up-authenticationmodule-with-forroot-and-jwtmodule-from-conceptanestjs-authentication)
   - [2. How to Configure AuthenticationModule Settings](#2-how-to-configure-authenticationmodule-settings)
+  - [3. How to Generate Swagger Documentation](#3-how-to-generate-swagger-documentation)
 - [Explanation](#explanation)
   - [Conceptual Overview](#conceptual-overview)
     - [What is This Library?](#what-is-this-library)
@@ -75,6 +76,7 @@ and efficient token management.
 - **Integration with NestJS Ecosystem**: Seamlessly integrates with other
   NestJS modules and services, leveraging the framework's features for enhanced
   functionality and performance.
+- **Swagger Documentation Generator**: Automatically generate Swagger/OpenAPI documentation from your controllers to make it easy to document and test your API.
 
 #### Installation
 
@@ -708,6 +710,51 @@ export class MyValidateTokenService implements ValidateTokenServiceInterface {
   }
 }
 ```
+
+### 3. How to Generate Swagger Documentation
+
+The Rockets Server module includes a built-in Swagger documentation generator that can automatically create OpenAPI documentation from your controllers.
+
+#### Using the NPM Script
+
+The easiest way to generate Swagger documentation is to use the provided npm script:
+
+```sh
+# From the rockets-server package directory
+npm run generate-swagger
+
+# Or using yarn
+yarn generate-swagger
+```
+
+This will generate a `swagger.json` file in the `swagger` directory at the root of your project.
+
+#### Using the CLI Tool
+
+If you've installed the package globally or are running it from another package, you can use the CLI tool:
+
+```sh
+# If installed globally
+rockets-swagger
+
+# Or using npx
+npx rockets-swagger
+```
+
+#### Programmatic Usage
+
+You can also use the generator programmatically in your own code:
+
+```typescript
+import { generateSwaggerJson } from '@concepta/rockets-server';
+
+// Generate the Swagger documentation
+generateSwaggerJson()
+  .then(() => console.log('Swagger generation complete'))
+  .catch(err => console.error('Error generating Swagger:', err));
+```
+
+For more detailed information on using and customizing the Swagger generator, see the [SWAGGER.md](./SWAGGER.md) file.
 
 ## Explanation
 

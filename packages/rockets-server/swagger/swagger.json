@@ -1,0 +1,709 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/signup": {
+      "post": {
+        "operationId": "AuthSignupController_create",
+        "summary": "Create a new user account",
+        "description": "Registers a new user in the system with email, username and password",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "User registration information",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCreateDto"
+              },
+              "examples": {
+                "standard": {
+                  "value": {
+                    "email": "user@example.com",
+                    "username": "johndoe",
+                    "password": "StrongP@ssw0rd",
+                    "active": true
+                  },
+                  "summary": "Standard user registration"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid input data or missing required fields"
+          },
+          "409": {
+            "description": "Email or username already exists"
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/user": {
+      "get": {
+        "operationId": "RocketsServerUserController_findById",
+        "summary": "Get a user by ID",
+        "description": "Retrieves the currently authenticated user's profile information",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "User profile retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - User not authenticated"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "tags": [
+          "user"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "RocketsServerUserController_update",
+        "summary": "Update a user",
+        "description": "Updates the currently authenticated user's profile information",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "User profile information to update",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdateDto"
+              },
+              "examples": {
+                "user": {
+                  "value": {
+                    "firstName": "John",
+                    "lastName": "Doe",
+                    "email": "john.doe@example.com"
+                  },
+                  "summary": "Standard user update"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized - User not authenticated"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "tags": [
+          "user"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/token/password": {
+      "post": {
+        "operationId": "AuthPasswordController_login",
+        "summary": "Authenticate with username/email and password",
+        "description": "Validates credentials and returns authentication tokens on success",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "User credentials",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthLocalLoginDto"
+              },
+              "examples": {
+                "standard": {
+                  "value": {
+                    "username": "user@example.com",
+                    "password": "YourPassword123!"
+                  },
+                  "summary": "Standard login request"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authentication successful, tokens provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationJwtResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials or inactive account"
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/token/refresh": {
+      "post": {
+        "operationId": "AuthTokenRefreshController_refresh",
+        "summary": "Refresh access token",
+        "description": "Generates a new access token using a valid refresh token",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Refresh token information",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRefreshDto"
+              },
+              "examples": {
+                "standard": {
+                  "value": {
+                    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  },
+                  "summary": "Standard refresh token request"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "New access and refresh tokens",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationJwtResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired refresh token"
+          }
+        },
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/recovery/login": {
+      "post": {
+        "operationId": "RocketsServerRecoveryController_recoverLogin",
+        "summary": "Recover username",
+        "description": "Sends an email with the username associated with the provided email address",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Email address for username recovery",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRecoveryRecoverLoginDto"
+              },
+              "examples": {
+                "standard": {
+                  "value": {
+                    "email": "user@example.com"
+                  },
+                  "summary": "Standard username recovery request"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Recovery email sent successfully (returns regardless of whether email exists)"
+          },
+          "400": {
+            "description": "Invalid email format"
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/recovery/password": {
+      "post": {
+        "operationId": "RocketsServerRecoveryController_recoverPassword",
+        "summary": "Request password reset",
+        "description": "Sends an email with a password reset link to the provided email address",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Email address for password reset",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRecoveryRecoverPasswordDto"
+              },
+              "examples": {
+                "standard": {
+                  "value": {
+                    "email": "user@example.com"
+                  },
+                  "summary": "Standard password reset request"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Recovery email sent successfully (returns regardless of whether email exists)"
+          },
+          "400": {
+            "description": "Invalid email format"
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      },
+      "patch": {
+        "operationId": "RocketsServerRecoveryController_updatePassword",
+        "summary": "Reset password",
+        "description": "Updates the user password using a valid recovery passcode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Passcode and new password information",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRecoveryUpdatePasswordDto"
+              },
+              "examples": {
+                "standard": {
+                  "value": {
+                    "passcode": "abc123def456",
+                    "newPassword": "NewSecureP@ssw0rd"
+                  },
+                  "summary": "Standard password reset"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password updated successfully"
+          },
+          "400": {
+            "description": "Invalid passcode, password requirements not met, or passcode expired"
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/recovery/passcode/{passcode}": {
+      "get": {
+        "operationId": "RocketsServerRecoveryController_validatePasscode",
+        "summary": "Validate recovery passcode",
+        "description": "Checks if the provided passcode is valid and not expired",
+        "parameters": [
+          {
+            "name": "passcode",
+            "required": true,
+            "in": "path",
+            "description": "Recovery passcode to validate",
+            "example": "abc123def456",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Passcode is valid"
+          },
+          "404": {
+            "description": "Passcode is invalid or expired"
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/otp": {
+      "post": {
+        "operationId": "RocketsServerOtpController_sendOtp",
+        "summary": "Send OTP to the provided email",
+        "description": "Generates a one-time passcode and sends it to the specified email address",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Email to receive the OTP",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RocketsServerOtpSendDto"
+              },
+              "examples": {
+                "standard": {
+                  "value": {
+                    "email": "user@example.com"
+                  },
+                  "summary": "Standard OTP request"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OTP sent successfully"
+          },
+          "400": {
+            "description": "Invalid email format"
+          }
+        },
+        "tags": [
+          "otp"
+        ]
+      },
+      "patch": {
+        "operationId": "RocketsServerOtpController_confirmOtp",
+        "summary": "Confirm OTP for a given email and passcode",
+        "description": "Validates the OTP passcode for the specified email and returns authentication tokens on success",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Email and passcode for OTP verification",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RocketsServerOtpConfirmDto"
+              },
+              "examples": {
+                "standard": {
+                  "value": {
+                    "email": "user@example.com",
+                    "passcode": "123456"
+                  },
+                  "summary": "Standard OTP confirmation"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OTP confirmed successfully, authentication tokens provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationJwtResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid email format or missing required fields"
+          },
+          "401": {
+            "description": "Invalid OTP or expired passcode"
+          }
+        },
+        "tags": [
+          "otp"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Rockets API",
+    "description": "API documentation for Rockets Server",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "UserCreateDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email"
+          },
+          "username": {
+            "type": "string",
+            "description": "Username"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Active"
+          },
+          "password": {
+            "type": "string",
+            "description": "Plain text password to set"
+          }
+        },
+        "required": [
+          "email",
+          "username"
+        ]
+      },
+      "UserDto": {
+        "type": "object",
+        "properties": {
+          "dateCreated": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date created"
+          },
+          "dateUpdated": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date updated"
+          },
+          "dateDeleted": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date deleted",
+            "nullable": true
+          },
+          "version": {
+            "type": "number",
+            "description": "Version of the data"
+          },
+          "id": {
+            "type": "string",
+            "description": "Unique identifier"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email"
+          },
+          "username": {
+            "type": "string",
+            "description": "Username"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Active"
+          }
+        },
+        "required": [
+          "dateCreated",
+          "dateUpdated",
+          "dateDeleted",
+          "version",
+          "id",
+          "email",
+          "username",
+          "active"
+        ]
+      },
+      "UserUpdateDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Active"
+          },
+          "password": {
+            "type": "string",
+            "description": "Plain text password to set"
+          },
+          "passwordCurrent": {
+            "type": "string",
+            "description": "Current password to validate"
+          }
+        }
+      },
+      "AuthLocalLoginDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "Username"
+          },
+          "password": {
+            "type": "string",
+            "description": "Password"
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ]
+      },
+      "AuthenticationJwtResponseDto": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "description": "JWT access token to use for request authorization."
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "JWT refresh token to use for obtaining a new access token."
+          }
+        },
+        "required": [
+          "accessToken",
+          "refreshToken"
+        ]
+      },
+      "AuthRefreshDto": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "description": "JWT access token to use for request authorization."
+          }
+        },
+        "required": [
+          "refreshToken"
+        ]
+      },
+      "AuthRecoveryRecoverLoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "user email",
+            "description": "Recover email login by providing an email that will receive an username"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "AuthRecoveryRecoverPasswordDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "user email",
+            "description": "Recover email password by providing an email that will receive a password reset link"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "AuthRecoveryUpdatePasswordDto": {
+        "type": "object",
+        "properties": {
+          "passcode": {
+            "type": "string",
+            "title": "account reset passcode",
+            "description": "Passcode used to reset account password"
+          },
+          "newPassword": {
+            "type": "string",
+            "title": "account new password",
+            "description": "New password account"
+          }
+        },
+        "required": [
+          "passcode",
+          "newPassword"
+        ]
+      },
+      "RocketsServerOtpSendDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email to send OTP to",
+            "example": "user@example.com"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "RocketsServerOtpConfirmDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email associated with the OTP",
+            "example": "user@example.com"
+          },
+          "passcode": {
+            "type": "string",
+            "description": "OTP passcode to verify",
+            "example": "123456"
+          }
+        },
+        "required": [
+          "email",
+          "passcode"
+        ]
+      }
+    }
+  }
+}

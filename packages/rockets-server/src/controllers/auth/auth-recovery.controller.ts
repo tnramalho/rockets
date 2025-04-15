@@ -23,26 +23,44 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiParam,
 } from '@nestjs/swagger';
 
+/**
+ * Controller for account recovery operations
+ * Handles login/username recovery, password reset, and passcode validation
+ */
 @Controller('recovery')
 @AuthPublic()
 @ApiTags('auth')
-export class AuthRecoveryController {
+export class RocketsServerRecoveryController {
   constructor(
     @Inject(AuthRecoveryService)
     private readonly authRecoveryService: AuthRecoveryServiceInterface,
   ) {}
 
   @ApiOperation({
-    summary:
-      'Recover account username password by providing an email that will receive an username.',
+    summary: 'Recover username',
+    description: 'Sends an email with the username associated with the provided email address',
   })
   @ApiBody({
     type: AuthRecoveryRecoverLoginDto,
-    description: 'DTO of login recover.',
+    description: 'Email address for username recovery',
+    examples: {
+      standard: {
+        value: {
+          email: 'user@example.com'
+        },
+        summary: 'Standard username recovery request'
+      }
+    }
   })
-  @ApiOkResponse()
+  @ApiOkResponse({
+    description: 'Recovery email sent successfully (returns regardless of whether email exists)'
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid email format'
+  })
   @Post('/login')
   async recoverLogin(
     @Body() recoverLoginDto: AuthRecoveryRecoverLoginDto,
@@ -51,14 +69,27 @@ export class AuthRecoveryController {
   }
 
   @ApiOperation({
-    summary:
-      'Recover account email password by providing an email that will receive a password reset link.',
+    summary: 'Request password reset',
+    description: 'Sends an email with a password reset link to the provided email address',
   })
   @ApiBody({
     type: AuthRecoveryRecoverPasswordDto,
-    description: 'DTO of email recover.',
+    description: 'Email address for password reset',
+    examples: {
+      standard: {
+        value: {
+          email: 'user@example.com'
+        },
+        summary: 'Standard password reset request'
+      }
+    }
   })
-  @ApiOkResponse()
+  @ApiOkResponse({
+    description: 'Recovery email sent successfully (returns regardless of whether email exists)'
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid email format'
+  })
   @Post('/password')
   async recoverPassword(
     @Body() recoverPasswordDto: AuthRecoveryRecoverPasswordDto,
@@ -66,16 +97,23 @@ export class AuthRecoveryController {
     await this.authRecoveryService.recoverPassword(recoverPasswordDto.email);
   }
 
-  // TODO: maybe we dont need
   @ApiOperation({
-    summary: 'Check if passcode is valid.',
+    summary: 'Validate recovery passcode',
+    description: 'Checks if the provided passcode is valid and not expired',
   })
-  @ApiOkResponse()
-  @ApiNotFoundResponse()
+  @ApiParam({
+    name: 'passcode',
+    description: 'Recovery passcode to validate',
+    example: 'abc123def456'
+  })
+  @ApiOkResponse({
+    description: 'Passcode is valid'
+  })
+  @ApiNotFoundResponse({
+    description: 'Passcode is invalid or expired'
+  })
   @Get('/passcode/:passcode')
-  // TODO: do we actually need this? since we already gonna validate on next endpoint
   async validatePasscode(@Param('passcode') passcode: string): Promise<void> {
-    // TODO: do we need to add email to validate? or valid token
     const otp = await this.authRecoveryService.validatePasscode(passcode);
 
     if (!otp) {
@@ -84,14 +122,28 @@ export class AuthRecoveryController {
   }
 
   @ApiOperation({
-    summary: 'Update lost password by providing passcode and new password.',
+    summary: 'Reset password',
+    description: 'Updates the user password using a valid recovery passcode',
   })
   @ApiBody({
     type: AuthRecoveryUpdatePasswordDto,
-    description: 'DTO of update password.',
+    description: 'Passcode and new password information',
+    examples: {
+      standard: {
+        value: {
+          passcode: 'abc123def456',
+          newPassword: 'NewSecureP@ssw0rd'
+        },
+        summary: 'Standard password reset'
+      }
+    }
   })
-  @ApiOkResponse()
-  @ApiBadRequestResponse()
+  @ApiOkResponse({
+    description: 'Password updated successfully'
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid passcode, password requirements not met, or passcode expired'
+  })
   @Patch('/password')
   async updatePassword(
     @Body() updatePasswordDto: AuthRecoveryUpdatePasswordDto,

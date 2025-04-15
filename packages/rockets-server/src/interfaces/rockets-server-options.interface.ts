@@ -17,11 +17,6 @@ import {
   EmailOptionsInterface,
   EmailServiceInterface,
 } from '@concepta/nestjs-email';
-import {
-  JwtIssueTokenServiceInterface,
-  JwtServiceInterface,
-  JwtVerifyTokenServiceInterface,
-} from '@concepta/nestjs-jwt';
 import { JwtOptions } from '@concepta/nestjs-jwt/dist/jwt.module-definition';
 import { OtpOptionsInterface } from '@concepta/nestjs-otp';
 import { PasswordOptionsInterface } from '@concepta/nestjs-password';
@@ -30,7 +25,6 @@ import { UserPasswordServiceInterface } from '@concepta/nestjs-user';
 import { UserOptionsInterface } from '@concepta/nestjs-user/dist/interfaces/user-options.interface';
 import { UserPasswordHistoryServiceInterface } from '@concepta/nestjs-user/dist/interfaces/user-password-history-service.interface';
 import { RocketsServerNotificationServiceInterface } from './rockets-server-notification.service.interface';
-import { RocketsServerOtpServiceInterface } from './rockets-server-otp-service.interface';
 import { RocketsServerSettingsInterface } from './rockets-server-settings.interface';
 import { RocketsServerUserLookupServiceInterface } from './rockets-server-user-lookup-service.interface';
 import { RocketsServerUserMutateServiceInterface } from './rockets-server-user-mutate-service.interface';
@@ -112,7 +106,7 @@ export interface RocketsServerOptionsInterface {
      * Used in: AuthRecoveryModule
      * Required: true
      */
-    userMutateService: RocketsServerUserMutateServiceInterface;
+    userMutateService?: RocketsServerUserMutateServiceInterface;
 
     /**
      * Notification service for sending recovery notifications
@@ -121,33 +115,14 @@ export interface RocketsServerOptionsInterface {
      * Required: false
      */
     notificationService?: RocketsServerNotificationServiceInterface;
-
-    /**
-     * OTP service for verification flows
-     * Used in: AuthRecoveryModule
-     * Required: true
-     */
-    otpService: RocketsServerOtpServiceInterface;
-
     /**
      * Core authentication services used in AuthenticationModule
      * Required: true
      */
-    verifyTokenService: VerifyTokenServiceInterface;
-    issueTokenService: IssueTokenServiceInterface;
-    validateTokenService: ValidateTokenServiceInterface;
+    verifyTokenService?: VerifyTokenServiceInterface;
+    issueTokenService?: IssueTokenServiceInterface;
+    validateTokenService?: ValidateTokenServiceInterface;
     validateUserService?: AuthLocalValidateUserServiceInterface;
-
-    /**
-     * JWT services used in JwtModule
-     * Required: false
-     */
-    jwtService?: JwtServiceInterface;
-    jwtAccessService?: JwtServiceInterface;
-    jwtRefreshService?: JwtServiceInterface;
-    jwtIssueTokenService?: JwtIssueTokenServiceInterface;
-    jwtVerifyTokenService?: JwtVerifyTokenServiceInterface;
-
     /**
      * User module services
      * Used in: UserModule
@@ -161,8 +136,7 @@ export interface RocketsServerOptionsInterface {
      * Used in: AuthRecoveryModule
      * Required: true
      */
-    emailService?: EmailServiceInterface;
-    // TODO: combine both
+    // TODO: combine both? should we have a default mailer?
     mailerService: EmailServiceInterface;
   };
 }

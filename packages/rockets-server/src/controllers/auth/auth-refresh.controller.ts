@@ -4,6 +4,8 @@ import {
   ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
+  ApiOperation,
+  ApiSecurity,
 } from '@nestjs/swagger';
 import {
   AuthenticatedUserInterface,
@@ -22,30 +24,43 @@ import {
 } from '@concepta/nestjs-auth-refresh';
 
 /**
- * Auth Local controller
+ * Controller for JWT refresh token operations
+ * Allows users to obtain a new access token using their refresh token
  */
 @Controller('token/refresh')
 @UseGuards(AuthRefreshGuard)
 @AuthPublic()
-@ApiTags('token')
+@ApiTags('auth')
+@ApiSecurity('bearer')
 export class AuthTokenRefreshController {
   constructor(
     @Inject(AuthRefreshIssueTokenService)
     private issueTokenService: IssueTokenServiceInterface,
   ) {}
 
-  /**
-   * Login
-   */
+  @ApiOperation({
+    summary: 'Refresh access token',
+    description: 'Generates a new access token using a valid refresh token',
+  })
   @ApiBody({
     type: AuthRefreshDto,
-    description: 'DTO containing a refresh token.',
+    description: 'Refresh token information',
+    examples: {
+      standard: {
+        value: {
+          refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+        },
+        summary: 'Standard refresh token request'
+      }
+    }
   })
   @ApiOkResponse({
     type: AuthenticationJwtResponseDto,
-    description: 'DTO containing an access token and a refresh token.',
+    description: 'New access and refresh tokens',
   })
-  @ApiUnauthorizedResponse()
+  @ApiUnauthorizedResponse({
+    description: 'Invalid or expired refresh token'
+  })
   @Post()
   async refresh(
     @AuthUser() user: AuthenticatedUserInterface,

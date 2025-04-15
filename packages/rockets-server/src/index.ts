@@ -6,3 +6,6 @@ export { ROCKETS_SERVER_MODULE_OPTIONS_DEFAULT_SETTINGS_TOKEN } from './rockets-
 
 // Export configuration
 export { authenticationOptionsDefaultConfig } from './config/rockets-server-options-default.config';
+
+// Export Swagger generator
+export { generateSwaggerJson } from './generate-swagger';

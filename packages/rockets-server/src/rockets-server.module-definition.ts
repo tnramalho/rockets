@@ -2,16 +2,14 @@ import { AuthJwtModule } from '@concepta/nestjs-auth-jwt';
 import { AuthJwtOptionsInterface } from '@concepta/nestjs-auth-jwt/dist/interfaces/auth-jwt-options.interface';
 import { AuthLocalModule } from '@concepta/nestjs-auth-local';
 import { AuthLocalOptionsInterface } from '@concepta/nestjs-auth-local/dist/interfaces/auth-local-options.interface';
-import {
-  AuthRecoveryController,
-  AuthRecoveryModule,
-} from '@concepta/nestjs-auth-recovery';
+import { AuthRecoveryModule } from '@concepta/nestjs-auth-recovery';
 import { AuthRecoveryOptionsInterface } from '@concepta/nestjs-auth-recovery/dist/interfaces/auth-recovery-options.interface';
 import { AuthRefreshModule } from '@concepta/nestjs-auth-refresh';
 import { AuthRefreshOptionsInterface } from '@concepta/nestjs-auth-refresh/dist/interfaces/auth-refresh-options.interface';
 import { AuthVerifyModule } from '@concepta/nestjs-auth-verify';
 import { AuthVerifyOptionsInterface } from '@concepta/nestjs-auth-verify/dist/interfaces/auth-verify-options.interface';
 import { AuthenticationModule } from '@concepta/nestjs-authentication';
+import { createSettingsProvider } from '@concepta/nestjs-common';
 import {
   EmailModule,
   EmailService,
@@ -26,7 +24,7 @@ import {
   UserLookupService,
   UserLookupServiceInterface,
   UserModule,
-  UserMutateServiceInterface,
+  UserMutateService,
 } from '@concepta/nestjs-user';
 import {
   USER_MODULE_USER_ENTITY_KEY,
@@ -41,20 +39,21 @@ import {
 import { ConfigModule } from '@nestjs/config';
 import { authenticationOptionsDefaultConfig } from './config/rockets-server-options-default.config';
 import { AuthPasswordController } from './controllers/auth/auth-password.controller';
+import { RocketsServerRecoveryController } from './controllers/auth/auth-recovery.controller';
 import { AuthTokenRefreshController } from './controllers/auth/auth-refresh.controller';
 import { AuthSignupController } from './controllers/auth/auth-signup.controller';
-import { AuthUserController } from './controllers/user/auth-user.controller';
+import { RocketsServerOtpController } from './controllers/otp/rockets-server-otp.controller';
+import { RocketsServerUserController } from './controllers/user/rockets-server-user.controller';
 import { RocketsServerEntitiesOptionsInterface } from './interfaces/rockets-server-entities-options.interface';
 import { RocketsServerOptionsExtrasInterface } from './interfaces/rockets-server-options-extras.interface';
 import { RocketsServerOptionsInterface } from './interfaces/rockets-server-options.interface';
+import { RocketsServerSettingsInterface } from './interfaces/rockets-server-settings.interface';
 import {
   ROCKETS_SERVER_MODULE_OPTIONS_DEFAULT_SETTINGS_TOKEN,
   RocketsServerUserLookupService,
 } from './rockets-server.constants';
 import { RocketsServerNotificationService } from './services/rockets-server-notification.service';
 import { RocketsServerOtpService } from './services/rockets-server-otp.service';
-import { createSettingsProvider } from '@concepta/nestjs-common';
-import { RocketsServerSettingsInterface } from './interfaces/rockets-server-settings.interface';
 
 const RAW_OPTIONS_TOKEN = Symbol('__ROCKETS_SERVER_MODULE_RAW_OPTIONS_TOKEN__');
 
@@ -112,10 +111,11 @@ export function createRocketsServerControllers(options: {
     ? options.controllers
     : [
         AuthSignupController,
-        AuthUserController,
+        RocketsServerUserController,
         AuthPasswordController,
         AuthTokenRefreshController,
-        AuthRecoveryController,
+        RocketsServerRecoveryController,
+        RocketsServerOtpController,
       ];
 }
 
@@ -168,16 +168,14 @@ export function createRocketsServerImports(options: {
         return {
           jwtIssueTokenService:
             options.jwt?.jwtIssueTokenService ||
-            options.services?.jwtIssueTokenService,
-          jwtRefreshService:
-            options.jwt?.jwtRefreshService ||
-            options.services?.jwtRefreshService,
+            options.services?.issueTokenService,
           jwtVerifyTokenService:
             options.jwt?.jwtVerifyTokenService ||
-            options.services?.jwtVerifyTokenService,
-          jwtAccessService:
-            options.jwt?.jwtAccessService || options.services?.jwtAccessService,
-          jwtService: options.jwt?.jwtService || options.services?.jwtService,
+            options.services?.verifyTokenService,
+          jwtRefreshService: options.jwt?.jwtRefreshService,
+          jwtAccessService: options.jwt?.jwtAccessService,
+          // TODO: This is only used ono apple, need to review
+          jwtService: options.jwt?.jwtService,
           settings: options.jwt?.settings,
         };
       },
@@ -248,13 +246,20 @@ export function createRocketsServerImports(options: {
       },
     }),
     AuthRecoveryModule.forRootAsync({
-      inject: [RAW_OPTIONS_TOKEN, EmailService, OtpService, UserLookupService],
+      inject: [
+        RAW_OPTIONS_TOKEN,
+        EmailService,
+        OtpService,
+        UserLookupService,
+        UserMutateService,
+      ],
       controllers: [],
       useFactory: (
         options: RocketsServerOptionsInterface,
         defaultEmailService: EmailService,
         defaultOtpService: OtpService,
         userLookupService: UserLookupService,
+        userMutateService: UserMutateService,
       ): AuthRecoveryOptionsInterface => {
         return {
           // TODO: keep this one using default and user mailer service to define how to send
@@ -264,7 +269,10 @@ export function createRocketsServerImports(options: {
             options.authRecovery?.userLookupService ||
             options.services?.userLookupService ||
             userLookupService,
-          userMutateService: options.services.userMutateService,
+          userMutateService:
+            options.authRecovery?.userMutateService ||
+            options.services.userMutateService ||
+            userMutateService,
           entityManagerProxy: options.authRecovery?.entityManagerProxy,
           notificationService:
             options.authRecovery?.notificationService ||
@@ -274,12 +282,19 @@ export function createRocketsServerImports(options: {
       },
     }),
     AuthVerifyModule.forRootAsync({
-      inject: [RAW_OPTIONS_TOKEN, EmailService, UserLookupService, OtpService],
+      inject: [
+        RAW_OPTIONS_TOKEN,
+        EmailService,
+        UserLookupService,
+        UserMutateService,
+        OtpService,
+      ],
       controllers: [],
       useFactory: (
         options: RocketsServerOptionsInterface,
         defaultEmailService: EmailServiceInterface,
         userLookupService: UserLookupService,
+        userMutateService: UserMutateService,
         defaultOtpService: OtpService,
       ): AuthVerifyOptionsInterface => {
         return {
@@ -291,7 +306,8 @@ export function createRocketsServerImports(options: {
             userLookupService,
           userMutateService:
             options.authVerify?.userMutateService ||
-            options.services?.userMutateService,
+            options.services?.userMutateService ||
+            userMutateService,
           entityManagerProxy: options.authVerify?.entityManagerProxy,
           notificationService:
             options.authVerify?.notificationService ||
@@ -325,7 +341,7 @@ export function createRocketsServerImports(options: {
             (options.services?.userLookupService as UserLookupServiceInterface),
           userMutateService:
             options.user?.userMutateService ||
-            (options.services?.userMutateService as UserMutateServiceInterface),
+            options.services?.userMutateService,
           userPasswordService:
             options.user?.userPasswordService ||
             options.services?.userPasswordService,

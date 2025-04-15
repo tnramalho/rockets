@@ -78,7 +78,8 @@
     "changelog": "standard-version",
     "changelog:minor": "standard-version --release-as minor",
     "changelog:patch": "standard-version --release-as patch",
-    "changelog:major": "standard-version --release-as major"
+    "changelog:major": "standard-version --release-as major",
+    "generate-swagger": "cd packages/rockets-server && yarn generate-swagger"
   },
   "packageManager": "yarn@4.4.0"
 }

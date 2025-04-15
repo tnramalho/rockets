@@ -1,5 +1,5 @@
 import { UserMutateService } from '@concepta/nestjs-user';
-import { AuthPublic } from '@concepta/nestjs-authentication';
+import { AuthPublic, AuthenticationJwtResponseDto } from '@concepta/nestjs-authentication';
 import { Body, Controller, Inject, Post } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -7,10 +7,17 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiSecurity,
+  ApiCreatedResponse,
+  ApiConflictResponse,
 } from '@nestjs/swagger';
-import { UserCreateDto } from '@concepta/nestjs-user';
+import { UserCreateDto, UserDto } from '@concepta/nestjs-user';
 import { UserEntityInterface } from '@concepta/nestjs-user';
 
+/**
+ * Controller for user registration/signup
+ * Allows creating new user accounts
+ */
 @Controller('signup')
 @AuthPublic()
 @ApiTags('auth')
@@ -21,14 +28,34 @@ export class AuthSignupController {
   ) {}
 
   @ApiOperation({
-    summary: 'Create a new user',
+    summary: 'Create a new user account',
+    description: 'Registers a new user in the system with email, username and password',
   })
   @ApiBody({
     type: UserCreateDto,
-    description: 'DTO for creating a new user',
+    description: 'User registration information',
+    examples: {
+      standard: {
+        value: {
+          email: 'user@example.com',
+          username: 'johndoe',
+          password: 'StrongP@ssw0rd',
+          active: true
+        },
+        summary: 'Standard user registration'
+      }
+    }
   })
-  @ApiOkResponse()
-  @ApiBadRequestResponse()
+  @ApiCreatedResponse({
+    description: 'User created successfully',
+    type: UserDto
+  })
+  @ApiBadRequestResponse({
+    description: 'Bad request - Invalid input data or missing required fields',
+  })
+  @ApiConflictResponse({
+    description: 'Email or username already exists',
+  })
   @Post()
   async create(
     @Body() userCreateDto: UserCreateDto,

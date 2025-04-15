@@ -8,13 +8,13 @@ export class VerifyTokenServiceFixture implements VerifyTokenServiceInterface {
     _token: string,
     _options?: JwtVerifyOptions | undefined,
   ): Promise<object> {
-    throw new Error('Method not implemented.');
+    return Promise.resolve({});
   }
 
   async refreshToken(
     _token: string,
     _options?: JwtVerifyOptions | undefined,
   ): Promise<object> {
-    throw new Error('Method not implemented.');
+    return Promise.resolve({});
   }
 }

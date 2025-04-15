@@ -13,7 +13,6 @@ import { JwtService } from '@concepta/nestjs-jwt';
 import { AuthJwtGuard } from '@concepta/nestjs-auth-jwt';
 import { EmailSendInterface } from '@concepta/nestjs-common';
 import { RocketsServerUserMutateServiceInterface } from './interfaces/rockets-server-user-mutate-service.interface';
-import { OtpServiceFixture } from './__fixtures__/services/otp.service.fixture';
 import { VerifyTokenServiceFixture } from './__fixtures__/services/verify-token.service.fixture';
 import { IssueTokenServiceFixture } from './__fixtures__/services/issue-token.service.fixture';
 import { ValidateTokenServiceFixture } from './__fixtures__/services/validate-token.service.fixture';
@@ -23,6 +22,8 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { UserFixture } from './__fixtures__/user/user.entity.fixture';
+import { UserOtpEntityFixture } from './__fixtures__/user/user-otp-entity.fixture';
 
 // Test controller with protected route
 @Controller('test')
@@ -55,6 +56,9 @@ const mockEmailService: EmailSendInterface = {
 // Mock user mutate service
 const mockUserMutateService: RocketsServerUserMutateServiceInterface = {
   update: jest.fn().mockResolvedValue({ id: '1', username: 'test' }),
+  create: jest.fn().mockResolvedValue({ id: '1', username: 'test' }),
+  replace: jest.fn().mockResolvedValue({ id: '1', username: 'test' }),
+  remove: jest.fn().mockResolvedValue({ id: '1', username: 'test' }),
 };
 
 // Mock configuration module
@@ -96,10 +100,17 @@ describe('RocketsServer (e2e)', () => {
             userLookupService: mockUserLookupService,
             mailerService: mockEmailService,
             userMutateService: mockUserMutateService,
-            otpService: new OtpServiceFixture(),
             verifyTokenService: new VerifyTokenServiceFixture(),
             issueTokenService: new IssueTokenServiceFixture(),
             validateTokenService: new ValidateTokenServiceFixture(),
+          },
+          entities: {
+            user: {
+              entity: UserFixture,
+            },
+            userOtp: {
+              entity: UserOtpEntityFixture,
+            },
           },
         }),
       ],
