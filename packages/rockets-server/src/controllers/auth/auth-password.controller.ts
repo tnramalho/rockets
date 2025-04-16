@@ -1,27 +1,24 @@
+import {
+  AuthLocalGuard,
+  AuthLocalIssueTokenService,
+} from '@concepta/nestjs-auth-local';
+import {
+  AuthPublic,
+  AuthUser,
+  IssueTokenServiceInterface,
+} from '@concepta/nestjs-authentication';
 import { Controller, Inject, Post, UseGuards } from '@nestjs/common';
 import {
   ApiBody,
   ApiOkResponse,
+  ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
-  ApiOperation,
-  ApiSecurity,
 } from '@nestjs/swagger';
-import {
-  AuthenticatedUserInterface,
-  AuthenticationResponseInterface,
-} from '@concepta/nestjs-common';
-import {
-  AuthUser,
-  IssueTokenServiceInterface,
-  AuthenticationJwtResponseDto,
-  AuthPublic,
-} from '@concepta/nestjs-authentication';
-import {
-  AuthLocalGuard,
-  AuthLocalIssueTokenService,
-  AuthLocalLoginDto,
-} from '@concepta/nestjs-auth-local';
+import { RocketsServerJwtResponseDto } from '../../dto/auth/rockets-server-jwt-response.dto';
+import { RocketsServerLoginDto } from '../../dto/auth/rockets-server-login.dto';
+import { RocketsServerAuthenticationResponseInterface } from '../../interfaces/common/rockets-server-authentication-response.interface';
+import { RocketsServerUserInterface } from '../../interfaces/common/rockets-server-user.interface';
 
 /**
  * Controller for password-based authentication
@@ -39,32 +36,33 @@ export class AuthPasswordController {
 
   @ApiOperation({
     summary: 'Authenticate with username/email and password',
-    description: 'Validates credentials and returns authentication tokens on success',
+    description:
+      'Validates credentials and returns authentication tokens on success',
   })
   @ApiBody({
-    type: AuthLocalLoginDto,
+    type: RocketsServerLoginDto,
     description: 'User credentials',
     examples: {
       standard: {
         value: {
           username: 'user@example.com',
-          password: 'YourPassword123!'
+          password: 'YourPassword123!',
         },
-        summary: 'Standard login request'
-      }
-    }
+        summary: 'Standard login request',
+      },
+    },
   })
   @ApiOkResponse({
-    type: AuthenticationJwtResponseDto,
+    type: RocketsServerJwtResponseDto,
     description: 'Authentication successful, tokens provided',
   })
   @ApiUnauthorizedResponse({
-    description: 'Invalid credentials or inactive account'
+    description: 'Invalid credentials or inactive account',
   })
   @Post()
   async login(
-    @AuthUser() user: AuthenticatedUserInterface,
-  ): Promise<AuthenticationResponseInterface> {
+    @AuthUser() user: RocketsServerUserInterface,
+  ): Promise<RocketsServerAuthenticationResponseInterface> {
     return this.issueTokenService.responsePayload(user.id);
   }
 }

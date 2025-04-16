@@ -18,8 +18,9 @@ import {
   ApiTags,
   ApiResponse,
 } from '@nestjs/swagger';
-import { UserUpdateDto, UserDto } from '@concepta/nestjs-user';
-import { UserEntityInterface } from '@concepta/nestjs-user';
+import { RocketsServerUserUpdateDto } from '../../dto/user/rockets-server-user-update.dto';
+import { RocketsServerUserDto } from '../../dto/user/rockets-server-user.dto';
+import { RocketsServerUserEntityInterface } from '../../interfaces/user/rockets-server-user-entity.interface';
 import { AuthJwtGuard } from '@concepta/nestjs-auth-jwt';
 
 /**
@@ -44,7 +45,7 @@ export class RocketsServerUserController {
   })
   @ApiOkResponse({
     description: 'User profile retrieved successfully',
-    type: UserDto,
+    type: RocketsServerUserDto,
   })
   @ApiNotFoundResponse({
     description: 'User not found',
@@ -56,7 +57,7 @@ export class RocketsServerUserController {
   @Get('')
   async findById(
     @AuthUser('id') id: string,
-  ): Promise<UserEntityInterface | null> {
+  ): Promise<RocketsServerUserEntityInterface | null> {
     return this.userLookupService.byId(id);
   }
 
@@ -66,7 +67,7 @@ export class RocketsServerUserController {
       "Updates the currently authenticated user's profile information",
   })
   @ApiBody({
-    type: UserUpdateDto,
+    type: RocketsServerUserUpdateDto,
     description: 'User profile information to update',
     examples: {
       user: {
@@ -81,7 +82,7 @@ export class RocketsServerUserController {
   })
   @ApiOkResponse({
     description: 'User updated successfully',
-    type: UserDto,
+    type: RocketsServerUserDto,
   })
   @ApiBadRequestResponse({
     description: 'Bad request - Invalid input data',
@@ -96,8 +97,8 @@ export class RocketsServerUserController {
   @Patch('')
   async update(
     @AuthUser('id') id: string,
-    @Body() userUpdateDto: UserUpdateDto,
-  ): Promise<UserEntityInterface> {
+    @Body() userUpdateDto: RocketsServerUserUpdateDto,
+  ): Promise<RocketsServerUserEntityInterface> {
     return this.userMutateService.update({ id, ...userUpdateDto });
   }
 }

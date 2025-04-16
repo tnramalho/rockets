@@ -1,23 +1,22 @@
+import { AuthLocalIssueTokenService } from '@concepta/nestjs-auth-local';
+import {
+  AuthPublic,
+  IssueTokenServiceInterface,
+} from '@concepta/nestjs-authentication';
 import { Body, Controller, Inject, Patch, Post } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
   ApiBody,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
-  ApiBadRequestResponse,
   ApiUnauthorizedResponse,
-  ApiSecurity,
 } from '@nestjs/swagger';
-import { RocketsServerOtpService } from '../../services/rockets-server-otp.service';
-import {
-  AuthPublic,
-  IssueTokenServiceInterface,
-  AuthenticationJwtResponseDto,
-} from '@concepta/nestjs-authentication';
-import { RocketsServerOtpSendDto } from '../../dto/rockets-server-otp-send.dto';
+import { RocketsServerJwtResponseDto } from '../../dto/auth/rockets-server-jwt-response.dto';
 import { RocketsServerOtpConfirmDto } from '../../dto/rockets-server-otp-confirm.dto';
-import { AuthLocalIssueTokenService } from '@concepta/nestjs-auth-local';
-import { AuthenticationResponseInterface } from '@concepta/nestjs-common';
+import { RocketsServerOtpSendDto } from '../../dto/rockets-server-otp-send.dto';
+import { RocketsServerAuthenticationResponseInterface } from '../../interfaces/common/rockets-server-authentication-response.interface';
+import { RocketsServerOtpService } from '../../services/rockets-server-otp.service';
 
 /**
  * Controller for One-Time Password (OTP) operations
@@ -81,7 +80,7 @@ export class RocketsServerOtpController {
   })
   @ApiOkResponse({
     description: 'OTP confirmed successfully, authentication tokens provided',
-    type: AuthenticationJwtResponseDto,
+    type: RocketsServerJwtResponseDto,
   })
   @ApiBadRequestResponse({
     description: 'Invalid email format or missing required fields',
@@ -92,7 +91,7 @@ export class RocketsServerOtpController {
   @Patch('')
   async confirmOtp(
     @Body() dto: RocketsServerOtpConfirmDto,
-  ): Promise<AuthenticationResponseInterface> {
+  ): Promise<RocketsServerAuthenticationResponseInterface> {
     const user = await this.otpService.confirmOtp(dto.email, dto.passcode);
     return this.issueTokenService.responsePayload(user.id);
   }

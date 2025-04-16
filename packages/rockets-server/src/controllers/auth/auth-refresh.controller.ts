@@ -7,21 +7,19 @@ import {
   ApiOperation,
   ApiSecurity,
 } from '@nestjs/swagger';
-import {
-  AuthenticatedUserInterface,
-  AuthenticationResponseInterface,
-} from '@concepta/nestjs-common';
+import { RocketsServerUserInterface } from '../../interfaces/common/rockets-server-user.interface';
+import { RocketsServerAuthenticationResponseInterface } from '../../interfaces/common/rockets-server-authentication-response.interface';
 import {
   IssueTokenServiceInterface,
   AuthUser,
-  AuthenticationJwtResponseDto,
   AuthPublic,
 } from '@concepta/nestjs-authentication';
 import {
-  AuthRefreshDto,
   AuthRefreshGuard,
   AuthRefreshIssueTokenService,
 } from '@concepta/nestjs-auth-refresh';
+import { RocketsServerRefreshDto } from '../../dto/auth/rockets-server-refresh.dto';
+import { RocketsServerJwtResponseDto } from '../../dto/auth/rockets-server-jwt-response.dto';
 
 /**
  * Controller for JWT refresh token operations
@@ -43,28 +41,28 @@ export class AuthTokenRefreshController {
     description: 'Generates a new access token using a valid refresh token',
   })
   @ApiBody({
-    type: AuthRefreshDto,
+    type: RocketsServerRefreshDto,
     description: 'Refresh token information',
     examples: {
       standard: {
         value: {
-          refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+          refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
         },
-        summary: 'Standard refresh token request'
-      }
-    }
+        summary: 'Standard refresh token request',
+      },
+    },
   })
   @ApiOkResponse({
-    type: AuthenticationJwtResponseDto,
+    type: RocketsServerJwtResponseDto,
     description: 'New access and refresh tokens',
   })
   @ApiUnauthorizedResponse({
-    description: 'Invalid or expired refresh token'
+    description: 'Invalid or expired refresh token',
   })
   @Post()
   async refresh(
-    @AuthUser() user: AuthenticatedUserInterface,
-  ): Promise<AuthenticationResponseInterface> {
+    @AuthUser() user: RocketsServerUserInterface,
+  ): Promise<RocketsServerAuthenticationResponseInterface> {
     return this.issueTokenService.responsePayload(user.id);
   }
 }

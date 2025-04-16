@@ -10,7 +10,10 @@ import request from 'supertest';
 import { RocketsServerModule } from './rockets-server.module';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@concepta/nestjs-jwt';
-import { AuthJwtGuard } from '@concepta/nestjs-auth-jwt';
+import {
+  AuthJwtGuard,
+  AuthJwtVerifyTokenService,
+} from '@concepta/nestjs-auth-jwt';
 import { EmailSendInterface } from '@concepta/nestjs-common';
 import { RocketsServerUserMutateServiceInterface } from './interfaces/rockets-server-user-mutate-service.interface';
 import { VerifyTokenServiceFixture } from './__fixtures__/services/verify-token.service.fixture';
@@ -24,6 +27,7 @@ import {
 } from '@nestjs/swagger';
 import { UserFixture } from './__fixtures__/user/user.entity.fixture';
 import { UserOtpEntityFixture } from './__fixtures__/user/user-otp-entity.fixture';
+import { VerifyTokenServiceInterface } from '@concepta/nestjs-authentication';
 
 // Test controller with protected route
 @Controller('test')
@@ -82,6 +86,7 @@ class MockConfigModule {}
 describe('RocketsServer (e2e)', () => {
   let app: INestApplication;
   let jwtService: JwtService;
+  let verifyTokenService: VerifyTokenServiceInterface;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -119,6 +124,9 @@ describe('RocketsServer (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     jwtService = moduleFixture.get<JwtService>(JwtService);
+    verifyTokenService = moduleFixture.get<VerifyTokenServiceInterface>(
+      AuthJwtVerifyTokenService,
+    );
     await app.init();
   });
 
@@ -155,6 +163,10 @@ describe('RocketsServer (e2e)', () => {
     });
 
     it('should reject access to protected route with invalid token', async () => {
+      // Spy on verifyTokenService to throw an error when verifying the token
+      jest.spyOn(verifyTokenService, 'accessToken').mockImplementation(() => {
+        throw new Error('Invalid token');
+      });
       await request(app.getHttpServer())
         .get('/test/protected')
         .set('Authorization', 'Bearer invalid-token')

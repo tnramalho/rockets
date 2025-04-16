@@ -1,18 +1,17 @@
+import { AuthPublic } from '@concepta/nestjs-authentication';
 import { UserMutateService } from '@concepta/nestjs-user';
-import { AuthPublic, AuthenticationJwtResponseDto } from '@concepta/nestjs-authentication';
 import { Body, Controller, Inject, Post } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
-  ApiOkResponse,
+  ApiConflictResponse,
+  ApiCreatedResponse,
   ApiOperation,
   ApiTags,
-  ApiSecurity,
-  ApiCreatedResponse,
-  ApiConflictResponse,
 } from '@nestjs/swagger';
-import { UserCreateDto, UserDto } from '@concepta/nestjs-user';
-import { UserEntityInterface } from '@concepta/nestjs-user';
+import { RocketsServerUserCreateDto } from '../../dto/user/rockets-server-user-create.dto';
+import { RocketsServerUserDto } from '../../dto/user/rockets-server-user.dto';
+import { RocketsServerUserEntityInterface } from '../../interfaces/user/rockets-server-user-entity.interface';
 
 /**
  * Controller for user registration/signup
@@ -29,10 +28,11 @@ export class AuthSignupController {
 
   @ApiOperation({
     summary: 'Create a new user account',
-    description: 'Registers a new user in the system with email, username and password',
+    description:
+      'Registers a new user in the system with email, username and password',
   })
   @ApiBody({
-    type: UserCreateDto,
+    type: RocketsServerUserCreateDto,
     description: 'User registration information',
     examples: {
       standard: {
@@ -40,15 +40,15 @@ export class AuthSignupController {
           email: 'user@example.com',
           username: 'johndoe',
           password: 'StrongP@ssw0rd',
-          active: true
+          active: true,
         },
-        summary: 'Standard user registration'
-      }
-    }
+        summary: 'Standard user registration',
+      },
+    },
   })
   @ApiCreatedResponse({
     description: 'User created successfully',
-    type: UserDto
+    type: RocketsServerUserDto,
   })
   @ApiBadRequestResponse({
     description: 'Bad request - Invalid input data or missing required fields',
@@ -58,8 +58,8 @@ export class AuthSignupController {
   })
   @Post()
   async create(
-    @Body() userCreateDto: UserCreateDto,
-  ): Promise<UserEntityInterface> {
+    @Body() userCreateDto: RocketsServerUserCreateDto,
+  ): Promise<RocketsServerUserEntityInterface> {
     return this.userMutateService.create(userCreateDto);
   }
 }
