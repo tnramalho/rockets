@@ -11,6 +11,7 @@ import { AuthVerifyOptionsInterface } from '@concepta/nestjs-auth-verify/dist/in
 import {
   AuthenticationOptionsInterface,
   IssueTokenServiceInterface,
+  VerifyTokenService,
   VerifyTokenServiceInterface,
 } from '@concepta/nestjs-authentication';
 import {
@@ -119,7 +120,7 @@ export interface RocketsServerOptionsInterface {
      * Core authentication services used in AuthenticationModule
      * Required: true
      */
-    verifyTokenService?: VerifyTokenServiceInterface;
+    verifyTokenService?: VerifyTokenService;
     issueTokenService?: IssueTokenServiceInterface;
     validateTokenService?: ValidateTokenServiceInterface;
     validateUserService?: AuthLocalValidateUserServiceInterface;

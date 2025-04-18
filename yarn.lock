@@ -761,7 +761,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concepta/nestjs-access-control@npm:^7.0.0-alpha.1, @concepta/nestjs-access-control@npm:^7.0.0-alpha.2, @concepta/nestjs-access-control@workspace:packages/nestjs-access-control":
+"@concepta/nestjs-access-control@npm:^7.0.0-alpha.2, @concepta/nestjs-access-control@workspace:packages/nestjs-access-control":
   version: 0.0.0-use.local
   resolution: "@concepta/nestjs-access-control@workspace:packages/nestjs-access-control"
   dependencies:
@@ -867,7 +867,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@concepta/nestjs-auth-jwt@npm:^7.0.0-alpha.1, @concepta/nestjs-auth-jwt@npm:^7.0.0-alpha.2, @concepta/nestjs-auth-jwt@workspace:packages/nestjs-auth-jwt":
+"@concepta/nestjs-auth-jwt@npm:^7.0.0-alpha.2, @concepta/nestjs-auth-jwt@workspace:packages/nestjs-auth-jwt":
   version: 0.0.0-use.local
   resolution: "@concepta/nestjs-auth-jwt@workspace:packages/nestjs-auth-jwt"
   dependencies:
@@ -887,7 +887,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@concepta/nestjs-auth-local@npm:^7.0.0-alpha.1, @concepta/nestjs-auth-local@npm:^7.0.0-alpha.2, @concepta/nestjs-auth-local@workspace:packages/nestjs-auth-local":
+"@concepta/nestjs-auth-local@npm:^7.0.0-alpha.2, @concepta/nestjs-auth-local@workspace:packages/nestjs-auth-local":
   version: 0.0.0-use.local
   resolution: "@concepta/nestjs-auth-local@workspace:packages/nestjs-auth-local"
   dependencies:
@@ -914,7 +914,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@concepta/nestjs-auth-recovery@npm:^7.0.0-alpha.1, @concepta/nestjs-auth-recovery@workspace:packages/nestjs-auth-recovery":
+"@concepta/nestjs-auth-recovery@npm:^7.0.0-alpha.2, @concepta/nestjs-auth-recovery@workspace:packages/nestjs-auth-recovery":
   version: 0.0.0-use.local
   resolution: "@concepta/nestjs-auth-recovery@workspace:packages/nestjs-auth-recovery"
   dependencies:
@@ -946,7 +946,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@concepta/nestjs-auth-refresh@npm:^7.0.0-alpha.1, @concepta/nestjs-auth-refresh@npm:^7.0.0-alpha.2, @concepta/nestjs-auth-refresh@workspace:packages/nestjs-auth-refresh":
+"@concepta/nestjs-auth-refresh@npm:^7.0.0-alpha.2, @concepta/nestjs-auth-refresh@workspace:packages/nestjs-auth-refresh":
   version: 0.0.0-use.local
   resolution: "@concepta/nestjs-auth-refresh@workspace:packages/nestjs-auth-refresh"
   dependencies:
@@ -967,7 +967,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@concepta/nestjs-auth-verify@npm:^7.0.0-alpha.1, @concepta/nestjs-auth-verify@workspace:packages/nestjs-auth-verify":
+"@concepta/nestjs-auth-verify@npm:^7.0.0-alpha.2, @concepta/nestjs-auth-verify@workspace:packages/nestjs-auth-verify":
   version: 0.0.0-use.local
   resolution: "@concepta/nestjs-auth-verify@workspace:packages/nestjs-auth-verify"
   dependencies:
@@ -999,7 +999,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@concepta/nestjs-authentication@npm:^7.0.0-alpha.1, @concepta/nestjs-authentication@npm:^7.0.0-alpha.2, @concepta/nestjs-authentication@workspace:packages/nestjs-authentication":
+"@concepta/nestjs-authentication@npm:^7.0.0-alpha.2, @concepta/nestjs-authentication@workspace:packages/nestjs-authentication":
   version: 0.0.0-use.local
   resolution: "@concepta/nestjs-authentication@workspace:packages/nestjs-authentication"
   dependencies:
@@ -1050,7 +1050,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@concepta/nestjs-common@npm:^7.0.0-alpha.1, @concepta/nestjs-common@npm:^7.0.0-alpha.2, @concepta/nestjs-common@workspace:packages/nestjs-common":
+"@concepta/nestjs-common@npm:^7.0.0-alpha.2, @concepta/nestjs-common@workspace:packages/nestjs-common":
   version: 0.0.0-use.local
   resolution: "@concepta/nestjs-common@workspace:packages/nestjs-common"
   dependencies:
@@ -1096,7 +1096,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@concepta/nestjs-email@npm:^7.0.0-alpha.1, @concepta/nestjs-email@npm:^7.0.0-alpha.2, @concepta/nestjs-email@workspace:packages/nestjs-email":
+"@concepta/nestjs-email@npm:^7.0.0-alpha.2, @concepta/nestjs-email@workspace:packages/nestjs-email":
   version: 0.0.0-use.local
   resolution: "@concepta/nestjs-email@workspace:packages/nestjs-email"
   dependencies:
@@ -1122,17 +1122,6 @@ __metadata:
     eventemitter2: "npm:^6.4.9"
   languageName: unknown
   linkType: soft
-
-"@concepta/nestjs-exception@npm:^7.0.0-alpha.1":
-  version: 7.0.0-alpha.1
-  resolution: "@concepta/nestjs-exception@npm:7.0.0-alpha.1"
-  dependencies:
-    "@concepta/nestjs-common": "npm:^7.0.0-alpha.1"
-    "@nestjs/common": "npm:^10.4.1"
-    "@nestjs/swagger": "npm:^7.4.0"
-  checksum: 10c0/fac6dd866e11eb77174b22be29707593bd253e9ad87764c779640d152378ac4e4e46aa3f8593540348cb7e1be50bc00b3a71a78600dd707304ceffb1bde9ab52
-  languageName: node
-  linkType: hard
 
 "@concepta/nestjs-federated@npm:^7.0.0-alpha.2, @concepta/nestjs-federated@workspace:packages/nestjs-federated":
   version: 0.0.0-use.local
@@ -1208,7 +1197,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@concepta/nestjs-jwt@npm:^7.0.0-alpha.1, @concepta/nestjs-jwt@npm:^7.0.0-alpha.2, @concepta/nestjs-jwt@workspace:packages/nestjs-jwt":
+"@concepta/nestjs-jwt@npm:^7.0.0-alpha.2, @concepta/nestjs-jwt@workspace:packages/nestjs-jwt":
   version: 0.0.0-use.local
   resolution: "@concepta/nestjs-jwt@workspace:packages/nestjs-jwt"
   dependencies:
@@ -1313,7 +1302,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@concepta/nestjs-otp@npm:^7.0.0-alpha.1, @concepta/nestjs-otp@npm:^7.0.0-alpha.2, @concepta/nestjs-otp@workspace:packages/nestjs-otp":
+"@concepta/nestjs-otp@npm:^7.0.0-alpha.2, @concepta/nestjs-otp@workspace:packages/nestjs-otp":
   version: 0.0.0-use.local
   resolution: "@concepta/nestjs-otp@workspace:packages/nestjs-otp"
   dependencies:
@@ -1334,7 +1323,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@concepta/nestjs-password@npm:^7.0.0-alpha.1, @concepta/nestjs-password@npm:^7.0.0-alpha.2, @concepta/nestjs-password@workspace:packages/nestjs-password":
+"@concepta/nestjs-password@npm:^7.0.0-alpha.2, @concepta/nestjs-password@workspace:packages/nestjs-password":
   version: 0.0.0-use.local
   resolution: "@concepta/nestjs-password@workspace:packages/nestjs-password"
   dependencies:
@@ -1443,7 +1432,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@concepta/nestjs-typeorm-ext@npm:^7.0.0-alpha.1, @concepta/nestjs-typeorm-ext@npm:^7.0.0-alpha.2, @concepta/nestjs-typeorm-ext@workspace:packages/nestjs-typeorm-ext":
+"@concepta/nestjs-typeorm-ext@npm:^7.0.0-alpha.2, @concepta/nestjs-typeorm-ext@workspace:packages/nestjs-typeorm-ext":
   version: 0.0.0-use.local
   resolution: "@concepta/nestjs-typeorm-ext@workspace:packages/nestjs-typeorm-ext"
   dependencies:
@@ -1459,7 +1448,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@concepta/nestjs-user@npm:^7.0.0-alpha.1, @concepta/nestjs-user@npm:^7.0.0-alpha.2, @concepta/nestjs-user@workspace:packages/nestjs-user":
+"@concepta/nestjs-user@npm:^7.0.0-alpha.2, @concepta/nestjs-user@workspace:packages/nestjs-user":
   version: 0.0.0-use.local
   resolution: "@concepta/nestjs-user@workspace:packages/nestjs-user"
   dependencies:
@@ -1503,22 +1492,21 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@concepta/rockets-server@workspace:packages/rockets-server"
   dependencies:
-    "@concepta/nestjs-access-control": "npm:^7.0.0-alpha.1"
-    "@concepta/nestjs-auth-jwt": "npm:^7.0.0-alpha.1"
-    "@concepta/nestjs-auth-local": "npm:^7.0.0-alpha.1"
-    "@concepta/nestjs-auth-recovery": "npm:^7.0.0-alpha.1"
-    "@concepta/nestjs-auth-refresh": "npm:^7.0.0-alpha.1"
-    "@concepta/nestjs-auth-verify": "npm:^7.0.0-alpha.1"
-    "@concepta/nestjs-authentication": "npm:^7.0.0-alpha.1"
-    "@concepta/nestjs-common": "npm:^7.0.0-alpha.1"
-    "@concepta/nestjs-email": "npm:^7.0.0-alpha.1"
-    "@concepta/nestjs-exception": "npm:^7.0.0-alpha.1"
-    "@concepta/nestjs-jwt": "npm:^7.0.0-alpha.1"
-    "@concepta/nestjs-otp": "npm:^7.0.0-alpha.1"
-    "@concepta/nestjs-password": "npm:^7.0.0-alpha.1"
-    "@concepta/nestjs-typeorm-ext": "npm:^7.0.0-alpha.1"
-    "@concepta/nestjs-user": "npm:^7.0.0-alpha.1"
-    "@concepta/typeorm-common": "npm:^7.0.0-alpha.1"
+    "@concepta/nestjs-access-control": "npm:^7.0.0-alpha.2"
+    "@concepta/nestjs-auth-jwt": "npm:^7.0.0-alpha.2"
+    "@concepta/nestjs-auth-local": "npm:^7.0.0-alpha.2"
+    "@concepta/nestjs-auth-recovery": "npm:^7.0.0-alpha.2"
+    "@concepta/nestjs-auth-refresh": "npm:^7.0.0-alpha.2"
+    "@concepta/nestjs-auth-verify": "npm:^7.0.0-alpha.2"
+    "@concepta/nestjs-authentication": "npm:^7.0.0-alpha.2"
+    "@concepta/nestjs-common": "npm:^7.0.0-alpha.2"
+    "@concepta/nestjs-email": "npm:^7.0.0-alpha.2"
+    "@concepta/nestjs-jwt": "npm:^7.0.0-alpha.2"
+    "@concepta/nestjs-otp": "npm:^7.0.0-alpha.2"
+    "@concepta/nestjs-password": "npm:^7.0.0-alpha.2"
+    "@concepta/nestjs-typeorm-ext": "npm:^7.0.0-alpha.2"
+    "@concepta/nestjs-user": "npm:^7.0.0-alpha.2"
+    "@concepta/typeorm-common": "npm:^7.0.0-alpha.2"
     "@nestjs/common": "npm:^10.4.1"
     "@nestjs/config": "npm:^3.2.3"
     "@nestjs/core": "npm:^10.4.1"
@@ -1549,7 +1537,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@concepta/typeorm-common@npm:^7.0.0-alpha.1, @concepta/typeorm-common@npm:^7.0.0-alpha.2, @concepta/typeorm-common@workspace:packages/typeorm-common":
+"@concepta/typeorm-common@npm:^7.0.0-alpha.2, @concepta/typeorm-common@workspace:packages/typeorm-common":
   version: 0.0.0-use.local
   resolution: "@concepta/typeorm-common@workspace:packages/typeorm-common"
   dependencies:

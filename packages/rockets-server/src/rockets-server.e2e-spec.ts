@@ -105,7 +105,7 @@ describe('RocketsServer (e2e)', () => {
             userLookupService: mockUserLookupService,
             mailerService: mockEmailService,
             userMutateService: mockUserMutateService,
-            verifyTokenService: new VerifyTokenServiceFixture(),
+            //verifyTokenService: new VerifyTokenServiceFixture(),
             issueTokenService: new IssueTokenServiceFixture(),
             validateTokenService: new ValidateTokenServiceFixture(),
           },

@@ -31,7 +31,6 @@
     "@concepta/nestjs-authentication": "^7.0.0-alpha.2",
     "@concepta/nestjs-common": "^7.0.0-alpha.2",
     "@concepta/nestjs-email": "^7.0.0-alpha.2",
-    "@concepta/nestjs-exception": "^7.0.0-alpha.2",
     "@concepta/nestjs-jwt": "^7.0.0-alpha.2",
     "@concepta/nestjs-otp": "^7.0.0-alpha.2",
     "@concepta/nestjs-password": "^7.0.0-alpha.2",
