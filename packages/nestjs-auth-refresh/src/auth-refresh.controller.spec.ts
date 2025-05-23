@@ -5,12 +5,12 @@ import {
 } from '@concepta/nestjs-common';
 import { randomUUID } from 'crypto';
 import { mock } from 'jest-mock-extended';
-import { AuthRefreshController } from './auth-refresh.controller';
+import { AuthRefreshControllerFixture } from './__fixtures__/auth-refresh.controller.fixture';
 
-describe(AuthRefreshController, () => {
+describe(AuthRefreshControllerFixture, () => {
   const accessToken = 'accessToken';
   const refreshToken = 'refreshToken';
-  let controller: AuthRefreshController;
+  let controller: AuthRefreshControllerFixture;
   const response: AuthenticationResponseInterface = {
     accessToken,
     refreshToken,
@@ -24,10 +24,10 @@ describe(AuthRefreshController, () => {
         });
       },
     });
-    controller = new AuthRefreshController(issueTokenService);
+    controller = new AuthRefreshControllerFixture(issueTokenService);
   });
 
-  describe(AuthRefreshController.prototype.refresh, () => {
+  describe(AuthRefreshControllerFixture.prototype.refresh, () => {
     it('should return user', async () => {
       const user: AuthenticatedUserInterface = {
         id: randomUUID(),

@@ -14,7 +14,7 @@ import { AuthVerifyService } from '../services/auth-verify.service';
 @Controller('auth/verify')
 @AuthPublic()
 @ApiTags('auth')
-export class AuthVerifyController {
+export class AuthVerifyControllerFixture {
   constructor(private readonly authVerifyService: AuthVerifyService) {}
 
   @ApiOperation({

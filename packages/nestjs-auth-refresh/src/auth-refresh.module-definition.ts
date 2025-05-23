@@ -23,7 +23,6 @@ import {
 import { AuthRefreshOptionsInterface } from './interfaces/auth-refresh-options.interface';
 import { AuthRefreshOptionsExtrasInterface } from './interfaces/auth-refresh-options-extras.interface';
 import { AuthRefreshSettingsInterface } from './interfaces/auth-refresh-settings.interface';
-import { AuthRefreshController } from './auth-refresh.controller';
 import { authRefreshDefaultConfig } from './config/auth-refresh-default.config';
 import { AuthRefreshStrategy } from './auth-refresh.strategy';
 
@@ -57,14 +56,13 @@ function definitionTransform(
   extras: AuthRefreshOptionsExtrasInterface,
 ): DynamicModule {
   const { providers } = definition;
-  const { controllers, global } = extras;
+  const { global } = extras;
 
   return {
     ...definition,
     global,
     imports: createAuthRefreshImports(),
     providers: createAuthRefreshProviders({ providers }),
-    controllers: createAuthRefreshControllers({ controllers }),
     exports: [ConfigModule, RAW_OPTIONS_TOKEN, ...createAuthRefreshExports()],
   };
 }
@@ -97,14 +95,6 @@ export function createAuthRefreshProviders(options: {
     createAuthRefreshIssueTokenServiceProvider(options.overrides),
     createAuthRefreshUserModelServiceProvider(options.overrides),
   ];
-}
-
-export function createAuthRefreshControllers(
-  overrides: Pick<AuthRefreshOptions, 'controllers'>,
-): DynamicModule['controllers'] {
-  return overrides?.controllers !== undefined
-    ? overrides.controllers
-    : [AuthRefreshController];
 }
 
 export function createAuthRefreshOptionsProvider(

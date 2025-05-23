@@ -1,11 +1,11 @@
-import { AuthVerifyController } from '../__fixtures__/auth-verify.controller';
+import { AuthVerifyControllerFixture } from '../__fixtures__/auth-verify.controller.fixture';
 import { AuthVerifyService } from '../services/auth-verify.service';
 import { AuthVerifyUpdateDto } from '../dto/auth-verify-update.dto';
 import { mock } from 'jest-mock-extended';
 import { AuthVerifyDto } from '../dto/auth-verify.dto';
 
-describe(AuthVerifyController.name, () => {
-  let controller: AuthVerifyController;
+describe(AuthVerifyControllerFixture.name, () => {
+  let controller: AuthVerifyControllerFixture;
   let authVerifyService: AuthVerifyService;
   const dto: AuthVerifyDto = {
     email: 'test@example.com',
@@ -15,7 +15,7 @@ describe(AuthVerifyController.name, () => {
   };
   beforeEach(() => {
     authVerifyService = mock<AuthVerifyService>();
-    controller = new AuthVerifyController(authVerifyService);
+    controller = new AuthVerifyControllerFixture(authVerifyService);
   });
 
   describe('send', () => {

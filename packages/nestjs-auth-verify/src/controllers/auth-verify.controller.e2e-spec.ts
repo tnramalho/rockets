@@ -10,7 +10,7 @@ import { UserFactory } from '@concepta/nestjs-user/src/seeding';
 
 import { AUTH_VERIFY_MODULE_SETTINGS_TOKEN } from '../auth-verify.constants';
 
-import { AuthVerifyController } from '../__fixtures__/auth-verify.controller';
+import { AuthVerifyControllerFixture } from '../__fixtures__/auth-verify.controller.fixture';
 import { AuthVerifySettingsInterface } from '../interfaces/auth-verify-settings.interface';
 import { AuthVerifyDto } from '../dto/auth-verify.dto';
 import { AuthVerifyUpdateDto } from '../dto/auth-verify-update.dto';
@@ -19,7 +19,7 @@ import { UserEntityFixture } from '../__fixtures__/user/entities/user-entity.fix
 import { AppModuleDbFixture } from '../__fixtures__/app.module.db.fixture';
 import { UserModelService } from '@concepta/nestjs-user';
 
-describe(AuthVerifyController, () => {
+describe(AuthVerifyControllerFixture, () => {
   let app: INestApplication;
   let otpService: OtpService;
   let userModelService: UserModelService;

@@ -15,9 +15,9 @@ import {
   AuthenticationJwtResponseDto,
   AuthPublic,
 } from '@concepta/nestjs-authentication';
-import { AuthRefreshIssueTokenService } from './auth-refresh.constants';
-import { AuthRefreshDto } from './dto/auth-refresh.dto';
-import { AuthRefreshGuard } from './auth-refresh.guard';
+import { AuthRefreshIssueTokenService } from '../auth-refresh.constants';
+import { AuthRefreshDto } from '../dto/auth-refresh.dto';
+import { AuthRefreshGuard } from '../auth-refresh.guard';
 
 /**
  * Auth Local controller
@@ -26,7 +26,7 @@ import { AuthRefreshGuard } from './auth-refresh.guard';
 @UseGuards(AuthRefreshGuard)
 @AuthPublic()
 @ApiTags('auth')
-export class AuthRefreshController {
+export class AuthRefreshControllerFixture {
   constructor(
     @Inject(AuthRefreshIssueTokenService)
     private issueTokenService: IssueTokenServiceInterface,

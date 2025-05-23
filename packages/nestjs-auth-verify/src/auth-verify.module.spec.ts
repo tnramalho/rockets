@@ -4,7 +4,7 @@ import { mock } from 'jest-mock-extended';
 
 import { EmailModule, EmailService } from '@concepta/nestjs-email';
 
-import { AuthVerifyController } from './__fixtures__/auth-verify.controller';
+import { AuthVerifyControllerFixture } from './__fixtures__/auth-verify.controller.fixture';
 import { AuthVerifyModule } from './auth-verify.module';
 import { AuthVerifyEmailServiceInterface } from './interfaces/auth-verify-email.service.interface';
 import { AuthVerifyOtpServiceInterface } from './interfaces/auth-verify-otp.service.interface';
@@ -24,7 +24,7 @@ describe(AuthVerifyModule, () => {
   let otpService: AuthVerifyOtpServiceInterface;
   let userModelService: AuthVerifyUserModelServiceInterface;
   let authVerifyService: AuthVerifyServiceInterface;
-  let authVerifyController: AuthVerifyController;
+  let authVerifyController: AuthVerifyControllerFixture;
   let emailService: EmailService;
 
   const mockEmailService = mock<AuthVerifyEmailServiceInterface>();
@@ -121,7 +121,7 @@ describe(AuthVerifyModule, () => {
     );
     authVerifyService = testModule.get<AuthVerifyService>(AuthVerifyService);
     authVerifyController =
-      testModule.get<AuthVerifyController>(AuthVerifyController);
+      testModule.get<AuthVerifyControllerFixture>(AuthVerifyControllerFixture);
   }
 
   function commonTests() {
@@ -130,7 +130,7 @@ describe(AuthVerifyModule, () => {
     expect(emailService).toBeInstanceOf(EmailService);
     expect(userModelService).toBeInstanceOf(UserModelServiceFixture);
     expect(authVerifyService).toBeInstanceOf(AuthVerifyService);
-    expect(authVerifyController).toBeInstanceOf(AuthVerifyController);
+    expect(authVerifyController).toBeInstanceOf(AuthVerifyControllerFixture);
   }
 });
 
@@ -144,6 +144,6 @@ function testModuleFactory(
       EmailModule.forRoot({ mailerService: new MailerServiceFixture() }),
       ...extraImports,
     ],
-    controllers: [AuthVerifyController],
+    controllers: [AuthVerifyControllerFixture],
   };
 }

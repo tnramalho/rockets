@@ -20,7 +20,7 @@ import { UserEntityFixture } from './user/entities/user-entity.fixture';
 
 import { default as ormConfig } from './ormconfig.fixture';
 import { MailerServiceFixture } from './email/mailer.service.fixture';
-import { AuthVerifyController } from './auth-verify.controller';
+import { AuthVerifyControllerFixture } from './auth-verify.controller.fixture';
 
 @Module({
   imports: [
@@ -74,6 +74,6 @@ import { AuthVerifyController } from './auth-verify.controller';
       mailerService: new MailerServiceFixture(),
     }),
   ],
-  controllers: [AuthVerifyController],
+  controllers: [AuthVerifyControllerFixture],
 })
 export class AppModuleDbFixture {}
