@@ -8,9 +8,7 @@ import {
   AuthVerifyOtpService,
   AuthVerifyUserModelService,
 } from './auth-verify.constants';
-import { AuthVerifyController } from './__fixtures__/auth-verify.controller';
 import {
-  createAuthVerifyControllers,
   createAuthVerifyEmailServiceProvider,
   createAuthVerifyExports,
   createAuthVerifyNotificationServiceProvider,
@@ -42,51 +40,6 @@ describe('AuthVerifyModuleDefinition', () => {
         AuthVerifyUserModelService,
         AuthVerifyService,
       ]);
-    });
-  });
-
-  describe(createAuthVerifyControllers.name, () => {
-    it('should return a default AuthVerifyController', () => {
-      const result = createAuthVerifyControllers();
-      expect(result).toEqual([AuthVerifyController]);
-    });
-
-    it('should return a default AuthVerifyController', () => {
-      const result = createAuthVerifyControllers({});
-      expect(result).toEqual([AuthVerifyController]);
-    });
-
-    it('should return a default AuthVerifyController', () => {
-      const result = createAuthVerifyControllers({ controllers: undefined });
-      expect(result).toEqual([AuthVerifyController]);
-    });
-
-    it('should return the provided controllers', () => {
-      const customController = class CustomController {};
-      const result = createAuthVerifyControllers({
-        controllers: [customController],
-      });
-      expect(result).toEqual([customController]);
-    });
-
-    it('should return an empty array if the controllers option is an empty array', () => {
-      const result = createAuthVerifyControllers({ controllers: [] });
-      expect(result).toEqual([]);
-    });
-
-    it('should return an array with AuthVerifyController if the controllers option includes AuthVerifyController', () => {
-      const result = createAuthVerifyControllers({
-        controllers: [AuthVerifyController],
-      });
-      expect(result).toEqual([AuthVerifyController]);
-    });
-
-    it('should return an array with AuthVerifyController and the provided controllers if the controllers option includes AuthVerifyController and other controllers', () => {
-      const customController = class CustomController {};
-      const result = createAuthVerifyControllers({
-        controllers: [AuthVerifyController, customController],
-      });
-      expect(result).toEqual([AuthVerifyController, customController]);
     });
   });
 

@@ -144,5 +144,6 @@ function testModuleFactory(
       EmailModule.forRoot({ mailerService: new MailerServiceFixture() }),
       ...extraImports,
     ],
+    controllers: [AuthVerifyController],
   };
 }

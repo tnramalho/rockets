@@ -1,8 +1,8 @@
-import { AuthVerifyController } from './__fixtures__/auth-verify.controller';
-import { AuthVerifyService } from './services/auth-verify.service';
-import { AuthVerifyUpdateDto } from './dto/auth-verify-update.dto';
+import { AuthVerifyController } from '../__fixtures__/auth-verify.controller';
+import { AuthVerifyService } from '../services/auth-verify.service';
+import { AuthVerifyUpdateDto } from '../dto/auth-verify-update.dto';
 import { mock } from 'jest-mock-extended';
-import { AuthVerifyDto } from './dto/auth-verify.dto';
+import { AuthVerifyDto } from '../dto/auth-verify.dto';
 
 describe(AuthVerifyController.name, () => {
   let controller: AuthVerifyController;
