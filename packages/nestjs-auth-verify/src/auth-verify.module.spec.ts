@@ -120,8 +120,9 @@ describe(AuthVerifyModule, () => {
       UserModelServiceFixture,
     );
     authVerifyService = testModule.get<AuthVerifyService>(AuthVerifyService);
-    authVerifyController =
-      testModule.get<AuthVerifyControllerFixture>(AuthVerifyControllerFixture);
+    authVerifyController = testModule.get<AuthVerifyControllerFixture>(
+      AuthVerifyControllerFixture,
+    );
   }
 
   function commonTests() {
