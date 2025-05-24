@@ -16,12 +16,12 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { AuthRecoveryRecoverLoginDto } from './dto/auth-recovery-recover-login.dto';
-import { AuthRecoveryRecoverPasswordDto } from './dto/auth-recovery-recover-password.dto';
-import { AuthRecoveryUpdatePasswordDto } from './dto/auth-recovery-update-password.dto';
-import { AuthRecoveryOtpInvalidException } from './exceptions/auth-recovery-otp-invalid.exception';
-import { AuthRecoveryServiceInterface } from './interfaces/auth-recovery.service.interface';
-import { AuthRecoveryService } from './services/auth-recovery.service';
+import { AuthRecoveryRecoverLoginDto } from '../dto/auth-recovery-recover-login.dto';
+import { AuthRecoveryRecoverPasswordDto } from '../dto/auth-recovery-recover-password.dto';
+import { AuthRecoveryUpdatePasswordDto } from '../dto/auth-recovery-update-password.dto';
+import { AuthRecoveryOtpInvalidException } from '../exceptions/auth-recovery-otp-invalid.exception';
+import { AuthRecoveryServiceInterface } from '../interfaces/auth-recovery.service.interface';
+import { AuthRecoveryService } from '../services/auth-recovery.service';
 
 @Controller('auth/recovery')
 @AuthPublic()

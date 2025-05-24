@@ -10,9 +10,8 @@ import {
   AuthRecoveryUserModelService,
   AuthRecoveryUserPasswordService,
 } from './auth-recovery.constants';
-import { AuthRecoveryController } from './auth-recovery.controller';
+import { AuthRecoveryController } from './__fixtures__/auth-recovery.controller.fixture';
 import {
-  createAuthRecoveryControllers,
   createAuthRecoveryEmailServiceProvider,
   createAuthRecoveryExports,
   createAuthRecoveryNotificationServiceProvider,
@@ -48,51 +47,6 @@ describe('AuthRecoveryModuleDefinition', () => {
         AuthRecoveryUserPasswordService,
         AuthRecoveryService,
       ]);
-    });
-  });
-
-  describe(createAuthRecoveryControllers.name, () => {
-    it('should return a default AuthRecoveryController', () => {
-      const result = createAuthRecoveryControllers();
-      expect(result).toEqual([AuthRecoveryController]);
-    });
-
-    it('should return a default AuthRecoveryController', () => {
-      const result = createAuthRecoveryControllers({});
-      expect(result).toEqual([AuthRecoveryController]);
-    });
-
-    it('should return a default AuthRecoveryController', () => {
-      const result = createAuthRecoveryControllers({ controllers: undefined });
-      expect(result).toEqual([AuthRecoveryController]);
-    });
-
-    it('should return the provided controllers', () => {
-      const customController = class CustomController {};
-      const result = createAuthRecoveryControllers({
-        controllers: [customController],
-      });
-      expect(result).toEqual([customController]);
-    });
-
-    it('should return an empty array if the controllers option is an empty array', () => {
-      const result = createAuthRecoveryControllers({ controllers: [] });
-      expect(result).toEqual([]);
-    });
-
-    it('should return an array with AuthRecoveryController if the controllers option includes AuthRecoveryController', () => {
-      const result = createAuthRecoveryControllers({
-        controllers: [AuthRecoveryController],
-      });
-      expect(result).toEqual([AuthRecoveryController]);
-    });
-
-    it('should return an array with AuthRecoveryController and the provided controllers if the controllers option includes AuthRecoveryController and other controllers', () => {
-      const customController = class CustomController {};
-      const result = createAuthRecoveryControllers({
-        controllers: [AuthRecoveryController, customController],
-      });
-      expect(result).toEqual([AuthRecoveryController, customController]);
     });
   });
 

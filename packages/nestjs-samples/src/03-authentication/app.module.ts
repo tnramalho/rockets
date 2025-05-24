@@ -58,5 +58,9 @@ import { createUserRepository } from './user/create-user-repository';
     }),
   ],
   controllers: [CustomUserController],
+  exports: [
+    AuthenticationModule,
+    AuthRefreshModule,
+  ]
 })
 export class AppModule {}

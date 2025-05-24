@@ -113,18 +113,6 @@ export function createInvitationProviders(options: {
   ];
 }
 
-// export function createInvitationControllers(
-//   overrides: Pick<InvitationOptions, 'controllers'> = {},
-// ): DynamicModule['controllers'] {
-//   return overrides?.controllers !== undefined
-//     ? overrides.controllers
-//     : [
-//         InvitationController,
-//         InvitationAcceptanceController,
-//         InvitationReattemptController,
-//       ];
-// }
-
 export function createInvitationSettingsProvider(
   optionsOverrides?: InvitationOptions,
 ): Provider {

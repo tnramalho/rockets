@@ -25,7 +25,7 @@ import { InvitationException } from '../../exceptions/invitation.exception';
 import { InvitationCreateInviteInterface } from '../../interfaces/domain/invitation-create-invite.interface';
 import { InvitationSendInviteInterface } from '../../interfaces/domain/invitation-send-invite.interface';
 import { InvitationResource } from '../../invitation.types';
-import { InvitationCrudService } from '../../services/invitation-crud.service';
+import { InvitationCrudService } from '../invitation-crud.service';
 import { InvitationSendService } from '../../services/invitation-send.service';
 
 @CrudController({

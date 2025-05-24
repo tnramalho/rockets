@@ -12,7 +12,7 @@ import { UserFactory } from '@concepta/nestjs-user/src/seeding';
 
 import { AUTH_RECOVERY_MODULE_SETTINGS_TOKEN } from './auth-recovery.constants';
 
-import { AuthRecoveryController } from './auth-recovery.controller';
+import { AuthRecoveryController } from './__fixtures__/auth-recovery.controller.fixture';
 import { AuthRecoverySettingsInterface } from './interfaces/auth-recovery-settings.interface';
 import { AuthRecoveryRecoverPasswordDto } from './dto/auth-recovery-recover-password.dto';
 import { AuthRecoveryRecoverLoginDto } from './dto/auth-recovery-recover-login.dto';

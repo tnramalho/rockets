@@ -8,7 +8,6 @@ import { AuthRecoveryOtpServiceInterface } from './interfaces/auth-recovery-otp.
 import { AuthRecoveryEmailServiceInterface } from './interfaces/auth-recovery-email.service.interface';
 import { AuthRecoveryUserModelServiceInterface } from './interfaces/auth-recovery-user-model.service.interface';
 import { AuthRecoveryServiceInterface } from './interfaces/auth-recovery.service.interface';
-import { AuthRecoveryController } from './auth-recovery.controller';
 import { AuthRecoveryModule } from './auth-recovery.module';
 import { AuthRecoveryService } from './services/auth-recovery.service';
 
@@ -27,7 +26,6 @@ describe(AuthRecoveryModule, () => {
   let userModelService: AuthRecoveryUserModelServiceInterface;
   let userPasswordService: UserPasswordServiceInterface;
   let authRecoveryService: AuthRecoveryServiceInterface;
-  let authRecoveryController: AuthRecoveryController;
   let emailService: EmailService;
 
   const mockEmailService = mock<AuthRecoveryEmailServiceInterface>();
@@ -151,9 +149,6 @@ describe(AuthRecoveryModule, () => {
     );
     authRecoveryService =
       testModule.get<AuthRecoveryService>(AuthRecoveryService);
-    authRecoveryController = testModule.get<AuthRecoveryController>(
-      AuthRecoveryController,
-    );
   }
 
   function commonTests() {
@@ -163,7 +158,6 @@ describe(AuthRecoveryModule, () => {
     expect(userModelService).toBeInstanceOf(UserModelServiceFixture);
     expect(userPasswordService).toBeInstanceOf(UserPasswordServiceFixture);
     expect(authRecoveryService).toBeInstanceOf(AuthRecoveryService);
-    expect(authRecoveryController).toBeInstanceOf(AuthRecoveryController);
   }
 });
 

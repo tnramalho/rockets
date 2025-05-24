@@ -19,7 +19,6 @@ import { AuthRecoveryOptionsInterface } from './interfaces/auth-recovery-options
 import { AuthRecoveryOptionsExtrasInterface } from './interfaces/auth-recovery-options-extras.interface';
 import { AuthRecoverySettingsInterface } from './interfaces/auth-recovery-settings.interface';
 import { authRecoveryDefaultConfig } from './config/auth-recovery-default.config';
-import { AuthRecoveryController } from './auth-recovery.controller';
 import { AuthRecoveryService } from './services/auth-recovery.service';
 import { AuthRecoveryNotificationService } from './services/auth-recovery-notification.service';
 import { AuthRecoveryEmailServiceInterface } from './interfaces/auth-recovery-email.service.interface';
@@ -54,14 +53,13 @@ function definitionTransform(
   extras: AuthRecoveryOptionsExtrasInterface,
 ): DynamicModule {
   const { providers } = definition;
-  const { controllers, global } = extras;
+  const { global } = extras;
 
   return {
     ...definition,
     global,
     imports: createAuthRecoveryImports(),
     providers: createAuthRecoveryProviders({ providers }),
-    controllers: createAuthRecoveryControllers({ controllers }),
     exports: [ConfigModule, RAW_OPTIONS_TOKEN, ...createAuthRecoveryExports()],
   };
 }
@@ -95,14 +93,6 @@ export function createAuthRecoveryProviders(options: {
     createAuthRecoveryUserPasswordServiceProvider(options.overrides),
     createAuthRecoveryNotificationServiceProvider(options.overrides),
   ];
-}
-
-export function createAuthRecoveryControllers(
-  overrides: Pick<AuthRecoveryOptions, 'controllers'> = {},
-): DynamicModule['controllers'] {
-  return overrides?.controllers !== undefined
-    ? overrides.controllers
-    : [AuthRecoveryController];
 }
 
 export function createAuthRecoverySettingsProvider(

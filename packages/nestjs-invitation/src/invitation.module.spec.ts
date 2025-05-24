@@ -17,8 +17,6 @@ import { InvitationOtpServiceInterface } from './interfaces/services/invitation-
 
 import { InvitationUserModelServiceInterface } from './interfaces/services/invitation-user-model.service.interface';
 import { InvitationServiceInterface } from './interfaces/services/invitation-service.interface';
-import { InvitationAcceptanceController } from './__fixtures__/controllers/invitation-acceptance.controller';
-import { InvitationReattemptController } from './__fixtures__/controllers/invitation-reattempt.controller';
 import { InvitationService } from './services/invitation.service';
 import { InvitationSendService } from './services/invitation-send.service';
 import { InvitationAcceptanceService } from './services/invitation-acceptance.service';
@@ -46,8 +44,6 @@ describe(InvitationModule, () => {
   let invitationSendService: InvitationSendServiceInterface;
   let invitationAcceptanceService: InvitationAcceptanceService;
   let invitationRevocationService: InvitationRevocationService;
-  let invitationAcceptanceController: InvitationAcceptanceController;
-  let invitationReattemptController: InvitationReattemptController;
 
   const mockEmailService = mock<InvitationEmailServiceInterface>();
 
@@ -251,16 +247,6 @@ describe(InvitationModule, () => {
     invitationRevocationService = testModule.get<InvitationRevocationService>(
       InvitationRevocationService,
     );
-
-    invitationAcceptanceController =
-      testModule.get<InvitationAcceptanceController>(
-        InvitationAcceptanceController,
-      );
-
-    invitationReattemptController =
-      testModule.get<InvitationReattemptController>(
-        InvitationReattemptController,
-      );
   }
 
   function commonTests() {
@@ -275,14 +261,6 @@ describe(InvitationModule, () => {
     );
     expect(invitationRevocationService).toBeInstanceOf(
       InvitationRevocationService,
-    );
-
-    expect(invitationAcceptanceController).toBeInstanceOf(
-      InvitationAcceptanceController,
-    );
-
-    expect(invitationReattemptController).toBeInstanceOf(
-      InvitationReattemptController,
     );
   }
 });
@@ -300,10 +278,6 @@ function testModuleFactory(
       InvitationLocalModuleFixture,
       EmailModule.forRoot({ mailerService: new MailerServiceFixture() }),
       ...extraImports,
-    ],
-    controllers: [
-      InvitationAcceptanceController,
-      InvitationReattemptController,
     ],
   };
 }

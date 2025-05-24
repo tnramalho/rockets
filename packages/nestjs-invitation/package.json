@@ -21,8 +21,8 @@
     "@nestjs/swagger": "^7.4.0"
   },
   "devDependencies": {
-    "@concepta/nestjs-email": "^7.0.0-alpha.3",
     "@concepta/nestjs-crud": "^7.0.0-alpha.3",
+    "@concepta/nestjs-email": "^7.0.0-alpha.3",
     "@concepta/nestjs-otp": "^7.0.0-alpha.3",
     "@concepta/nestjs-password": "^7.0.0-alpha.3",
     "@concepta/nestjs-typeorm-ext": "^7.0.0-alpha.3",

@@ -21,6 +21,7 @@ import { UserEntityFixture } from './user/entities/user-entity.fixture';
 
 import { default as ormConfig } from './ormconfig.fixture';
 import { MailerServiceFixture } from './email/mailer.service.fixture';
+import { AuthRecoveryController } from './auth-recovery.controller.fixture';
 
 @Module({
   imports: [
@@ -80,5 +81,6 @@ import { MailerServiceFixture } from './email/mailer.service.fixture';
       mailerService: new MailerServiceFixture(),
     }),
   ],
+  controllers: [AuthRecoveryController],
 })
 export class AppModuleDbFixture {}

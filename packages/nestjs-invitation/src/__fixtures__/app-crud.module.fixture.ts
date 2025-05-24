@@ -18,7 +18,7 @@ import { default as ormConfig } from './ormconfig.fixture';
 import { InvitationController } from './controllers/invitation.controller';
 import { InvitationAcceptanceController } from './controllers/invitation-acceptance.controller';
 import { InvitationReattemptController } from './controllers/invitation-reattempt.controller';
-import { InvitationCrudService } from '../services/invitation-crud.service';
+import { InvitationCrudService } from './invitation-crud.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({

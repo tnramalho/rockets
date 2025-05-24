@@ -4,7 +4,7 @@ import { TypeOrmCrudService } from '@concepta/nestjs-crud';
 
 import { InvitationEntityInterface } from '@concepta/nestjs-common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { InvitationEntityFixture } from '../__fixtures__/invitation/entities/invitation.entity.fixture';
+import { InvitationEntityFixture } from './invitation/entities/invitation.entity.fixture';
 
 @Injectable()
 export class InvitationCrudService extends TypeOrmCrudService<InvitationEntityInterface> {
