@@ -10,8 +10,8 @@ import {
   AuthenticationJwtResponseDto,
   AuthPublic,
 } from '@concepta/nestjs-authentication';
-import { AUTH_APPLE_ISSUE_TOKEN_SERVICE_TOKEN } from './auth-apple.constants';
-import { AuthAppleGuard } from './auth-apple.guard';
+import { AUTH_APPLE_ISSUE_TOKEN_SERVICE_TOKEN } from '../auth-apple.constants';
+import { AuthAppleGuard } from '../auth-apple.guard';
 
 /**
  * Apple controller
@@ -32,7 +32,7 @@ import { AuthAppleGuard } from './auth-apple.guard';
 @UseGuards(AuthAppleGuard)
 @AuthPublic()
 @ApiTags('auth')
-export class AuthAppleController {
+export class AuthAppleControllerFixture {
   constructor(
     @Inject(AUTH_APPLE_ISSUE_TOKEN_SERVICE_TOKEN)
     private issueTokenService: IssueTokenServiceInterface,

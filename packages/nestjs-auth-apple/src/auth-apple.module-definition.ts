@@ -24,7 +24,6 @@ import { AuthAppleOptionsInterface } from './interfaces/auth-apple-options.inter
 import { AuthAppleOptionsExtrasInterface } from './interfaces/auth-apple-options-extras.interface';
 import { authAppleDefaultConfig } from './config/auth-apple-default.config';
 import { AuthAppleSettingsInterface } from './interfaces/auth-apple-settings.interface';
-import { AuthAppleController } from './auth-apple.controller';
 import { AuthAppleStrategy } from './auth-apple.strategy';
 import { AuthAppleService } from './auth-apple.service';
 import { AuthAppleServiceInterface } from './interfaces/auth-apple-service.interface';
@@ -56,14 +55,13 @@ function definitionTransform(
   extras: AuthAppleOptionsExtrasInterface,
 ): DynamicModule {
   const { providers = [] } = definition;
-  const { global = false, controllers } = extras;
+  const { global = false } = extras;
 
   return {
     ...definition,
     global,
     imports: createAuthAppleImports(),
     providers: createAuthAppleProviders({ providers }),
-    controllers: createAuthAppleControllers({ controllers }),
     exports: [ConfigModule, RAW_OPTIONS_TOKEN, ...createAuthAppleExports()],
   };
 }
@@ -77,14 +75,6 @@ export function createAuthAppleExports() {
     AUTH_APPLE_MODULE_SETTINGS_TOKEN,
     AUTH_APPLE_ISSUE_TOKEN_SERVICE_TOKEN,
   ];
-}
-
-export function createAuthAppleControllers(
-  overrides: AuthAppleOptions = {},
-): DynamicModule['controllers'] {
-  return overrides?.controllers !== undefined
-    ? overrides.controllers
-    : [AuthAppleController];
 }
 
 export function createAuthAppleProviders(options: {
