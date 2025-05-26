@@ -13,7 +13,8 @@ import {
 import { AppModule } from './app.module';
 import { UserEntity } from './user/user.entity';
 import { UserDto } from './user/user.controller';
-import { AuthRefreshControllerFixture } from '@concepta/nestjs-auth-refresh/src/__fixtures__/auth-refresh.controller.fixture';
+import { AuthLocalControllerFixture } from './auth-local.controller.fixture';
+import { AuthRefreshControllerFixture } from './auth-refresh.controller.fixture';
 
 const sleep = (ms: number) => {
   return new Promise((resolve) => {
@@ -28,6 +29,9 @@ describe('AppController (e2e)', () => {
     beforeEach(async () => {
       const moduleFixture: TestingModule = await Test.createTestingModule({
         imports: [AppModule],
+        controllers: [
+          AuthLocalControllerFixture,
+        ]
       })
         .overrideProvider('USER_MODULE_USER_ENTITY_REPO_TOKEN')
         .useValue(mock<UserEntity>())
@@ -103,7 +107,7 @@ describe('AppController (e2e)', () => {
     });
   });
 
-  describe.skip('Authentication Refresh', () => {
+  describe('Authentication Refresh', () => {
     let app: INestApplication;
     let globalAccessToken: string;
     let globalRefreshToken: string;
@@ -113,6 +117,7 @@ describe('AppController (e2e)', () => {
         imports: [AppModule],
         controllers: [
           AuthRefreshControllerFixture, 
+          AuthLocalControllerFixture,
         ],
       }).compile();
 

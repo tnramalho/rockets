@@ -5,12 +5,12 @@ import {
 } from '@concepta/nestjs-common';
 import { randomUUID } from 'crypto';
 import { mock } from 'jest-mock-extended';
-import { AuthLocalController } from './auth-local.controller';
+import { AuthLocalControllerFixture } from '../__fixtures__/auth-local.controller.fixture';
 
-describe(AuthLocalController, () => {
+describe(AuthLocalControllerFixture, () => {
   const accessToken = 'accessToken';
   const refreshToken = 'refreshToken';
-  let controller: AuthLocalController;
+  let controller: AuthLocalControllerFixture;
   const response: AuthenticationResponseInterface = {
     accessToken,
     refreshToken,
@@ -24,10 +24,10 @@ describe(AuthLocalController, () => {
         });
       },
     });
-    controller = new AuthLocalController(issueTokenService);
+    controller = new AuthLocalControllerFixture(issueTokenService);
   });
 
-  describe(AuthLocalController.prototype.login, () => {
+  describe(AuthLocalControllerFixture.prototype.login, () => {
     it('should return user', async () => {
       const user: AuthenticatedUserInterface = {
         id: randomUUID(),

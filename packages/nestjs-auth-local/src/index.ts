@@ -12,7 +12,6 @@ export { AuthLocalLoginDto } from './dto/auth-local-login.dto';
 
 // module
 export { AuthLocalModule } from './auth-local.module';
-export { AuthLocalController } from './auth-local.controller';
 export { AuthLocalValidateUserService } from './services/auth-local-validate-user.service';
 
 export {

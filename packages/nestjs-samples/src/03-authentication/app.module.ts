@@ -61,6 +61,7 @@ import { createUserRepository } from './user/create-user-repository';
   exports: [
     AuthenticationModule,
     AuthRefreshModule,
+    AuthLocalModule,
   ]
 })
 export class AppModule {}

@@ -10,25 +10,23 @@ import {
   AuthenticationResponseInterface,
 } from '@concepta/nestjs-common';
 import {
-  AuthUser,
   IssueTokenServiceInterface,
+  AuthUser,
   AuthenticationJwtResponseDto,
   AuthPublic,
 } from '@concepta/nestjs-authentication';
-import { AuthLocalIssueTokenService } from './auth-local.constants';
-import { AuthLocalLoginDto } from './dto/auth-local-login.dto';
-import { AuthLocalGuard } from './auth-local.guard';
+import { AuthRefreshGuard, AuthRefreshIssueTokenService, AuthRefreshDto } from '@concepta/nestjs-auth-refresh';
 
 /**
  * Auth Local controller
  */
-@Controller('auth/login')
-@UseGuards(AuthLocalGuard)
+@Controller('token/refresh')
+@UseGuards(AuthRefreshGuard)
 @AuthPublic()
 @ApiTags('auth')
-export class AuthLocalController {
+export class AuthRefreshControllerFixture {
   constructor(
-    @Inject(AuthLocalIssueTokenService)
+    @Inject(AuthRefreshIssueTokenService)
     private issueTokenService: IssueTokenServiceInterface,
   ) {}
 
@@ -36,8 +34,8 @@ export class AuthLocalController {
    * Login
    */
   @ApiBody({
-    type: AuthLocalLoginDto,
-    description: 'DTO containing username and password.',
+    type: AuthRefreshDto,
+    description: 'DTO containing a refresh token.',
   })
   @ApiOkResponse({
     type: AuthenticationJwtResponseDto,
@@ -45,7 +43,7 @@ export class AuthLocalController {
   })
   @ApiUnauthorizedResponse()
   @Post()
-  async login(
+  async refresh(
     @AuthUser() user: AuthenticatedUserInterface,
   ): Promise<AuthenticationResponseInterface> {
     return this.issueTokenService.responsePayload(user.id);
