@@ -21,7 +21,6 @@ import { AuthGithubOptionsInterface } from './interfaces/auth-github-options.int
 import { AuthGithubOptionsExtrasInterface } from './interfaces/auth-github-options-extras.interface';
 import { authGithubDefaultConfig } from './config/auth-github-default.config';
 import { AuthGithubSettingsInterface } from './interfaces/auth-github-settings.interface';
-import { AuthGithubController } from './auth-github.controller';
 import { AuthGithubStrategy } from './auth-github.strategy';
 
 const RAW_OPTIONS_TOKEN = Symbol('__AUTH_GITHUB_MODULE_RAW_OPTIONS_TOKEN__');
@@ -51,14 +50,13 @@ function definitionTransform(
   extras: AuthGithubOptionsExtrasInterface,
 ): DynamicModule {
   const { providers = [] } = definition;
-  const { global = false, controllers } = extras;
+  const { global = false } = extras;
 
   return {
     ...definition,
     global,
     imports: createAuthGithubImports(),
     providers: createAuthGithubProviders({ providers }),
-    controllers: createAuthGithubControllers({ controllers }),
     exports: [ConfigModule, RAW_OPTIONS_TOKEN, ...createAuthGithubExports()],
   };
 }
@@ -72,14 +70,6 @@ export function createAuthGithubExports() {
     AUTH_GITHUB_MODULE_SETTINGS_TOKEN,
     AUTH_GITHUB_ISSUE_TOKEN_SERVICE_TOKEN,
   ];
-}
-
-export function createAuthGithubControllers(
-  overrides: AuthGithubOptions = {},
-): DynamicModule['controllers'] {
-  return overrides?.controllers !== undefined
-    ? overrides.controllers
-    : [AuthGithubController];
 }
 
 export function createAuthGithubProviders(options: {

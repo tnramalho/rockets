@@ -10,8 +10,8 @@ import {
   AuthenticationJwtResponseDto,
   AuthPublic,
 } from '@concepta/nestjs-authentication';
-import { AUTH_GITHUB_ISSUE_TOKEN_SERVICE_TOKEN } from './auth-github.constants';
-import { AuthGithubGuard } from './auth-github.guard';
+import { AUTH_GITHUB_ISSUE_TOKEN_SERVICE_TOKEN } from '../auth-github.constants';
+import { AuthGithubGuard } from '../auth-github.guard';
 
 // TODO: improve documentation
 /**
@@ -33,7 +33,7 @@ import { AuthGithubGuard } from './auth-github.guard';
 @UseGuards(AuthGithubGuard)
 @AuthPublic()
 @ApiTags('auth')
-export class AuthGithubController {
+export class AuthGithubControllerFixture {
   constructor(
     @Inject(AUTH_GITHUB_ISSUE_TOKEN_SERVICE_TOKEN)
     private issueTokenService: IssueTokenServiceInterface,
