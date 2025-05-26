@@ -7,7 +7,6 @@ import { CrudModule } from '@concepta/nestjs-crud';
 import { UserModule, UserModelService } from '@concepta/nestjs-user';
 import { PasswordModule } from '@concepta/nestjs-password';
 import { FederatedModule } from '@concepta/nestjs-federated';
-import { AuthGoogleController } from './auth-google.controller';
 import { AuthGoogleModule } from './auth-google.module';
 
 import { FederatedEntityFixture } from './__fixtures__/federated-entity.fixture';
@@ -15,7 +14,6 @@ import { UserEntityFixture } from './__fixtures__/user.entity.fixture';
 
 describe(AuthGoogleModule, () => {
   let authGoogleModule: AuthGoogleModule;
-  let authGoogleController: AuthGoogleController;
 
   describe(AuthGoogleModule.forRoot, () => {
     it('module should be loaded', async () => {
@@ -64,10 +62,8 @@ describe(AuthGoogleModule, () => {
       }).compile();
 
       authGoogleModule = module.get(AuthGoogleModule);
-      authGoogleController = module.get(AuthGoogleController);
 
       expect(authGoogleModule).toBeInstanceOf(AuthGoogleModule);
-      expect(authGoogleController).toBeInstanceOf(AuthGoogleController);
     });
   });
 });

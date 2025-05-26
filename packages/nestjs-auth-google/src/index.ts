@@ -1,5 +1,4 @@
 export { AuthGoogleModule } from './auth-google.module';
-export { AuthGoogleController } from './auth-google.controller';
 
 // dto
 export { AuthGoogleLoginDto } from './dto/auth-google-login.dto';

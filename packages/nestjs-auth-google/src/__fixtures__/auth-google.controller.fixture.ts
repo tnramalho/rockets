@@ -10,8 +10,8 @@ import {
   AuthenticationJwtResponseDto,
   AuthPublic,
 } from '@concepta/nestjs-authentication';
-import { AUTH_GOOGLE_ISSUE_TOKEN_SERVICE_TOKEN } from './auth-google.constants';
-import { AuthGoogleGuard } from './auth-google.guard';
+import { AUTH_GOOGLE_ISSUE_TOKEN_SERVICE_TOKEN } from '../auth-google.constants';
+import { AuthGoogleGuard } from '../auth-google.guard';
 
 /**
  * Google controller
@@ -32,7 +32,7 @@ import { AuthGoogleGuard } from './auth-google.guard';
 @UseGuards(AuthGoogleGuard)
 @AuthPublic()
 @ApiTags('auth')
-export class AuthGoogleController {
+export class AuthGoogleControllerFixture {
   constructor(
     @Inject(AUTH_GOOGLE_ISSUE_TOKEN_SERVICE_TOKEN)
     private issueTokenService: IssueTokenServiceInterface,
