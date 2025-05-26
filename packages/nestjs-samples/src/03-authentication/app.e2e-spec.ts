@@ -29,9 +29,7 @@ describe('AppController (e2e)', () => {
     beforeEach(async () => {
       const moduleFixture: TestingModule = await Test.createTestingModule({
         imports: [AppModule],
-        controllers: [
-          AuthLocalControllerFixture,
-        ]
+        controllers: [AuthLocalControllerFixture],
       })
         .overrideProvider('USER_MODULE_USER_ENTITY_REPO_TOKEN')
         .useValue(mock<UserEntity>())
@@ -115,10 +113,7 @@ describe('AppController (e2e)', () => {
     beforeEach(async () => {
       const moduleFixture: TestingModule = await Test.createTestingModule({
         imports: [AppModule],
-        controllers: [
-          AuthRefreshControllerFixture, 
-          AuthLocalControllerFixture,
-        ],
+        controllers: [AuthRefreshControllerFixture, AuthLocalControllerFixture],
       }).compile();
 
       app = moduleFixture.createNestApplication();

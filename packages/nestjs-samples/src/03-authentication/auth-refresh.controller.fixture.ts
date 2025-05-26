@@ -15,7 +15,11 @@ import {
   AuthenticationJwtResponseDto,
   AuthPublic,
 } from '@concepta/nestjs-authentication';
-import { AuthRefreshGuard, AuthRefreshIssueTokenService, AuthRefreshDto } from '@concepta/nestjs-auth-refresh';
+import {
+  AuthRefreshGuard,
+  AuthRefreshIssueTokenService,
+  AuthRefreshDto,
+} from '@concepta/nestjs-auth-refresh';
 
 /**
  * Auth Local controller

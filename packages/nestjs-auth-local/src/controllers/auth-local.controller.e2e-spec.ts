@@ -17,7 +17,7 @@ describe('AuthLocalController (e2e)', () => {
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModuleDbFixture],
-      controllers:[AuthLocalControllerFixture],
+      controllers: [AuthLocalControllerFixture],
     })
       .overrideProvider(PasswordValidationService)
       .useValue({

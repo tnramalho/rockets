@@ -10,7 +10,6 @@ import {
   AuthRecoveryUserModelService,
   AuthRecoveryUserPasswordService,
 } from './auth-recovery.constants';
-import { AuthRecoveryController } from './__fixtures__/auth-recovery.controller.fixture';
 import {
   createAuthRecoveryEmailServiceProvider,
   createAuthRecoveryExports,
