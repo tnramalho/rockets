@@ -1,6 +1,5 @@
 import {
   AuthVerifyModule,
-  AuthVerifyController,
   AuthVerifyService,
   AuthVerifyNotificationService,
   AuthVerifyDto,
@@ -9,10 +8,6 @@ import {
 describe('Index', () => {
   it('AuthVerifyModule should be a function', () => {
     expect(AuthVerifyModule).toBeInstanceOf(Function);
-  });
-
-  it('AuthVerifyController should be a function', () => {
-    expect(AuthVerifyController).toBeInstanceOf(Function);
   });
 
   it('AuthVerifyService should be a function', () => {

@@ -1,18 +1,19 @@
-import { Repository } from 'typeorm';
 import { Test, TestingModule } from '@nestjs/testing';
 import { DynamicModule, ModuleMetadata } from '@nestjs/common';
 import {
   RepositoryInterface,
   getDynamicRepositoryToken,
-  getEntityRepositoryToken,
 } from '@concepta/nestjs-common';
-import { TypeOrmExtModule } from '@concepta/nestjs-typeorm-ext';
+import {
+  TypeOrmExtModule,
+  TypeOrmRepositoryAdapter,
+} from '@concepta/nestjs-typeorm-ext';
 
 import { FileService } from './services/file.service';
 
 import { FILE_MODULE_FILE_ENTITY_KEY } from './file.constants';
 
-import { FileEntityInterface } from './interfaces/file-entity.interface';
+import { FileEntityInterface } from '@concepta/nestjs-common';
 
 import { AwsStorageService } from './__fixtures__/aws-storage.service';
 import { FileStorageModuleFixture } from './__fixtures__/file-storage.module.fixture';
@@ -30,19 +31,18 @@ describe(FileModule, () => {
   let testModule: TestingModule;
   let fileModule: FileModule;
   let fileService: FileService;
-  let fileEntityRepo: RepositoryInterface<FileEntityInterface>;
   let fileDynamicRepo: RepositoryInterface<FileEntityInterface>;
 
   describe(FileModule.forRoot, () => {
     beforeEach(async () => {
       testModule = await Test.createTestingModule(
         testModuleFactory([
-          FileModule.forRoot({
-            entities: {
-              file: {
-                entity: FileEntityFixture,
-              },
+          TypeOrmExtModule.forFeature({
+            file: {
+              entity: FileEntityFixture,
             },
+          }),
+          FileModule.forRoot({
             storageServices: [new AwsStorageService()],
           }),
         ]),
@@ -59,12 +59,12 @@ describe(FileModule, () => {
     beforeEach(async () => {
       testModule = await Test.createTestingModule(
         testModuleFactory([
-          FileModule.register({
-            entities: {
-              file: {
-                entity: FileEntityFixture,
-              },
+          TypeOrmExtModule.forFeature({
+            file: {
+              entity: FileEntityFixture,
             },
+          }),
+          FileModule.register({
             storageServices: [new AwsStorageService()],
           }),
         ]),
@@ -82,15 +82,17 @@ describe(FileModule, () => {
       testModule = await Test.createTestingModule(
         testModuleFactory([
           FileModule.forRootAsync({
+            imports: [
+              TypeOrmExtModule.forFeature({
+                file: {
+                  entity: FileEntityFixture,
+                },
+              }),
+            ],
             inject: [AwsStorageService],
             useFactory: (awsStorageService: AwsStorageService) => ({
               storageServices: [awsStorageService],
             }),
-            entities: {
-              file: {
-                entity: FileEntityFixture,
-              },
-            },
           }),
         ]),
       ).compile();
@@ -116,15 +118,17 @@ describe(FileModule, () => {
       testModule = await Test.createTestingModule(
         testModuleFactory([
           FileModule.registerAsync({
+            imports: [
+              TypeOrmExtModule.forFeature({
+                file: {
+                  entity: FileEntityFixture,
+                },
+              }),
+            ],
             inject: [AwsStorageService],
             useFactory: (awsStorageService: AwsStorageService) => ({
               storageServices: [awsStorageService],
             }),
-            entities: {
-              file: {
-                entity: FileEntityFixture,
-              },
-            },
           }),
         ]),
       ).compile();
@@ -139,9 +143,6 @@ describe(FileModule, () => {
   const commonVars = () => {
     fileModule = testModule.get(FileModule);
     fileService = testModule.get(FileService);
-    fileEntityRepo = testModule.get<RepositoryInterface<FileEntityFixture>>(
-      getEntityRepositoryToken(FILE_MODULE_FILE_ENTITY_KEY),
-    );
     fileDynamicRepo = testModule.get(
       getDynamicRepositoryToken(FILE_MODULE_FILE_ENTITY_KEY),
     );
@@ -150,8 +151,7 @@ describe(FileModule, () => {
   const commonTests = async () => {
     expect(fileModule).toBeInstanceOf(FileModule);
     expect(fileService).toBeInstanceOf(FileService);
-    expect(fileEntityRepo).toBeInstanceOf(Repository);
-    expect(fileDynamicRepo).toBeInstanceOf(Repository);
+    expect(fileDynamicRepo).toBeInstanceOf(TypeOrmRepositoryAdapter);
 
     const result = await fileService.push({
       fileName: FILE_NAME_FIXTURE,

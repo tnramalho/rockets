@@ -9,9 +9,7 @@ import {
   AuthLocalPasswordValidationService,
   AuthLocalUserModelService,
 } from './auth-local.constants';
-import { AuthLocalController } from './auth-local.controller';
 import {
-  createAuthLocalControllers,
   createAuthLocalExports,
   createAuthLocalIssueTokenServiceProvider,
   createAuthLocalPasswordValidationServiceProvider,
@@ -32,51 +30,6 @@ describe('Auth-local.module-definition', () => {
         AuthLocalPasswordValidationService,
         AuthLocalValidateUserService,
       ]);
-    });
-  });
-
-  describe(createAuthLocalControllers.name, () => {
-    it('should return a default AuthLocalController', () => {
-      const result = createAuthLocalControllers();
-      expect(result).toEqual([AuthLocalController]);
-    });
-
-    it('should return a default AuthLocalController', () => {
-      const result = createAuthLocalControllers({});
-      expect(result).toEqual([AuthLocalController]);
-    });
-
-    it('should return a default AuthLocalController', () => {
-      const result = createAuthLocalControllers({ controllers: undefined });
-      expect(result).toEqual([AuthLocalController]);
-    });
-
-    it('should return the provided controllers', () => {
-      const customController = class CustomController {};
-      const result = createAuthLocalControllers({
-        controllers: [customController],
-      });
-      expect(result).toEqual([customController]);
-    });
-
-    it('should return an empty array if the controllers option is an empty array', () => {
-      const result = createAuthLocalControllers({ controllers: [] });
-      expect(result).toEqual([]);
-    });
-
-    it('should return an array with AuthLocalController if the controllers option includes AuthLocalController', () => {
-      const result = createAuthLocalControllers({
-        controllers: [AuthLocalController],
-      });
-      expect(result).toEqual([AuthLocalController]);
-    });
-
-    it('should return an array with AuthLocalController and the provided controllers if the controllers option includes AuthLocalController and other controllers', () => {
-      const customController = class CustomController {};
-      const result = createAuthLocalControllers({
-        controllers: [AuthLocalController, customController],
-      });
-      expect(result).toEqual([AuthLocalController, customController]);
     });
   });
 

@@ -12,7 +12,7 @@ import { UserFactory } from '@concepta/nestjs-user/src/seeding';
 
 import { AUTH_RECOVERY_MODULE_SETTINGS_TOKEN } from './auth-recovery.constants';
 
-import { AuthRecoveryController } from './auth-recovery.controller';
+import { AuthRecoveryController } from './__fixtures__/auth-recovery.controller.fixture';
 import { AuthRecoverySettingsInterface } from './interfaces/auth-recovery-settings.interface';
 import { AuthRecoveryRecoverPasswordDto } from './dto/auth-recovery-recover-password.dto';
 import { AuthRecoveryRecoverLoginDto } from './dto/auth-recovery-recover-login.dto';
@@ -20,10 +20,12 @@ import { AuthRecoveryUpdatePasswordDto } from './dto/auth-recovery-update-passwo
 
 import { UserEntityFixture } from './__fixtures__/user/entities/user-entity.fixture';
 import { AppModuleDbFixture } from './__fixtures__/app.module.db.fixture';
+import { UserModelService } from '@concepta/nestjs-user';
 
 describe(AuthRecoveryController, () => {
   let app: INestApplication;
   let otpService: OtpService;
+  let userModelService: UserModelService;
   let settings: AuthRecoverySettingsInterface;
   let user: UserEntityFixture;
   let seedingSource: SeedingSource;
@@ -40,6 +42,7 @@ describe(AuthRecoveryController, () => {
     await app.init();
 
     otpService = moduleFixture.get<OtpService>(OtpService);
+    userModelService = moduleFixture.get<UserModelService>(UserModelService);
 
     settings = moduleFixture.get<AuthRecoverySettingsInterface>(
       AUTH_RECOVERY_MODULE_SETTINGS_TOKEN,
@@ -123,15 +126,14 @@ describe(AuthRecoveryController, () => {
       } as AuthRecoveryUpdatePasswordDto)
       .expect(200);
   });
+
+  const getFirstUser = async (
+    _app: INestApplication,
+  ): Promise<UserInterface> => {
+    const response = await userModelService.find();
+    return response[0];
+  };
 });
-
-const getFirstUser = async (app: INestApplication): Promise<UserInterface> => {
-  const response = await supertest(app.getHttpServer())
-    .get('/user?limit=1')
-    .expect(200);
-
-  return response?.body[0];
-};
 
 const validateRecoverPassword = async (
   app: INestApplication,

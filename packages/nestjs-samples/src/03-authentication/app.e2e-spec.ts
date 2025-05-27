@@ -9,11 +9,12 @@ import {
   ExceptionsFilter,
   RepositoryInterface,
 } from '@concepta/nestjs-common';
-import { UserCrudService } from '@concepta/nestjs-user';
 
 import { AppModule } from './app.module';
 import { UserEntity } from './user/user.entity';
 import { UserDto } from './user/user.controller';
+import { AuthLocalControllerFixture } from './auth-local.controller.fixture';
+import { AuthRefreshControllerFixture } from './auth-refresh.controller.fixture';
 
 const sleep = (ms: number) => {
   return new Promise((resolve) => {
@@ -28,13 +29,12 @@ describe('AppController (e2e)', () => {
     beforeEach(async () => {
       const moduleFixture: TestingModule = await Test.createTestingModule({
         imports: [AppModule],
+        controllers: [AuthLocalControllerFixture],
       })
         .overrideProvider('USER_MODULE_USER_ENTITY_REPO_TOKEN')
         .useValue(mock<UserEntity>())
         .overrideProvider('USER_MODULE_USER_CUSTOM_REPO_TOKEN')
         .useValue(mock<RepositoryInterface<UserEntity>>())
-        .overrideProvider(UserCrudService)
-        .useValue({})
         .compile();
 
       app = moduleFixture.createNestApplication();
@@ -113,10 +113,8 @@ describe('AppController (e2e)', () => {
     beforeEach(async () => {
       const moduleFixture: TestingModule = await Test.createTestingModule({
         imports: [AppModule],
-      })
-        .overrideProvider(UserCrudService)
-        .useValue({})
-        .compile();
+        controllers: [AuthRefreshControllerFixture, AuthLocalControllerFixture],
+      }).compile();
 
       app = moduleFixture.createNestApplication();
       await app.init();

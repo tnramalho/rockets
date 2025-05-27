@@ -18,7 +18,6 @@ import { AuthVerifyOptionsInterface } from './interfaces/auth-verify-options.int
 import { AuthVerifyOptionsExtrasInterface } from './interfaces/auth-verify-options-extras.interface';
 import { AuthVerifySettingsInterface } from './interfaces/auth-verify-settings.interface';
 import { authVerifyDefaultConfig } from './config/auth-verify-default.config';
-import { AuthVerifyController } from './auth-verify.controller';
 import { AuthVerifyService } from './services/auth-verify.service';
 import { AuthVerifyNotificationService } from './services/auth-verify-notification.service';
 import { AuthVerifyEmailServiceInterface } from './interfaces/auth-verify-email.service.interface';
@@ -50,14 +49,13 @@ function definitionTransform(
   extras: AuthVerifyOptionsExtrasInterface,
 ): DynamicModule {
   const { providers } = definition;
-  const { controllers, global } = extras;
+  const { global } = extras;
 
   return {
     ...definition,
     global,
     imports: createAuthVerifyImports(),
     providers: createAuthVerifyProviders({ providers }),
-    controllers: createAuthVerifyControllers({ controllers }),
     exports: [ConfigModule, RAW_OPTIONS_TOKEN, ...createAuthVerifyExports()],
   };
 }
@@ -89,14 +87,6 @@ export function createAuthVerifyProviders(options: {
     createAuthVerifyUserModelServiceProvider(options.overrides),
     createAuthVerifyNotificationServiceProvider(options.overrides),
   ];
-}
-
-export function createAuthVerifyControllers(
-  overrides: Pick<AuthVerifyOptions, 'controllers'> = {},
-): DynamicModule['controllers'] {
-  return overrides?.controllers !== undefined
-    ? overrides.controllers
-    : [AuthVerifyController];
 }
 
 export function createAuthVerifySettingsProvider(

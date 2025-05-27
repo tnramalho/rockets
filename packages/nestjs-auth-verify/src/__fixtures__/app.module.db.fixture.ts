@@ -20,6 +20,7 @@ import { UserEntityFixture } from './user/entities/user-entity.fixture';
 
 import { default as ormConfig } from './ormconfig.fixture';
 import { MailerServiceFixture } from './email/mailer.service.fixture';
+import { AuthVerifyControllerFixture } from './auth-verify.controller.fixture';
 
 @Module({
   imports: [
@@ -47,24 +48,32 @@ import { MailerServiceFixture } from './email/mailer.service.fixture';
         emailService,
       }),
     }),
-    OtpModule.forRoot({
-      entities: {
-        userOtp: {
-          entity: UserOtpEntityFixture,
-        },
-      },
+    OtpModule.forRootAsync({
+      useFactory: () => ({}),
+      entities: ['userOtp'],
+      imports: [
+        TypeOrmExtModule.forFeature({
+          userOtp: {
+            entity: UserOtpEntityFixture,
+          },
+        }),
+      ],
     }),
     PasswordModule.forRoot({}),
-    UserModule.forRoot({
-      entities: {
-        user: {
-          entity: UserEntityFixture,
-        },
-      },
+    UserModule.forRootAsync({
+      imports: [
+        TypeOrmExtModule.forFeature({
+          user: {
+            entity: UserEntityFixture,
+          },
+        }),
+      ],
+      useFactory: () => ({}),
     }),
     EmailModule.forRoot({
       mailerService: new MailerServiceFixture(),
     }),
   ],
+  controllers: [AuthVerifyControllerFixture],
 })
 export class AppModuleDbFixture {}

@@ -7,7 +7,6 @@ import { CrudModule } from '@concepta/nestjs-crud';
 import { UserModule, UserModelService } from '@concepta/nestjs-user';
 import { PasswordModule } from '@concepta/nestjs-password';
 import { FederatedModule } from '@concepta/nestjs-federated';
-import { AuthGithubController } from './auth-github.controller';
 import { AuthGithubModule } from './auth-github.module';
 
 import { FederatedEntityFixture } from './__fixtures__/federated-entity.fixture';
@@ -15,7 +14,6 @@ import { UserEntityFixture } from './__fixtures__/user.entity.fixture';
 
 describe(AuthGithubModule, () => {
   let authGithubModule: AuthGithubModule;
-  let authGithubController: AuthGithubController;
 
   describe(AuthGithubModule.forRoot, () => {
     it('module should be loaded', async () => {
@@ -36,33 +34,36 @@ describe(AuthGithubModule, () => {
             }),
           }),
           FederatedModule.forRootAsync({
+            imports: [
+              TypeOrmExtModule.forFeature({
+                federated: {
+                  entity: FederatedEntityFixture,
+                },
+              }),
+            ],
             inject: [UserModelService],
             useFactory: (userModelService) => ({
               userModelService,
             }),
-            entities: {
-              federated: {
-                entity: FederatedEntityFixture,
-              },
-            },
           }),
           CrudModule.forRoot({}),
           PasswordModule.forRoot({}),
-          UserModule.forRoot({
-            entities: {
-              user: {
-                entity: UserEntityFixture,
-              },
-            },
+          UserModule.forRootAsync({
+            imports: [
+              TypeOrmExtModule.forFeature({
+                user: {
+                  entity: UserEntityFixture,
+                },
+              }),
+            ],
+            useFactory: () => ({}),
           }),
         ],
       }).compile();
 
       authGithubModule = module.get(AuthGithubModule);
-      authGithubController = module.get(AuthGithubController);
 
       expect(authGithubModule).toBeInstanceOf(AuthGithubModule);
-      expect(authGithubController).toBeInstanceOf(AuthGithubController);
     });
   });
 });

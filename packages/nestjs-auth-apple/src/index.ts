@@ -1,5 +1,4 @@
 export { AuthAppleModule } from './auth-apple.module';
-export { AuthAppleController } from './auth-apple.controller';
 
 // dto
 export { AuthAppleLoginDto } from './dto/auth-apple-login.dto';

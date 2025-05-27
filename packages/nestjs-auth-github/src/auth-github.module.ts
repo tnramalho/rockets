@@ -4,10 +4,6 @@ import {
   AuthGithubAsyncOptions,
   AuthGithubModuleClass,
   AuthGithubOptions,
-  createAuthGithubControllers,
-  createAuthGithubExports,
-  createAuthGithubImports,
-  createAuthGithubProviders,
 } from './auth-github.module-definition';
 
 /**
@@ -29,15 +25,5 @@ export class AuthGithubModule extends AuthGithubModuleClass {
 
   static forRootAsync(options: AuthGithubAsyncOptions): DynamicModule {
     return super.registerAsync({ ...options, global: true });
-  }
-
-  static forFeature(options: AuthGithubOptions): DynamicModule {
-    return {
-      module: AuthGithubModule,
-      imports: createAuthGithubImports(),
-      providers: createAuthGithubProviders({ overrides: options }),
-      controllers: createAuthGithubControllers(options),
-      exports: createAuthGithubExports(),
-    };
   }
 }

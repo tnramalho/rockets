@@ -1,5 +1,4 @@
 export { AuthGithubModule } from './auth-github.module';
-export { AuthGithubController } from './auth-github.controller';
 
 // dto
 export { AuthGithubLoginDto } from './dto/auth-github-login.dto';

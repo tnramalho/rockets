@@ -1,6 +1,5 @@
 import {
   AuthRecoveryModule,
-  AuthRecoveryController,
   AuthRecoveryService,
   AuthRecoveryNotificationService,
   AuthRecoveryRecoverLoginDto,
@@ -12,10 +11,6 @@ import {
 describe('Index', () => {
   it('AuthRecoveryModule should be a function', () => {
     expect(AuthRecoveryModule).toBeInstanceOf(Function);
-  });
-
-  it('AuthRecoveryController should be a function', () => {
-    expect(AuthRecoveryController).toBeInstanceOf(Function);
   });
 
   it('AuthRecoveryService should be a function', () => {

@@ -21,7 +21,6 @@ import { AuthGoogleOptionsInterface } from './interfaces/auth-google-options.int
 import { AuthGoogleOptionsExtrasInterface } from './interfaces/auth-google-options-extras.interface';
 import { authGoogleDefaultConfig } from './config/auth-google-default.config';
 import { AuthGoogleSettingsInterface } from './interfaces/auth-google-settings.interface';
-import { AuthGoogleController } from './auth-google.controller';
 import { AuthGoogleStrategy } from './auth-google.strategy';
 
 const RAW_OPTIONS_TOKEN = Symbol('__AUTH_GOOGLE_MODULE_RAW_OPTIONS_TOKEN__');
@@ -51,14 +50,13 @@ function definitionTransform(
   extras: AuthGoogleOptionsExtrasInterface,
 ): DynamicModule {
   const { providers = [] } = definition;
-  const { global = false, controllers } = extras;
+  const { global = false } = extras;
 
   return {
     ...definition,
     global,
     imports: createAuthGoogleImports(),
     providers: createAuthGoogleProviders({ providers }),
-    controllers: createAuthGoogleControllers({ controllers }),
     exports: [ConfigModule, RAW_OPTIONS_TOKEN, ...createAuthGoogleExports()],
   };
 }
@@ -72,14 +70,6 @@ export function createAuthGoogleExports() {
     AUTH_GOOGLE_MODULE_SETTINGS_TOKEN,
     AUTH_GOOGLE_ISSUE_TOKEN_SERVICE_TOKEN,
   ];
-}
-
-export function createAuthGoogleControllers(
-  overrides: AuthGoogleOptions = {},
-): DynamicModule['controllers'] {
-  return overrides?.controllers !== undefined
-    ? overrides.controllers
-    : [AuthGoogleController];
 }
 
 export function createAuthGoogleProviders(options: {

@@ -7,7 +7,6 @@ import { CrudModule } from '@concepta/nestjs-crud';
 import { UserModule, UserModelService } from '@concepta/nestjs-user';
 import { PasswordModule } from '@concepta/nestjs-password';
 import { FederatedModule } from '@concepta/nestjs-federated';
-import { AuthGoogleController } from './auth-google.controller';
 import { AuthGoogleModule } from './auth-google.module';
 
 import { FederatedEntityFixture } from './__fixtures__/federated-entity.fixture';
@@ -15,7 +14,6 @@ import { UserEntityFixture } from './__fixtures__/user.entity.fixture';
 
 describe(AuthGoogleModule, () => {
   let authGoogleModule: AuthGoogleModule;
-  let authGoogleController: AuthGoogleController;
 
   describe(AuthGoogleModule.forRoot, () => {
     it('module should be loaded', async () => {
@@ -36,33 +34,36 @@ describe(AuthGoogleModule, () => {
             }),
           }),
           FederatedModule.forRootAsync({
+            imports: [
+              TypeOrmExtModule.forFeature({
+                federated: {
+                  entity: FederatedEntityFixture,
+                },
+              }),
+            ],
             inject: [UserModelService],
             useFactory: (userModelService) => ({
               userModelService,
             }),
-            entities: {
-              federated: {
-                entity: FederatedEntityFixture,
-              },
-            },
           }),
           CrudModule.forRoot({}),
           PasswordModule.forRoot({}),
-          UserModule.forRoot({
-            entities: {
-              user: {
-                entity: UserEntityFixture,
-              },
-            },
+          UserModule.forRootAsync({
+            imports: [
+              TypeOrmExtModule.forFeature({
+                user: {
+                  entity: UserEntityFixture,
+                },
+              }),
+            ],
+            useFactory: () => ({}),
           }),
         ],
       }).compile();
 
       authGoogleModule = module.get(AuthGoogleModule);
-      authGoogleController = module.get(AuthGoogleController);
 
       expect(authGoogleModule).toBeInstanceOf(AuthGoogleModule);
-      expect(authGoogleController).toBeInstanceOf(AuthGoogleController);
     });
   });
 });

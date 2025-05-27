@@ -27,7 +27,6 @@ import { AuthLocalOptionsInterface } from './interfaces/auth-local-options.inter
 import { AuthLocalSettingsInterface } from './interfaces/auth-local-settings.interface';
 import { AuthLocalUserModelServiceInterface } from './interfaces/auth-local-user-model-service.interface';
 import { authLocalDefaultConfig } from './config/auth-local-default.config';
-import { AuthLocalController } from './auth-local.controller';
 import { AuthLocalStrategy } from './auth-local.strategy';
 import { AuthLocalValidateUserService } from './services/auth-local-validate-user.service';
 
@@ -58,14 +57,13 @@ function definitionTransform(
   extras: AuthLocalOptionsExtrasInterface,
 ): DynamicModule {
   const { providers } = definition;
-  const { controllers, global } = extras;
+  const { global } = extras;
 
   return {
     ...definition,
     global,
     imports: createAuthLocalImports(),
     providers: createAuthLocalProviders({ providers }),
-    controllers: createAuthLocalControllers({ controllers }),
     exports: [ConfigModule, RAW_OPTIONS_TOKEN, ...createAuthLocalExports()],
   };
 }
@@ -100,14 +98,6 @@ export function createAuthLocalProviders(options: {
     createAuthLocalUserModelServiceProvider(options.overrides),
     createAuthLocalPasswordValidationServiceProvider(options.overrides),
   ];
-}
-
-export function createAuthLocalControllers(
-  overrides?: Pick<AuthLocalOptions, 'controllers'>,
-): DynamicModule['controllers'] {
-  return overrides?.controllers !== undefined
-    ? overrides.controllers
-    : [AuthLocalController];
 }
 
 export function createAuthLocalOptionsProvider(

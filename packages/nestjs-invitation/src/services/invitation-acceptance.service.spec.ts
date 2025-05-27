@@ -5,8 +5,8 @@ import {
   INVITATION_MODULE_CATEGORY_USER_KEY,
   OtpInterface,
   UserInterface,
+  UserEntityInterface,
 } from '@concepta/nestjs-common';
-import { UserEntityInterface } from '@concepta/nestjs-user';
 import { OtpService } from '@concepta/nestjs-otp';
 import { UserFactory } from '@concepta/nestjs-user/src/seeding';
 import { SeedingSource } from '@concepta/typeorm-seeding';
@@ -15,7 +15,7 @@ import { EmailService } from '@concepta/nestjs-email';
 import { INVITATION_MODULE_SETTINGS_TOKEN } from '../invitation.constants';
 import { InvitationFactory } from '../seeding/invitation.factory';
 import { InvitationSettingsInterface } from '../interfaces/options/invitation-settings.interface';
-import { InvitationEntityInterface } from '../interfaces/domain/invitation-entity.interface';
+import { InvitationEntityInterface } from '@concepta/nestjs-common';
 import { InvitationAcceptanceService } from './invitation-acceptance.service';
 import { AppModuleFixture } from '../__fixtures__/app.module.fixture';
 import { InvitationEntityFixture } from '../__fixtures__/invitation/entities/invitation.entity.fixture';

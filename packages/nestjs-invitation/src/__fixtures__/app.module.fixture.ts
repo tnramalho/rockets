@@ -15,6 +15,8 @@ import { InvitationAcceptedEventAsync } from '../events/invitation-accepted.even
 import { UserOtpEntityFixture } from './user/entities/user-otp.entity.fixture';
 import { UserEntityFixture } from './user/entities/user.entity.fixture';
 import { default as ormConfig } from './ormconfig.fixture';
+import { InvitationAcceptanceController } from './controllers/invitation-acceptance.controller';
+import { InvitationReattemptController } from './controllers/invitation-reattempt.controller';
 
 @Module({
   imports: [
@@ -27,35 +29,45 @@ import { default as ormConfig } from './ormconfig.fixture';
       useFactory: (mailerService: MailerService) => ({ mailerService }),
     }),
     InvitationModule.registerAsync({
+      imports: [
+        TypeOrmExtModule.forFeature({
+          invitation: {
+            entity: InvitationEntityFixture,
+          },
+        }),
+      ],
       inject: [UserModelService, OtpService, EmailService],
       useFactory: (userModelService, otpService, emailService) => ({
         userModelService,
         otpService,
         emailService,
       }),
-      entities: {
-        invitation: {
-          entity: InvitationEntityFixture,
-        },
-      },
     }),
-    OtpModule.forRoot({
-      entities: {
-        'user-otp': {
-          entity: UserOtpEntityFixture,
-        },
-      },
+    OtpModule.forRootAsync({
+      imports: [
+        TypeOrmExtModule.forFeature({
+          'user-otp': {
+            entity: UserOtpEntityFixture,
+          },
+        }),
+      ],
+      useFactory: () => ({}),
+      entities: ['user-otp'],
     }),
     PasswordModule.forRoot({}),
-    UserModule.forRoot({
-      settings: {
-        invitationAcceptedEvent: InvitationAcceptedEventAsync,
-      },
-      entities: {
-        user: {
-          entity: UserEntityFixture,
+    UserModule.forRootAsync({
+      imports: [
+        TypeOrmExtModule.forFeature({
+          user: {
+            entity: UserEntityFixture,
+          },
+        }),
+      ],
+      useFactory: () => ({
+        settings: {
+          invitationAcceptedEvent: InvitationAcceptedEventAsync,
         },
-      },
+      }),
     }),
     EmailModule.register({
       mailerService: {
@@ -77,6 +89,11 @@ import { default as ormConfig } from './ormconfig.fixture';
         }),
       },
     },
+  ],
+  controllers: [
+    // InvitationController,
+    InvitationAcceptanceController,
+    InvitationReattemptController,
   ],
 })
 export class AppModuleFixture {}

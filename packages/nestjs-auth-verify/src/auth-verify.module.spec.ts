@@ -4,7 +4,6 @@ import { mock } from 'jest-mock-extended';
 
 import { EmailModule, EmailService } from '@concepta/nestjs-email';
 
-import { AuthVerifyController } from './auth-verify.controller';
 import { AuthVerifyModule } from './auth-verify.module';
 import { AuthVerifyEmailServiceInterface } from './interfaces/auth-verify-email.service.interface';
 import { AuthVerifyOtpServiceInterface } from './interfaces/auth-verify-otp.service.interface';
@@ -24,7 +23,6 @@ describe(AuthVerifyModule, () => {
   let otpService: AuthVerifyOtpServiceInterface;
   let userModelService: AuthVerifyUserModelServiceInterface;
   let authVerifyService: AuthVerifyServiceInterface;
-  let authVerifyController: AuthVerifyController;
   let emailService: EmailService;
 
   const mockEmailService = mock<AuthVerifyEmailServiceInterface>();
@@ -120,8 +118,6 @@ describe(AuthVerifyModule, () => {
       UserModelServiceFixture,
     );
     authVerifyService = testModule.get<AuthVerifyService>(AuthVerifyService);
-    authVerifyController =
-      testModule.get<AuthVerifyController>(AuthVerifyController);
   }
 
   function commonTests() {
@@ -130,7 +126,6 @@ describe(AuthVerifyModule, () => {
     expect(emailService).toBeInstanceOf(EmailService);
     expect(userModelService).toBeInstanceOf(UserModelServiceFixture);
     expect(authVerifyService).toBeInstanceOf(AuthVerifyService);
-    expect(authVerifyController).toBeInstanceOf(AuthVerifyController);
   }
 });
 

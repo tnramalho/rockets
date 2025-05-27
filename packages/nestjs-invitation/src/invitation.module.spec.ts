@@ -17,9 +17,6 @@ import { InvitationOtpServiceInterface } from './interfaces/services/invitation-
 
 import { InvitationUserModelServiceInterface } from './interfaces/services/invitation-user-model.service.interface';
 import { InvitationServiceInterface } from './interfaces/services/invitation-service.interface';
-import { InvitationController } from './controllers/invitation.controller';
-import { InvitationAcceptanceController } from './controllers/invitation-acceptance.controller';
-import { InvitationReattemptController } from './controllers/invitation-reattempt.controller';
 import { InvitationService } from './services/invitation.service';
 import { InvitationSendService } from './services/invitation-send.service';
 import { InvitationAcceptanceService } from './services/invitation-acceptance.service';
@@ -47,9 +44,6 @@ describe(InvitationModule, () => {
   let invitationSendService: InvitationSendServiceInterface;
   let invitationAcceptanceService: InvitationAcceptanceService;
   let invitationRevocationService: InvitationRevocationService;
-  let invitationController: InvitationController;
-  let invitationAcceptanceController: InvitationAcceptanceController;
-  let invitationReattemptController: InvitationReattemptController;
 
   const mockEmailService = mock<InvitationEmailServiceInterface>();
 
@@ -57,16 +51,16 @@ describe(InvitationModule, () => {
     beforeEach(async () => {
       testModule = await Test.createTestingModule(
         testModuleFactory([
+          TypeOrmExtModule.forFeature({
+            invitation: {
+              entity: InvitationEntityFixture,
+            },
+          }),
           InvitationModule.forRoot({
             emailService: mockEmailService,
             otpService: new OtpServiceFixture(),
             userModelService: new UserModelServiceFixture(),
             invitationSendService: new InvitationSendServiceFixture(),
-            entities: {
-              invitation: {
-                entity: InvitationEntityFixture,
-              },
-            },
           }),
         ]),
       ).compile();
@@ -82,15 +76,15 @@ describe(InvitationModule, () => {
     beforeEach(async () => {
       testModule = await Test.createTestingModule(
         testModuleFactory([
+          TypeOrmExtModule.forFeature({
+            invitation: {
+              entity: InvitationEntityFixture,
+            },
+          }),
           InvitationModule.forRoot({
             emailService: mockEmailService,
             otpService: new OtpServiceFixture(),
             userModelService: new UserModelServiceFixture(),
-            entities: {
-              invitation: {
-                entity: InvitationEntityFixture,
-              },
-            },
           }),
         ]),
       ).compile();
@@ -113,16 +107,16 @@ describe(InvitationModule, () => {
     beforeEach(async () => {
       testModule = await Test.createTestingModule(
         testModuleFactory([
+          TypeOrmExtModule.forFeature({
+            invitation: {
+              entity: InvitationEntityFixture,
+            },
+          }),
           InvitationModule.register({
             emailService: mockEmailService,
             otpService: new OtpServiceFixture(),
             userModelService: new UserModelServiceFixture(),
             invitationSendService: new InvitationSendServiceFixture(),
-            entities: {
-              invitation: {
-                entity: InvitationEntityFixture,
-              },
-            },
           }),
         ]),
       ).compile();
@@ -143,6 +137,13 @@ describe(InvitationModule, () => {
       testModule = await Test.createTestingModule(
         testModuleFactory([
           InvitationModule.forRootAsync({
+            imports: [
+              TypeOrmExtModule.forFeature({
+                invitation: {
+                  entity: InvitationEntityFixture,
+                },
+              }),
+            ],
             inject: [
               UserModelServiceFixture,
               OtpServiceFixture,
@@ -160,11 +161,6 @@ describe(InvitationModule, () => {
               emailService,
               invitationSendService,
             }),
-            entities: {
-              invitation: {
-                entity: InvitationEntityFixture,
-              },
-            },
           }),
         ]),
       ).compile();
@@ -185,6 +181,13 @@ describe(InvitationModule, () => {
       testModule = await Test.createTestingModule(
         testModuleFactory([
           InvitationModule.registerAsync({
+            imports: [
+              TypeOrmExtModule.forFeature({
+                invitation: {
+                  entity: InvitationEntityFixture,
+                },
+              }),
+            ],
             inject: [
               UserModelServiceFixture,
               OtpServiceFixture,
@@ -202,11 +205,6 @@ describe(InvitationModule, () => {
               emailService,
               invitationSendService,
             }),
-            entities: {
-              invitation: {
-                entity: InvitationEntityFixture,
-              },
-            },
           }),
         ]),
       ).compile();
@@ -249,19 +247,6 @@ describe(InvitationModule, () => {
     invitationRevocationService = testModule.get<InvitationRevocationService>(
       InvitationRevocationService,
     );
-
-    invitationController =
-      testModule.get<InvitationController>(InvitationController);
-
-    invitationAcceptanceController =
-      testModule.get<InvitationAcceptanceController>(
-        InvitationAcceptanceController,
-      );
-
-    invitationReattemptController =
-      testModule.get<InvitationReattemptController>(
-        InvitationReattemptController,
-      );
   }
 
   function commonTests() {
@@ -276,15 +261,6 @@ describe(InvitationModule, () => {
     );
     expect(invitationRevocationService).toBeInstanceOf(
       InvitationRevocationService,
-    );
-
-    expect(invitationController).toBeInstanceOf(InvitationController);
-    expect(invitationAcceptanceController).toBeInstanceOf(
-      InvitationAcceptanceController,
-    );
-
-    expect(invitationReattemptController).toBeInstanceOf(
-      InvitationReattemptController,
     );
   }
 });

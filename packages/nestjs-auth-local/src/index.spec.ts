@@ -1,6 +1,5 @@
 import {
   AuthLocalModule,
-  AuthLocalController,
   AuthLocalLoginDto,
   AuthLocalGuard,
   LocalAuthGuard,
@@ -9,10 +8,6 @@ import {
 describe('Index', () => {
   it('AuthLocalModule should be imported', () => {
     expect(AuthLocalModule).toBeInstanceOf(Function);
-  });
-
-  it('AuthLocalController should be imported', () => {
-    expect(AuthLocalController).toBeInstanceOf(Function);
   });
 
   it('AuthLocalLoginDto should be imported', () => {
