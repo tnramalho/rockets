@@ -71,6 +71,7 @@ describe('Org Profile Crud Builder (e2e)', () => {
   ): ConfigurableCrudOptions => {
     if (!extras) return options;
 
+    options.service.entity = OrgProfileEntityFixture;
     options.controller.model.type = extras.model.type;
     if (options.createOne) options.createOne.dto = extras.createOne.dto;
     if (options.updateOne) options.updateOne.dto = extras.updateOne.dto;

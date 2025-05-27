@@ -1,5 +1,4 @@
 export { AuthRecoveryModule } from './auth-recovery.module';
-export { AuthRecoveryController } from './__fixtures__/auth-recovery.controller.fixture';
 export { AuthRecoveryService } from './services/auth-recovery.service';
 export { AuthRecoveryNotificationService } from './services/auth-recovery-notification.service';
 

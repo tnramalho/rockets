@@ -24,11 +24,11 @@ import { OrgProfilePaginatedDto } from '../dto/profile/org-profile-paginated.dto
 import { OrgProfileCreateDto } from '../dto/profile/org-profile-create.dto';
 import { OrgProfileUpdateDto } from '../dto/profile/org-profile-update.dto';
 import { ORG_MODULE_CONFIGURABLE_CRUD_PROFILE_SERVICE_TOKEN } from '../org.constants';
-import { OrgProfileEntityFixture } from '../__fixtures__/org-profile.entity.fixture';
+import { OrgProfileSqliteEntity } from '@concepta/nestjs-typeorm-ext';
 
 const orgProfileCrudBuilderDefaultOptions: ConfigurableCrudOptions = {
   service: {
-    entity: OrgProfileEntityFixture,
+    entity: OrgProfileSqliteEntity,
     injectionToken: ORG_MODULE_CONFIGURABLE_CRUD_PROFILE_SERVICE_TOKEN,
   },
   controller: {

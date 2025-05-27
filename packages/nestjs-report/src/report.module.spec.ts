@@ -14,7 +14,7 @@ import { ReportService } from './services/report.service';
 
 import { REPORT_MODULE_REPORT_ENTITY_KEY } from './report.constants';
 
-import { ReportEntityInterface } from '@concepta/nestjs-common/src/domain/report/interfaces/report-entity.interface';
+import { ReportEntityInterface } from '@concepta/nestjs-common';
 
 import { AwsStorageService } from './__fixtures__/aws-storage.service';
 import {
