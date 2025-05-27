@@ -5,9 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "BSD-3-Clause",
-  "publishConfig": {
-    "access": "restricted"
-  },
+  "private": true,
   "files": [
     "dist/**/!(*.spec|*.e2e-spec|*.fixture).{js,d.ts}"
   ],
