@@ -1,9 +1,12 @@
-import { LoggerTransportInterface } from '@concepta/nestjs-logger';
-import { Inject, Injectable, LogLevel } from '@nestjs/common';
 import { CoralogixLogger, Log, LoggerConfig } from 'coralogix-logger';
-import { LoggerCoralogixSettingsInterface } from '../interfaces/logger-coralogix-settings.interface';
+
+import { Inject, Injectable, LogLevel } from '@nestjs/common';
+
+import { LoggerTransportInterface } from '@concepta/nestjs-logger';
+
 import { LOGGER_CORALOGIX_MODULE_SETTINGS_TOKEN } from '../config/logger-coralogix.config';
 import { LoggerCoralogixException } from '../exceptions/logger-coralogix.exceptions';
+import { LoggerCoralogixSettingsInterface } from '../interfaces/logger-coralogix-settings.interface';
 
 @Injectable()
 export class LoggerCoralogixTransport implements LoggerTransportInterface {

@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { Order } from './entities/order.entity';
+import { Injectable, OnModuleInit } from '@nestjs/common';
+
 import { CreateOrderDto } from './dto/create-order.dto';
+import { Order } from './entities/order.entity';
 import {
   OrderCreatedEvent,
   OrderCreatedEventAsync,
 } from './events/order-created.event';
-import { OnModuleInit } from '@nestjs/common';
 import {
   OrderCreatedListener,
   OrderCreatedListenerAsync,

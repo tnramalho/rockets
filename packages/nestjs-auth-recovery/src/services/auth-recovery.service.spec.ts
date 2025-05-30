@@ -1,5 +1,6 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
 import { UserPasswordServiceInterface } from '@concepta/nestjs-user';
 
 import {
@@ -7,14 +8,13 @@ import {
   AuthRecoveryUserModelService,
   AuthRecoveryUserPasswordService,
 } from '../auth-recovery.constants';
-
-import { AuthRecoveryService } from './auth-recovery.service';
-import { AuthRecoveryNotificationService } from './auth-recovery-notification.service';
-
-import { AuthRecoverySettingsInterface } from '../interfaces/auth-recovery-settings.interface';
-import { AuthRecoveryOtpServiceInterface } from '../interfaces/auth-recovery-otp.service.interface';
-import { AuthRecoveryUserModelServiceInterface } from '../interfaces/auth-recovery-user-model.service.interface';
 import { AuthRecoveryNotificationServiceInterface } from '../interfaces/auth-recovery-notification.service.interface';
+import { AuthRecoveryOtpServiceInterface } from '../interfaces/auth-recovery-otp.service.interface';
+import { AuthRecoverySettingsInterface } from '../interfaces/auth-recovery-settings.interface';
+import { AuthRecoveryUserModelServiceInterface } from '../interfaces/auth-recovery-user-model.service.interface';
+
+import { AuthRecoveryNotificationService } from './auth-recovery-notification.service';
+import { AuthRecoveryService } from './auth-recovery.service';
 
 import { AppModuleFixture } from '../__fixtures__/app.module.fixture';
 import { OtpServiceFixture } from '../__fixtures__/otp/otp.service.fixture';

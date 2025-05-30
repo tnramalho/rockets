@@ -1,5 +1,5 @@
-import { EventBaseInterface } from './events/interfaces/event-base.interface';
 import { EventAsyncInterface } from './events/interfaces/event-async.interface';
+import { EventBaseInterface } from './events/interfaces/event-base.interface';
 import { EventExpectsReturnOfInterface } from './events/interfaces/event-expects-return-of.interface';
 
 export type EventPayload<V> = V;

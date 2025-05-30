@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { CryptUtil } from '../utils/crypt.util';
-import { PasswordValidationServiceInterface } from '../interfaces/password-validation-service.interface';
+
 import { PasswordValidateOptionsInterface } from '../interfaces/password-validate-options.interface';
+import { PasswordValidationServiceInterface } from '../interfaces/password-validation-service.interface';
+import { CryptUtil } from '../utils/crypt.util';
 
 /**
  * Service with functions related to password validation

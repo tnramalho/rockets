@@ -1,12 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TypeOrmExtModule } from '@concepta/nestjs-typeorm-ext';
-import { AuthenticationModule } from '@concepta/nestjs-authentication';
+
 import { AuthJwtModule } from '@concepta/nestjs-auth-jwt';
-import { JwtModule } from '@concepta/nestjs-jwt';
+import { AuthenticationModule } from '@concepta/nestjs-authentication';
 import { CrudModule } from '@concepta/nestjs-crud';
-import { UserModule, UserModelService } from '@concepta/nestjs-user';
-import { PasswordModule } from '@concepta/nestjs-password';
 import { FederatedModule } from '@concepta/nestjs-federated';
+import { JwtModule } from '@concepta/nestjs-jwt';
+import { PasswordModule } from '@concepta/nestjs-password';
+import { TypeOrmExtModule } from '@concepta/nestjs-typeorm-ext';
+import { UserModule, UserModelService } from '@concepta/nestjs-user';
+
 import { AuthGithubModule } from './auth-github.module';
 
 import { FederatedEntityFixture } from './__fixtures__/federated-entity.fixture';

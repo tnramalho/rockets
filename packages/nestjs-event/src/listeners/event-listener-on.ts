@@ -1,8 +1,9 @@
-import { EventListener } from './event-listener';
-import { EventListenOnInterface } from '../services/interfaces/event-listen-on.interface';
-import { EventListenOnOptionsInterface } from '../services/interfaces/event-listen-on-options.interface';
 import { EventManager } from '../event-manager';
 import { EventClassInterface } from '../events/interfaces/event-class.interface';
+import { EventListenOnOptionsInterface } from '../services/interfaces/event-listen-on-options.interface';
+import { EventListenOnInterface } from '../services/interfaces/event-listen-on.interface';
+
+import { EventListener } from './event-listener';
 
 /**
  * Abstract event listen on class.

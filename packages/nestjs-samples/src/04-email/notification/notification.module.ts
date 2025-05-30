@@ -1,6 +1,9 @@
-import { Module } from '@nestjs/common';
 import { MailerModule, MailerService } from '@nestjs-modules/mailer';
+
+import { Module } from '@nestjs/common';
+
 import { EmailModule } from '@concepta/nestjs-email';
+
 import { NotificationController } from './notification.controller';
 
 @Module({

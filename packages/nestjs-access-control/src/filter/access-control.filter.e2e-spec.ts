@@ -1,3 +1,6 @@
+import { AccessControl } from 'accesscontrol';
+import supertest from 'supertest';
+
 import {
   Controller,
   ExecutionContext,
@@ -7,8 +10,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Test, TestingModule } from '@nestjs/testing';
-import { AccessControl } from 'accesscontrol';
-import supertest from 'supertest';
+
 import { AccessControlModule } from '../access-control.module';
 import { ACCESS_CONTROL_MODULE_SETTINGS_TOKEN } from '../constants';
 import { AccessControlReadOne } from '../decorators/access-control-read-one.decorator';

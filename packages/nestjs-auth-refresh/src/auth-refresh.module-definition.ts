@@ -5,13 +5,13 @@ import {
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-import { createSettingsProvider } from '@concepta/nestjs-common';
 import {
   IssueTokenService,
   IssueTokenServiceInterface,
   VerifyTokenService,
   VerifyTokenServiceInterface,
 } from '@concepta/nestjs-authentication';
+import { createSettingsProvider } from '@concepta/nestjs-common';
 
 import {
   AUTH_REFRESH_MODULE_SETTINGS_TOKEN,
@@ -19,12 +19,11 @@ import {
   AuthRefreshUserModelService,
   AuthRefreshVerifyService,
 } from './auth-refresh.constants';
-
-import { AuthRefreshOptionsInterface } from './interfaces/auth-refresh-options.interface';
-import { AuthRefreshOptionsExtrasInterface } from './interfaces/auth-refresh-options-extras.interface';
-import { AuthRefreshSettingsInterface } from './interfaces/auth-refresh-settings.interface';
-import { authRefreshDefaultConfig } from './config/auth-refresh-default.config';
 import { AuthRefreshStrategy } from './auth-refresh.strategy';
+import { authRefreshDefaultConfig } from './config/auth-refresh-default.config';
+import { AuthRefreshOptionsExtrasInterface } from './interfaces/auth-refresh-options-extras.interface';
+import { AuthRefreshOptionsInterface } from './interfaces/auth-refresh-options.interface';
+import { AuthRefreshSettingsInterface } from './interfaces/auth-refresh-settings.interface';
 
 const RAW_OPTIONS_TOKEN = Symbol('__AUTH_REFRESH_MODULE_RAW_OPTIONS_TOKEN__');
 

@@ -1,11 +1,13 @@
 import { Column } from 'typeorm';
+
 import {
   OrgProfileInterface,
   ReferenceId,
   ReferenceIdInterface,
+  OrgEntityInterface,
 } from '@concepta/nestjs-common';
+
 import { CommonSqliteEntity } from '../common/common-sqlite.entity';
-import { OrgEntityInterface } from '@concepta/nestjs-common';
 
 /**
  * Org Sqlite Entity

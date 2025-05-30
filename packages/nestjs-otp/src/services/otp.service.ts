@@ -1,7 +1,9 @@
-import ms from 'ms';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
+import ms from 'ms';
+
 import { Inject, Injectable, Type } from '@nestjs/common';
+
 import {
   ReferenceAssignment,
   OtpInterface,
@@ -15,16 +17,17 @@ import {
   ModelMutateException,
   ModelValidationException,
 } from '@concepta/nestjs-common';
+
+import { OtpCreateDto } from '../dto/otp-create.dto';
+import { OtpEntityNotFoundException } from '../exceptions/otp-entity-not-found.exception';
+import { OtpLimitReachedException } from '../exceptions/otp-limit-reached.exception';
+import { OtpTypeNotDefinedException } from '../exceptions/otp-type-not-defined.exception';
+import { OtpServiceInterface } from '../interfaces/otp-service.interface';
+import { OtpSettingsInterface } from '../interfaces/otp-settings.interface';
 import {
   OTP_MODULE_REPOSITORIES_TOKEN,
   OTP_MODULE_SETTINGS_TOKEN,
 } from '../otp.constants';
-import { OtpSettingsInterface } from '../interfaces/otp-settings.interface';
-import { OtpServiceInterface } from '../interfaces/otp-service.interface';
-import { OtpCreateDto } from '../dto/otp-create.dto';
-import { OtpTypeNotDefinedException } from '../exceptions/otp-type-not-defined.exception';
-import { OtpEntityNotFoundException } from '../exceptions/otp-entity-not-found.exception';
-import { OtpLimitReachedException } from '../exceptions/otp-limit-reached.exception';
 
 @Injectable()
 export class OtpService implements OtpServiceInterface {

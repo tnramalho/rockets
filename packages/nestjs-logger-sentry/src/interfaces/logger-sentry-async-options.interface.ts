@@ -1,4 +1,5 @@
 import { FactoryProvider, ModuleMetadata } from '@nestjs/common';
+
 import { LoggerSentryOptionsInterface } from './logger-sentry-options.interface';
 
 /**

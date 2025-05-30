@@ -1,4 +1,5 @@
 import { EventListenerOn } from '@concepta/nestjs-event';
+
 import {
   OrderCreatedEvent,
   OrderCreatedEventAsync,

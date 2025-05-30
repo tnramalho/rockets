@@ -1,8 +1,12 @@
 import { Exclude, Expose } from 'class-transformer';
+
 import { ApiProperty } from '@nestjs/swagger';
-import { RoleAssignmentInterface } from '@concepta/nestjs-common';
-import { CommonEntityDto } from '@concepta/nestjs-common';
-import { ReferenceId } from '@concepta/nestjs-common';
+
+import {
+  RoleAssignmentInterface,
+  CommonEntityDto,
+  ReferenceId,
+} from '@concepta/nestjs-common';
 
 /**
  * Role assignment DTO

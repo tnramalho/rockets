@@ -1,12 +1,13 @@
 import { PasswordStorageInterface } from '@concepta/nestjs-common';
 
 import { PasswordStrengthEnum } from '../enum/password-strength.enum';
+import { PasswordNotStrongException } from '../exceptions/password-not-strong.exception';
 import { PasswordSettingsInterface } from '../interfaces/password-settings.interface';
+
 import { PasswordCreationService } from './password-creation.service';
 import { PasswordStorageService } from './password-storage.service';
 import { PasswordStrengthService } from './password-strength.service';
 import { PasswordValidationService } from './password-validation.service';
-import { PasswordNotStrongException } from '../exceptions/password-not-strong.exception';
 
 describe(PasswordCreationService, () => {
   let config: PasswordSettingsInterface;

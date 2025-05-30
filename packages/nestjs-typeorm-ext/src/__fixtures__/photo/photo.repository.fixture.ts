@@ -1,4 +1,5 @@
 import { DataSource, Repository } from 'typeorm';
+
 import { PhotoEntityFixture } from './photo.entity.fixture';
 
 interface CustomFixtureMethods {

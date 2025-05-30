@@ -1,5 +1,7 @@
 import { IsObject, IsOptional, IsString } from 'class-validator';
+
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
 import { LiteralObject } from '@concepta/nestjs-common';
 
 export class InvitationAcceptInviteDto {

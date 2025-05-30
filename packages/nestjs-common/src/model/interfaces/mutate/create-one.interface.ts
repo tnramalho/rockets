@@ -1,4 +1,5 @@
 import { PlainLiteralObject } from '@nestjs/common';
+
 import { ReferenceIdInterface } from '../../../reference/interfaces/reference-id.interface';
 
 export interface CreateOneInterface<

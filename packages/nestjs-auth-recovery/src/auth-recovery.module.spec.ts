@@ -1,23 +1,24 @@
 import { mock } from 'jest-mock-extended';
+
 import { DynamicModule, ModuleMetadata } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { EmailModule, EmailService } from '@concepta/nestjs-email';
+import { UserPasswordServiceInterface } from '@concepta/nestjs-user';
 
-import { AuthRecoveryOtpServiceInterface } from './interfaces/auth-recovery-otp.service.interface';
+import { AuthRecoveryModule } from './auth-recovery.module';
 import { AuthRecoveryEmailServiceInterface } from './interfaces/auth-recovery-email.service.interface';
+import { AuthRecoveryOtpServiceInterface } from './interfaces/auth-recovery-otp.service.interface';
 import { AuthRecoveryUserModelServiceInterface } from './interfaces/auth-recovery-user-model.service.interface';
 import { AuthRecoveryServiceInterface } from './interfaces/auth-recovery.service.interface';
-import { AuthRecoveryModule } from './auth-recovery.module';
 import { AuthRecoveryService } from './services/auth-recovery.service';
 
-import { UserModelServiceFixture } from './__fixtures__/user/services/user-model.service.fixture';
-import { UserModuleFixture } from './__fixtures__/user/user.module.fixture';
-import { OtpModuleFixture } from './__fixtures__/otp/otp.module.fixture';
-import { UserPasswordServiceFixture } from './__fixtures__/user/services/user-password.service.fixture';
-import { OtpServiceFixture } from './__fixtures__/otp/otp.service.fixture';
 import { MailerServiceFixture } from './__fixtures__/email/mailer.service.fixture';
-import { UserPasswordServiceInterface } from '@concepta/nestjs-user';
+import { OtpModuleFixture } from './__fixtures__/otp/otp.module.fixture';
+import { OtpServiceFixture } from './__fixtures__/otp/otp.service.fixture';
+import { UserModelServiceFixture } from './__fixtures__/user/services/user-model.service.fixture';
+import { UserPasswordServiceFixture } from './__fixtures__/user/services/user-password.service.fixture';
+import { UserModuleFixture } from './__fixtures__/user/user.module.fixture';
 
 describe(AuthRecoveryModule, () => {
   let testModule: TestingModule;

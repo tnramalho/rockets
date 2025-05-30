@@ -1,4 +1,5 @@
 import { Entity, Unique } from 'typeorm';
+
 import { CacheSqliteEntity } from '@concepta/nestjs-typeorm-ext';
 
 /**

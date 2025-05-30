@@ -1,15 +1,18 @@
 import supertest from 'supertest';
-import { Test, TestingModule } from '@nestjs/testing';
+
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 import { getDataSourceToken } from '@nestjs/typeorm';
+
 import { SeedingSource } from '@concepta/typeorm-seeding';
 
-import { UserFactory } from '../user.factory';
-import { UserEntityFixture } from '../__fixtures__/user.entity.fixture';
-import { UserProfileEntityFixture } from '../__fixtures__/user-profile.entity.fixture';
 import { UserProfileFactory } from '../user-profile.factory';
 import { UserProfileSeeder } from '../user-profile.seeder';
+import { UserFactory } from '../user.factory';
+
 import { AppModuleUserProfileFixture } from '../__fixtures__/app.module.user-profile.fixture';
+import { UserProfileEntityFixture } from '../__fixtures__/user-profile.entity.fixture';
+import { UserEntityFixture } from '../__fixtures__/user.entity.fixture';
 
 describe('User Profile Crud Builder (e2e)', () => {
   let app: INestApplication;

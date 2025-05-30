@@ -1,4 +1,5 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+
 import { UserEntity } from './user/user.entity';
 
 const config: TypeOrmModuleOptions = {

@@ -1,20 +1,22 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmExtModule } from '@concepta/nestjs-typeorm-ext';
+
+import { AuthJwtModule } from '@concepta/nestjs-auth-jwt';
 import { AuthLocalModule } from '@concepta/nestjs-auth-local';
 import { AuthRefreshModule } from '@concepta/nestjs-auth-refresh';
-import { AuthJwtModule } from '@concepta/nestjs-auth-jwt';
 import { AuthenticationModule } from '@concepta/nestjs-authentication';
+import { CrudModule } from '@concepta/nestjs-crud';
+import { JwtModule } from '@concepta/nestjs-jwt';
+import { PasswordModule } from '@concepta/nestjs-password';
+import { TypeOrmExtModule } from '@concepta/nestjs-typeorm-ext';
 import {
   UserModule,
   UserModelServiceInterface,
   UserModelService,
 } from '@concepta/nestjs-user';
-import { JwtModule } from '@concepta/nestjs-jwt';
-import { PasswordModule } from '@concepta/nestjs-password';
-import { CrudModule } from '@concepta/nestjs-crud';
+
+import { createUserRepository } from './user/create-user-repository';
 import { CustomUserController } from './user/user.controller';
 import { UserEntity } from './user/user.entity';
-import { createUserRepository } from './user/create-user-repository';
 
 @Module({
   imports: [

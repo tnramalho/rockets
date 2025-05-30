@@ -1,4 +1,5 @@
 import { Type } from '@nestjs/common';
+
 import { CanAccess } from './can-access.interface';
 
 export interface AccessControlQueryOptionInterface {

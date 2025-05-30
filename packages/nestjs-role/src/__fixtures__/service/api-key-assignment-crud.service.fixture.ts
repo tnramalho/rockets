@@ -1,8 +1,11 @@
 import { Repository } from 'typeorm';
-import { TypeOrmCrudService } from '@concepta/nestjs-crud';
-import { RoleAssignmentInterface } from '@concepta/nestjs-common';
-import { UserRoleEntityFixture } from '../entities/user-role-entity.fixture';
+
 import { InjectRepository } from '@nestjs/typeorm';
+
+import { RoleAssignmentInterface } from '@concepta/nestjs-common';
+import { TypeOrmCrudService } from '@concepta/nestjs-crud';
+
+import { UserRoleEntityFixture } from '../entities/user-role-entity.fixture';
 
 /**
  * Role assignment CRUD service

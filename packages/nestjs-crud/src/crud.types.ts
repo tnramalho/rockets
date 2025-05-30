@@ -1,6 +1,8 @@
-import { Type } from '@nestjs/common';
 import { CrudOptions as xCrudOptions } from '@nestjsx/crud';
 import { ObjectLiteral } from 'typeorm';
+
+import { Type } from '@nestjs/common';
+
 import { ConfigurableCrudOptions } from './util/interfaces/configurable-crud-options.interface';
 
 export type CrudValidationOptions = xCrudOptions['validation'];

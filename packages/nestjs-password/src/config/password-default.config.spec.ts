@@ -1,7 +1,8 @@
+import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { ConfigModule } from '@nestjs/config';
 import { PasswordOptionsInterface } from '../interfaces/password-options.interface';
+
 import { passwordDefaultConfig } from './password-default.config';
 
 describe('password configuration', () => {

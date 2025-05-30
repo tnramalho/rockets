@@ -1,4 +1,21 @@
 // import { Param } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+
+import {
+  AccessControlCreateMany,
+  AccessControlCreateOne,
+  AccessControlDeleteOne,
+  AccessControlQuery,
+  AccessControlReadMany,
+  AccessControlReadOne,
+  AccessControlRecoverOne,
+  AccessControlUpdateOne,
+} from '@concepta/nestjs-access-control';
+import {
+  UserCreatableInterface,
+  UserUpdatableInterface,
+  UserEntityInterface,
+} from '@concepta/nestjs-common';
 import {
   CrudBody,
   CrudCreateOne,
@@ -13,31 +30,15 @@ import {
   CrudReadMany,
   CrudRecoverOne,
 } from '@concepta/nestjs-crud';
-import { ApiTags } from '@nestjs/swagger';
-import {
-  UserCreatableInterface,
-  UserUpdatableInterface,
-} from '@concepta/nestjs-common';
-import {
-  AccessControlCreateMany,
-  AccessControlCreateOne,
-  AccessControlDeleteOne,
-  AccessControlQuery,
-  AccessControlReadMany,
-  AccessControlReadOne,
-  AccessControlRecoverOne,
-  AccessControlUpdateOne,
-} from '@concepta/nestjs-access-control';
 
+import { UserCreateManyDto } from '../../dto/user-create-many.dto';
+import { UserCreateDto } from '../../dto/user-create.dto';
+import { UserPaginatedDto } from '../../dto/user-paginated.dto';
+import { UserUpdateDto } from '../../dto/user-update.dto';
+import { UserDto } from '../../dto/user.dto';
+import { UserAccessQueryService } from '../../services/user-access-query.service';
 import { UserResource } from '../../user.types';
 import { UserCrudServiceFixture } from '../services/user-crud.service.fixture';
-import { UserEntityInterface } from '@concepta/nestjs-common';
-import { UserDto } from '../../dto/user.dto';
-import { UserCreateDto } from '../../dto/user-create.dto';
-import { UserCreateManyDto } from '../../dto/user-create-many.dto';
-import { UserUpdateDto } from '../../dto/user-update.dto';
-import { UserPaginatedDto } from '../../dto/user-paginated.dto';
-import { UserAccessQueryService } from '../../services/user-access-query.service';
 
 /**
  * User controller.

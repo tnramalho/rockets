@@ -1,4 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
+
 import { RuntimeExceptionOptions } from './interfaces/runtime-exception-options.interface';
 import { RuntimeException } from './runtime.exception';
 

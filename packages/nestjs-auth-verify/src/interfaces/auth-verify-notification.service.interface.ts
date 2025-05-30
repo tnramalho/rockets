@@ -1,4 +1,5 @@
 import { EmailSendOptionsInterface } from '@concepta/nestjs-common';
+
 import { AuthVerifyEmailParamsInterface } from './auth-verify-email-params.interface';
 
 export interface AuthVerifyNotificationServiceInterface {

@@ -1,7 +1,9 @@
-import { EntityManagerProxy } from './entity-manager.proxy';
-import { SafeTransactionOptionsInterface } from '../interfaces/safe-transaction-options.interface';
-import { TransactionProxy } from './transaction.proxy';
 import { ObjectLiteral, Repository } from 'typeorm';
+
+import { SafeTransactionOptionsInterface } from '../interfaces/safe-transaction-options.interface';
+
+import { EntityManagerProxy } from './entity-manager.proxy';
+import { TransactionProxy } from './transaction.proxy';
 
 export class RepositoryProxy<T extends ObjectLiteral> {
   private entityManagerProxy: EntityManagerProxy;

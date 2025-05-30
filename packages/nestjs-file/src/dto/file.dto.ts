@@ -1,8 +1,9 @@
-import { CommonEntityDto } from '@concepta/nestjs-common';
-import { FileInterface } from '@concepta/nestjs-common';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
 import { IsOptional, IsString } from 'class-validator';
+
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
+import { CommonEntityDto, FileInterface } from '@concepta/nestjs-common';
 
 /**
  * File DTO

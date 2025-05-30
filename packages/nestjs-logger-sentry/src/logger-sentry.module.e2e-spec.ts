@@ -1,9 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
 import supertest from 'supertest';
+
+import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
 import { AppErrorModuleFixture } from './__fixture__/app-error.module.fixture';
-import { LoggerSentryTransport } from './transports/logger-sentry.transport';
 import { AppWarnModuleFixture } from './__fixture__/app-warn.module.fixture';
+import { LoggerSentryTransport } from './transports/logger-sentry.transport';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;

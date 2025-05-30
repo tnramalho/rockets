@@ -1,25 +1,27 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { AuthVerifyServiceInterface } from '../interfaces/auth-verify.service.interface';
-import { AuthVerifySettingsInterface } from '../interfaces/auth-verify-settings.interface';
-import { AuthVerifyOtpServiceInterface } from '../interfaces/auth-verify-otp.service.interface';
-import { AuthVerifyUserModelServiceInterface } from '../interfaces/auth-verify-user-model.service.interface';
+import {
+  AssigneeRelationInterface,
+  ReferenceIdInterface,
+} from '@concepta/nestjs-common';
+
 import {
   AUTH_VERIFY_MODULE_SETTINGS_TOKEN,
   AuthVerifyOtpService,
   AuthVerifyUserModelService,
 } from '../auth-verify.constants';
-import { AuthVerifyNotificationService } from './auth-verify-notification.service';
-import {
-  AssigneeRelationInterface,
-  ReferenceIdInterface,
-} from '@concepta/nestjs-common';
-import { AuthVerifySendParamsInterface } from '../interfaces/auth-verify-send-params.interface';
-import { AuthVerifyConfirmParamsInterface } from '../interfaces/auth-verify-confirm-params.interface';
-import { AuthVerifyRevokeParamsInterface } from '../interfaces/auth-verify-revoke-params.interface';
-import { AuthVerifyValidateParamsInterface } from '../interfaces/auth-verify-validate-params.interface';
-import { AuthVerifyNotificationServiceInterface } from '../interfaces/auth-verify-notification.service.interface';
 import { AuthRecoveryOtpInvalidException } from '../exceptions/auth-verify-otp-invalid.exception';
+import { AuthVerifyConfirmParamsInterface } from '../interfaces/auth-verify-confirm-params.interface';
+import { AuthVerifyNotificationServiceInterface } from '../interfaces/auth-verify-notification.service.interface';
+import { AuthVerifyOtpServiceInterface } from '../interfaces/auth-verify-otp.service.interface';
+import { AuthVerifyRevokeParamsInterface } from '../interfaces/auth-verify-revoke-params.interface';
+import { AuthVerifySendParamsInterface } from '../interfaces/auth-verify-send-params.interface';
+import { AuthVerifySettingsInterface } from '../interfaces/auth-verify-settings.interface';
+import { AuthVerifyUserModelServiceInterface } from '../interfaces/auth-verify-user-model.service.interface';
+import { AuthVerifyValidateParamsInterface } from '../interfaces/auth-verify-validate-params.interface';
+import { AuthVerifyServiceInterface } from '../interfaces/auth-verify.service.interface';
+
+import { AuthVerifyNotificationService } from './auth-verify-notification.service';
 
 @Injectable()
 export class AuthVerifyService implements AuthVerifyServiceInterface {

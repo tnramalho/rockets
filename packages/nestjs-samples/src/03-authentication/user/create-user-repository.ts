@@ -1,5 +1,7 @@
 import { DataSource, FindOneOptions } from 'typeorm';
+
 import { UserEntityInterface } from '@concepta/nestjs-common';
+
 import { UserEntity } from './user.entity';
 
 export function createUserRepository(dataSource: DataSource) {

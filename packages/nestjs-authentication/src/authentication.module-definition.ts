@@ -12,16 +12,17 @@ import {
   JwtVerifyTokenServiceInterface,
 } from '@concepta/nestjs-jwt';
 
-import { AUTHENTICATION_MODULE_SETTINGS_TOKEN } from './authentication.constants';
-
-import { AuthenticationOptionsInterface } from './interfaces/authentication-options.interface';
+import {
+  AUTHENTICATION_MODULE_SETTINGS_TOKEN,
+  ValidateTokenService,
+} from './authentication.constants';
+import { authenticationDefaultConfig } from './config/authentication-default.config';
 import { AuthenticationOptionsExtrasInterface } from './interfaces/authentication-options-extras.interface';
+import { AuthenticationOptionsInterface } from './interfaces/authentication-options.interface';
 import { AuthenticationSettingsInterface } from './interfaces/authentication-settings.interface';
 import { ValidateTokenServiceInterface } from './interfaces/validate-token-service.interface';
-import { ValidateTokenService } from './authentication.constants';
-import { VerifyTokenService } from './services/verify-token.service';
 import { IssueTokenService } from './services/issue-token.service';
-import { authenticationDefaultConfig } from './config/authentication-default.config';
+import { VerifyTokenService } from './services/verify-token.service';
 
 const RAW_OPTIONS_TOKEN = Symbol('__AUTHENTICATION_MODULE_RAW_OPTIONS_TOKEN__');
 

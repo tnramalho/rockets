@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+
 import {
   ModelService,
   ReferenceIdInterface,
@@ -9,13 +10,14 @@ import {
   InjectDynamicRepository,
   ReportEntityInterface,
 } from '@concepta/nestjs-common';
+
 import { ReportCreateDto } from '../dto/report-create.dto';
 import { ReportUpdateDto } from '../dto/report-update.dto';
-import { ReportModelServiceInterface } from '../interfaces/report-model-service.interface';
-import { REPORT_MODULE_REPORT_ENTITY_KEY } from '../report.constants';
-import { ReportServiceKeyMissingException } from '../exceptions/report-service-key-missing.exception';
 import { ReportNameMissingException } from '../exceptions/report-name-missing.exception';
 import { ReportQueryException } from '../exceptions/report-query.exception';
+import { ReportServiceKeyMissingException } from '../exceptions/report-service-key-missing.exception';
+import { ReportModelServiceInterface } from '../interfaces/report-model-service.interface';
+import { REPORT_MODULE_REPORT_ENTITY_KEY } from '../report.constants';
 
 /**
  * Report model service

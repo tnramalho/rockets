@@ -5,6 +5,7 @@ import {
 } from '@nestjs/config';
 
 import { splitLogLevel } from '@concepta/nestjs-logger';
+
 import { LoggerCoralogixSettingsInterface } from '../interfaces/logger-coralogix-settings.interface';
 import { formatMessage, logLevelMap } from '../utils';
 

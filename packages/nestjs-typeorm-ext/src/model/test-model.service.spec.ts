@@ -1,8 +1,8 @@
 import { randomUUID } from 'crypto';
-import { Test, TestingModule } from '@nestjs/testing';
-import { SeedingSource } from '@concepta/typeorm-seeding';
-import { getDataSourceToken } from '@nestjs/typeorm';
+
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { getDataSourceToken } from '@nestjs/typeorm';
 
 import {
   ModelMutateException,
@@ -10,12 +10,13 @@ import {
   ModelIdNoMatchException,
   ModelService,
 } from '@concepta/nestjs-common';
+import { SeedingSource } from '@concepta/typeorm-seeding';
 
-import { AppModuleFixture } from '../__fixtures__/repository/app.module.fixture';
 import { TestModelServiceFixture } from '../__fixtures__/model/test-model.service.fixture';
-import { TestModuleFixture } from '../__fixtures__/repository/test.module.fixture';
+import { AppModuleFixture } from '../__fixtures__/repository/app.module.fixture';
 import { TestEntityFixture } from '../__fixtures__/repository/test.entity.fixture';
 import { TestFactoryFixture } from '../__fixtures__/repository/test.factory.fixture';
+import { TestModuleFixture } from '../__fixtures__/repository/test.module.fixture';
 
 describe(ModelService, () => {
   const WRONG_UUID = '3bfd065e-0c30-11ed-861d-0242ac120002';

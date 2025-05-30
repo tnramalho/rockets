@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+
 import {
   RepositoryInterface,
   getDynamicRepositoryToken,
@@ -9,17 +10,17 @@ import {
 } from '@concepta/nestjs-password';
 import { TypeOrmRepositoryAdapter } from '@concepta/nestjs-typeorm-ext';
 
+import { UserModelServiceInterface } from './interfaces/user-model-service.interface';
+import { UserAccessQueryService } from './services/user-access-query.service';
+import { UserModelService } from './services/user-model.service';
+import { UserPasswordHistoryModelService } from './services/user-password-history-model.service';
+import { UserPasswordHistoryService } from './services/user-password-history.service';
+import { UserPasswordService } from './services/user-password.service';
 import {
   USER_MODULE_USER_ENTITY_KEY,
   USER_MODULE_USER_PASSWORD_HISTORY_ENTITY_KEY,
 } from './user.constants';
 import { UserModule } from './user.module';
-import { UserModelService } from './services/user-model.service';
-import { UserPasswordService } from './services/user-password.service';
-import { UserModelServiceInterface } from './interfaces/user-model-service.interface';
-import { UserPasswordHistoryService } from './services/user-password-history.service';
-import { UserPasswordHistoryModelService } from './services/user-password-history-model.service';
-import { UserAccessQueryService } from './services/user-access-query.service';
 
 import { AppModuleFixture } from './__fixtures__/app.module.fixture';
 import { UserEntityFixture } from './__fixtures__/user.entity.fixture';

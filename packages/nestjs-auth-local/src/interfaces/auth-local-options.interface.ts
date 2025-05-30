@@ -1,5 +1,6 @@
 import { IssueTokenServiceInterface } from '@concepta/nestjs-authentication';
 import { PasswordValidationServiceInterface } from '@concepta/nestjs-password';
+
 import { AuthLocalSettingsInterface } from './auth-local-settings.interface';
 import { AuthLocalUserModelServiceInterface } from './auth-local-user-model-service.interface';
 import { AuthLocalValidateUserServiceInterface } from './auth-local-validate-user-service.interface';

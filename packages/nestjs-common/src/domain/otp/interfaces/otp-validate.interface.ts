@@ -1,5 +1,6 @@
 import { ReferenceAssignment } from '../../../reference/interfaces/reference.types';
 import { AssigneeRelationInterface } from '../../assignee/interfaces/assignee-relation.interface';
+
 import { OtpInterface } from './otp.interface';
 
 export interface OtpValidateInterface {

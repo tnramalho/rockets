@@ -4,8 +4,9 @@ import {
   registerAs,
 } from '@nestjs/config';
 
-import { LoggerSentrySettingsInterface } from '../interfaces/logger-sentry-settings.interface';
 import { splitLogLevel } from '@concepta/nestjs-logger';
+
+import { LoggerSentrySettingsInterface } from '../interfaces/logger-sentry-settings.interface';
 import { formatMessage, logLevelMap } from '../utils';
 
 /**

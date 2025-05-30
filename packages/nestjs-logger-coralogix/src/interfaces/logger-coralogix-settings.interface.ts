@@ -1,9 +1,11 @@
-import { LoggerCoralogixConfigInterface } from './logger-coralogix-config.interface';
+import { Severity } from 'coralogix-logger';
+
 import {
   LoggerSettingsInterface,
   LoggerTransportSettingsInterface,
 } from '@concepta/nestjs-logger';
-import { Severity } from 'coralogix-logger';
+
+import { LoggerCoralogixConfigInterface } from './logger-coralogix-config.interface';
 /**
  * Coralogix options interface.
  */

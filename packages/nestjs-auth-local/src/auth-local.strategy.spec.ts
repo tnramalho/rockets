@@ -1,19 +1,23 @@
 import { randomUUID } from 'crypto';
+
 import { mock } from 'jest-mock-extended';
+
+import { BadRequestException, HttpStatus } from '@nestjs/common';
+
 import { ReferenceIdInterface } from '@concepta/nestjs-common';
 import { PasswordValidationService } from '@concepta/nestjs-password';
-import { BadRequestException, HttpStatus } from '@nestjs/common';
+
 import { AuthLocalStrategy } from './auth-local.strategy';
+import { AuthLocalInvalidCredentialsException } from './exceptions/auth-local-invalid-credentials.exception';
+import { AuthLocalInvalidLoginDataException } from './exceptions/auth-local-invalid-login-data.exception';
+import { AuthLocalException } from './exceptions/auth-local.exception';
 import { AuthLocalSettingsInterface } from './interfaces/auth-local-settings.interface';
 import { AuthLocalUserModelServiceInterface } from './interfaces/auth-local-user-model-service.interface';
 import { AuthLocalValidateUserServiceInterface } from './interfaces/auth-local-validate-user-service.interface';
+import { AuthLocalValidateUserInterface } from './interfaces/auth-local-validate-user.interface';
 import { AuthLocalValidateUserService } from './services/auth-local-validate-user.service';
 
 import { UserFixture } from './__fixtures__/user/user.entity.fixture';
-import { AuthLocalValidateUserInterface } from './interfaces/auth-local-validate-user.interface';
-import { AuthLocalException } from './exceptions/auth-local.exception';
-import { AuthLocalInvalidCredentialsException } from './exceptions/auth-local-invalid-credentials.exception';
-import { AuthLocalInvalidLoginDataException } from './exceptions/auth-local-invalid-login-data.exception';
 
 describe(AuthLocalStrategy.name, () => {
   const USERNAME = 'username';

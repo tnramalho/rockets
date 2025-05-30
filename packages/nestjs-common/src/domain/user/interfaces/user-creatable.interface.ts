@@ -1,5 +1,6 @@
-import { UserInterface } from './user.interface';
 import { PasswordStorageInterface } from '../../password/interfaces/password-storage.interface';
+
+import { UserInterface } from './user.interface';
 
 export interface UserCreatableInterface
   extends Pick<UserInterface, 'username' | 'email'>,

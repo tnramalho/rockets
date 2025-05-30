@@ -1,6 +1,7 @@
-import { ValidationPipeOptions } from '@nestjs/common';
 import { ParamsOptions } from '@nestjsx/crud-request';
 import { ClassTransformOptions } from 'class-transformer';
+
+import { ValidationPipeOptions } from '@nestjs/common';
 
 export const CRUD_MODULE_SETTINGS_TOKEN = 'CRUD_MODULE_SETTINGS_TOKEN';
 

@@ -1,4 +1,5 @@
 import { Column, Entity } from 'typeorm';
+
 import { UserSqliteEntity } from '@concepta/nestjs-typeorm-ext';
 
 @Entity()

@@ -1,4 +1,5 @@
 import { DynamicModule, Provider } from '@nestjs/common';
+
 import { CanAccess } from './can-access.interface';
 
 export interface AccessControlOptionsExtrasInterface

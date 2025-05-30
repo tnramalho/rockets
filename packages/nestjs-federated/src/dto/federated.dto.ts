@@ -1,9 +1,14 @@
-import { IsString, ValidateNested } from 'class-validator';
 import { Exclude, Expose, Type } from 'class-transformer';
+import { IsString, ValidateNested } from 'class-validator';
+
 import { ApiProperty } from '@nestjs/swagger';
-import { ReferenceIdInterface } from '@concepta/nestjs-common';
-import { FederatedInterface } from '@concepta/nestjs-common';
-import { CommonEntityDto, ReferenceIdDto } from '@concepta/nestjs-common';
+
+import {
+  ReferenceIdInterface,
+  FederatedInterface,
+  CommonEntityDto,
+  ReferenceIdDto,
+} from '@concepta/nestjs-common';
 
 /**
  * Federated DTO

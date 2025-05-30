@@ -1,10 +1,11 @@
-import { DeepPartial } from '../../utils/deep-partial';
 import { ReferenceIdInterface } from '../../reference/interfaces/reference-id.interface';
-import { ByIdInterface } from './query/by-id.interface';
+import { DeepPartial } from '../../utils/deep-partial';
+
 import { CreateOneInterface } from './mutate/create-one.interface';
-import { UpdateOneInterface } from './mutate/update-one.interface';
-import { ReplaceOneInterface } from './mutate/replace-one.interface';
 import { RemoveOneInterface } from './mutate/remove-one.interface';
+import { ReplaceOneInterface } from './mutate/replace-one.interface';
+import { UpdateOneInterface } from './mutate/update-one.interface';
+import { ByIdInterface } from './query/by-id.interface';
 import { FindInterface } from './query/find.interface';
 
 export interface ModelServiceInterface<

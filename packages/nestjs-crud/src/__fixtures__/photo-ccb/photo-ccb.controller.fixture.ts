@@ -1,14 +1,14 @@
-import { PhotoEntityInterfaceFixture } from '../photo/interfaces/photo-entity.interface.fixture';
+import { CrudSoftDelete } from '../../decorators/routes/crud-soft-delete.decorator';
+import { ConfigurableCrudBuilder } from '../../util/configurable-crud.builder';
+import { PhotoCreateManyDtoFixture } from '../photo/dto/photo-create-many.dto.fixture';
+import { PhotoCreateDtoFixture } from '../photo/dto/photo-create.dto.fixture';
+import { PhotoPaginatedDtoFixture } from '../photo/dto/photo-paginated.dto.fixture';
+import { PhotoUpdateDtoFixture } from '../photo/dto/photo-update.dto.fixture';
+import { PhotoDtoFixture } from '../photo/dto/photo.dto.fixture';
 import { PhotoCreatableInterfaceFixture } from '../photo/interfaces/photo-creatable.interface.fixture';
+import { PhotoEntityInterfaceFixture } from '../photo/interfaces/photo-entity.interface.fixture';
 import { PhotoUpdatableInterfaceFixture } from '../photo/interfaces/photo-updatable.interface.fixture';
 import { PhotoFixture } from '../photo/photo.entity.fixture';
-import { PhotoDtoFixture } from '../photo/dto/photo.dto.fixture';
-import { PhotoPaginatedDtoFixture } from '../photo/dto/photo-paginated.dto.fixture';
-import { PhotoCreateDtoFixture } from '../photo/dto/photo-create.dto.fixture';
-import { PhotoCreateManyDtoFixture } from '../photo/dto/photo-create-many.dto.fixture';
-import { PhotoUpdateDtoFixture } from '../photo/dto/photo-update.dto.fixture';
-import { ConfigurableCrudBuilder } from '../../util/configurable-crud.builder';
-import { CrudSoftDelete } from '../../decorators/routes/crud-soft-delete.decorator';
 
 export const PHOTO_CRUD_SERVICE_TOKEN = Symbol('__PHOTO_CRUD_SERVICE_TOKEN__');
 

@@ -1,10 +1,13 @@
+import { randomUUID } from 'crypto';
+
+import { mock } from 'jest-mock-extended';
+
 import { IssueTokenServiceInterface } from '@concepta/nestjs-authentication';
 import {
   AuthenticatedUserInterface,
   AuthenticationResponseInterface,
 } from '@concepta/nestjs-common';
-import { randomUUID } from 'crypto';
-import { mock } from 'jest-mock-extended';
+
 import { AuthRefreshControllerFixture } from './__fixtures__/auth-refresh.controller.fixture';
 
 describe(AuthRefreshControllerFixture, () => {

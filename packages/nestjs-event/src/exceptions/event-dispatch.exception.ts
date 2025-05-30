@@ -2,7 +2,9 @@ import {
   RuntimeException,
   RuntimeExceptionOptions,
 } from '@concepta/nestjs-common';
+
 import { EventBaseInterface } from '../events/interfaces/event-base.interface';
+
 import { EventException } from './event.exception';
 
 /**

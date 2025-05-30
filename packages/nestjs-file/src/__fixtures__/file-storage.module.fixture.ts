@@ -1,4 +1,5 @@
 import { Global, Module } from '@nestjs/common';
+
 import { AwsStorageService } from './aws-storage.service';
 
 @Global()

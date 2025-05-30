@@ -1,3 +1,5 @@
+import { Strategy } from 'passport-apple';
+
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 
@@ -11,14 +13,12 @@ import {
   AUTH_APPLE_SERVICE_TOKEN,
   AUTH_APPLE_STRATEGY_NAME,
 } from './auth-apple.constants';
-
-import { AuthAppleSettingsInterface } from './interfaces/auth-apple-settings.interface';
 import { AuthAppleMissingEmailException } from './exceptions/auth-apple-missing-email.exception';
 import { AuthAppleMissingIdException } from './exceptions/auth-apple-missing-id.exception';
-import { Strategy } from 'passport-apple';
-import { AuthAppleServiceInterface } from './interfaces/auth-apple-service.interface';
-import { mapProfile } from './utils/auth-apple-map-profile';
 import { AuthAppleCredentialsInterface } from './interfaces/auth-apple-credentials.interface';
+import { AuthAppleServiceInterface } from './interfaces/auth-apple-service.interface';
+import { AuthAppleSettingsInterface } from './interfaces/auth-apple-settings.interface';
+import { mapProfile } from './utils/auth-apple-map-profile';
 
 @Injectable()
 export class AuthAppleStrategy extends PassportStrategy(

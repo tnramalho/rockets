@@ -1,12 +1,15 @@
 import { DataSource } from 'typeorm';
+
 import { Provider } from '@nestjs/common';
 import { getDataSourceToken, getRepositoryToken } from '@nestjs/typeorm';
-import { getDynamicRepositoryToken } from '@concepta/nestjs-common';
-import { TypeOrmExtDataSourceToken } from '../typeorm-ext.types';
-import { TYPEORM_EXT_MODULE_DEFAULT_DATA_SOURCE_NAME } from '../typeorm-ext.constants';
 import { EntityClassOrSchema } from '@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type';
+
+import { getDynamicRepositoryToken } from '@concepta/nestjs-common';
+
 import { TypeOrmExtEntityOptionInterface } from '../interfaces/typeorm-ext-entity-options.interface';
 import { TypeOrmRepositoryAdapter } from '../repository/typeorm-repository.adapter';
+import { TYPEORM_EXT_MODULE_DEFAULT_DATA_SOURCE_NAME } from '../typeorm-ext.constants';
+import { TypeOrmExtDataSourceToken } from '../typeorm-ext.types';
 
 /**
  *  Create dynamic repository provider function

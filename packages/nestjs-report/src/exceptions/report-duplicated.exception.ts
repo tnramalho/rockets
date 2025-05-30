@@ -1,8 +1,10 @@
 import { HttpStatus } from '@nestjs/common';
+
 import {
   RuntimeException,
   RuntimeExceptionOptions,
 } from '@concepta/nestjs-common';
+
 import { ReportException } from './report.exception';
 
 export class ReportDuplicateEntryException extends ReportException {

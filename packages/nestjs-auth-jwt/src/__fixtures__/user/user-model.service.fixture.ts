@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
+
 import {
   ReferenceIdInterface,
   ReferenceSubject,
 } from '@concepta/nestjs-common';
+
 import { AuthJwtUserModelServiceInterface } from '../../interfaces/auth-jwt-user-model-service.interface';
 
 @Injectable()

@@ -1,8 +1,11 @@
-import { IssueTokenService } from '@concepta/nestjs-authentication';
-import { PasswordValidationService } from '@concepta/nestjs-password';
-import { FactoryProvider } from '@nestjs/common';
 import { mock } from 'jest-mock-extended';
-import { UserModelServiceFixture } from './__fixtures__/user/user-model.service.fixture';
+
+import { FactoryProvider } from '@nestjs/common';
+
+import { IssueTokenService } from '@concepta/nestjs-authentication';
+import { JwtIssueTokenService } from '@concepta/nestjs-jwt';
+import { PasswordValidationService } from '@concepta/nestjs-password';
+
 import {
   AUTH_LOCAL_MODULE_SETTINGS_TOKEN,
   AuthLocalIssueTokenService,
@@ -17,7 +20,8 @@ import {
   createAuthLocalValidateUserServiceProvider,
 } from './auth-local.module-definition';
 import { AuthLocalValidateUserService } from './services/auth-local-validate-user.service';
-import { JwtIssueTokenService } from '@concepta/nestjs-jwt';
+
+import { UserModelServiceFixture } from './__fixtures__/user/user-model.service.fixture';
 
 describe('Auth-local.module-definition', () => {
   describe(createAuthLocalExports.name, () => {

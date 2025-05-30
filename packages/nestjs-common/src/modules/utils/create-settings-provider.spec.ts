@@ -1,4 +1,5 @@
 import { FactoryProvider } from '@nestjs/common';
+
 import { createSettingsProvider } from './create-settings-provider';
 
 describe(createSettingsProvider.name, () => {

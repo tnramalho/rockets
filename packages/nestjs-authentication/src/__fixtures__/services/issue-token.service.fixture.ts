@@ -1,5 +1,7 @@
 import { JwtSignOptions } from '@nestjs/jwt';
+
 import { AuthenticationResponseInterface } from '@concepta/nestjs-common';
+
 import { IssueTokenServiceInterface } from '../../interfaces/issue-token-service.interface';
 
 export class IssueTokenServiceFixture implements IssueTokenServiceInterface {

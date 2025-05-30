@@ -13,21 +13,18 @@ import {
   RoleEntityInterface,
 } from '@concepta/nestjs-common';
 
+import { roleDefaultConfig } from './config/role-default.config';
+import { RoleMissingEntitiesOptionsException } from './exceptions/role-missing-entities-options.exception';
+import { RoleOptionsExtrasInterface } from './interfaces/role-options-extras.interface';
+import { RoleOptionsInterface } from './interfaces/role-options.interface';
+import { RoleSettingsInterface } from './interfaces/role-settings.interface';
 import {
   ROLE_MODULE_REPOSITORIES_TOKEN,
   ROLE_MODULE_ROLE_ENTITY_KEY,
   ROLE_MODULE_SETTINGS_TOKEN,
 } from './role.constants';
-
-import { RoleOptionsInterface } from './interfaces/role-options.interface';
-import { RoleOptionsExtrasInterface } from './interfaces/role-options-extras.interface';
-import { RoleSettingsInterface } from './interfaces/role-settings.interface';
-
-import { RoleService } from './services/role.service';
 import { RoleModelService } from './services/role-model.service';
-
-import { roleDefaultConfig } from './config/role-default.config';
-import { RoleMissingEntitiesOptionsException } from './exceptions/role-missing-entities-options.exception';
+import { RoleService } from './services/role.service';
 
 const RAW_OPTIONS_TOKEN = Symbol('__ROLE_MODULE_RAW_OPTIONS_TOKEN__');
 

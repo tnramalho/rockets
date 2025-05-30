@@ -1,8 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { FileCreatableInterface, FileInterface } from '@concepta/nestjs-common';
+import {
+  FileCreatableInterface,
+  FileInterface,
+  ReferenceIdInterface,
+} from '@concepta/nestjs-common';
 
-import { ReferenceIdInterface } from '@concepta/nestjs-common';
 import { FileCreateException } from '../exceptions/file-create.exception';
 import { FileDuplicateEntryException } from '../exceptions/file-duplicated.exception';
 import { FileIdMissingException } from '../exceptions/file-id-missing.exception';
@@ -11,6 +14,7 @@ import { FILE_STRATEGY_SERVICE_KEY } from '../file.constants';
 import { FileModelServiceInterface } from '../interfaces/file-model-service.interface';
 import { FileServiceInterface } from '../interfaces/file-service.interface';
 import { FileStrategyServiceInterface } from '../interfaces/file-strategy-service.interface';
+
 import { FileModelService } from './file-model.service';
 
 @Injectable()

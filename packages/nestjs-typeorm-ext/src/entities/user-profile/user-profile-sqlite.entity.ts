@@ -1,6 +1,8 @@
 import { Column } from 'typeorm';
-import { CommonSqliteEntity } from '../common/common-sqlite.entity';
+
 import { UserProfileEntityInterface } from '@concepta/nestjs-common';
+
+import { CommonSqliteEntity } from '../common/common-sqlite.entity';
 
 /**
  * User Profile Sqlite Entity

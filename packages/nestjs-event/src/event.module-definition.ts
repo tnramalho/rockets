@@ -1,4 +1,5 @@
 import EventEmitter2 from 'eventemitter2';
+
 import {
   ConfigurableModuleBuilder,
   DynamicModule,
@@ -10,18 +11,17 @@ import { ConfigModule } from '@nestjs/config';
 
 import { createSettingsProvider } from '@concepta/nestjs-common';
 
+import { eventSettingsConfig } from './config/event-settings.config';
 import {
   EVENT_MODULE_EMITTER_SERVICE_TOKEN,
   EVENT_MODULE_SETTINGS_TOKEN,
 } from './event-constants';
-
-import { EventOptionsInterface } from './interfaces/event-options.interface';
-import { EventOptionsExtrasInterface } from './interfaces/event-options-extras.interface';
-import { EventSettingsInterface } from './interfaces/event-settings.interface';
 import { EventManager } from './event-manager';
-import { EventListenService } from './services/event-listen.service';
+import { EventOptionsExtrasInterface } from './interfaces/event-options-extras.interface';
+import { EventOptionsInterface } from './interfaces/event-options.interface';
+import { EventSettingsInterface } from './interfaces/event-settings.interface';
 import { EventDispatchService } from './services/event-dispatch.service';
-import { eventSettingsConfig } from './config/event-settings.config';
+import { EventListenService } from './services/event-listen.service';
 
 const RAW_OPTIONS_TOKEN = Symbol('__EVENT_MODULE_RAW_OPTIONS_TOKEN__');
 

@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { JwtVerifyTokenServiceInterface } from '../interfaces/jwt-verify-token-service.interface';
+
 import { JwtVerifyServiceInterface } from '../interfaces/jwt-verify-service.interface';
+import { JwtVerifyTokenServiceInterface } from '../interfaces/jwt-verify-token-service.interface';
 import { JwtAccessService, JwtRefreshService } from '../jwt.constants';
 
 @Injectable()

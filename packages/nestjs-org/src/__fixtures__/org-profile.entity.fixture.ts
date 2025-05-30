@@ -1,4 +1,5 @@
 import { Column, Entity } from 'typeorm';
+
 import { OrgProfileSqliteEntity } from '@concepta/nestjs-typeorm-ext';
 
 /**

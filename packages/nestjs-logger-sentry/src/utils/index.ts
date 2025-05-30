@@ -1,7 +1,8 @@
-import { LoggerMessageInterface } from '@concepta/nestjs-logger';
+import { SeverityLevel } from '@sentry/types';
 
 import { LogLevel } from '@nestjs/common';
-import { SeverityLevel } from '@sentry/types';
+
+import { LoggerMessageInterface } from '@concepta/nestjs-logger';
 /**
  * Mapping from log level to sentry severity
  *

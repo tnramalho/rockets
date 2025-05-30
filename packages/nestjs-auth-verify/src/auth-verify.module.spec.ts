@@ -1,6 +1,7 @@
+import { mock } from 'jest-mock-extended';
+
 import { DynamicModule, ModuleMetadata } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { mock } from 'jest-mock-extended';
 
 import { EmailModule, EmailService } from '@concepta/nestjs-email';
 

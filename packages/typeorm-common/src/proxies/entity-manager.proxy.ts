@@ -1,8 +1,10 @@
+import { EntityManager, ObjectLiteral, Repository } from 'typeorm';
+
 import { EntityManagerOptionInterface } from '../interfaces/entity-manager-option.interface';
 import { QueryOptionsInterface } from '../interfaces/query-options.interface';
 import { SafeTransactionOptionsInterface } from '../interfaces/safe-transaction-options.interface';
+
 import { TransactionProxy } from './transaction.proxy';
-import { EntityManager, ObjectLiteral, Repository } from 'typeorm';
 
 export class EntityManagerProxy {
   constructor(private _entityManager: EntityManager) {}

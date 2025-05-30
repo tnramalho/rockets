@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
-import { AppControllerFixture } from './app.controller.fixture';
+
 import { LoggerModule } from '../logger.module';
+
+import { AppControllerFixture } from './app.controller.fixture';
 
 @Module({
   controllers: [AppControllerFixture],

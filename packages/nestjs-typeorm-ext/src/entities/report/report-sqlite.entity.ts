@@ -1,9 +1,11 @@
 import { Column, Entity, Unique } from 'typeorm';
+
 import {
   ReferenceId,
   ReportStatusEnum,
   ReportEntityInterface,
 } from '@concepta/nestjs-common';
+
 import { CommonSqliteEntity } from '../common/common-sqlite.entity';
 
 /**

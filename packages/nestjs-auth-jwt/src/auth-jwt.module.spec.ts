@@ -1,19 +1,20 @@
 import { mock } from 'jest-mock-extended';
+
 import { DynamicModule, ModuleMetadata } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { JwtModule, JwtVerifyTokenService } from '@concepta/nestjs-jwt';
+
 import {
   AuthenticationModule,
   VerifyTokenService,
 } from '@concepta/nestjs-authentication';
+import { JwtModule, JwtVerifyTokenService } from '@concepta/nestjs-jwt';
 
 import { AuthJwtUserModelService } from './auth-jwt.constants';
-
 import { AuthJwtModule } from './auth-jwt.module';
 import { AuthJwtUserModelServiceInterface } from './interfaces/auth-jwt-user-model-service.interface';
 
-import { UserModuleFixture } from './__fixtures__/user/user.module.fixture';
 import { UserModelServiceFixture } from './__fixtures__/user/user-model.service.fixture';
+import { UserModuleFixture } from './__fixtures__/user/user.module.fixture';
 
 describe(AuthJwtModule, () => {
   const jwtVerifyTokenService = mock<JwtVerifyTokenService>();

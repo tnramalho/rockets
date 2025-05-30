@@ -2,6 +2,7 @@ import {
   RuntimeException,
   RuntimeExceptionOptions,
 } from '@concepta/nestjs-common';
+
 import { RoleException } from './role.exception';
 
 export class RoleAssignmentNotFoundException extends RoleException {

@@ -1,8 +1,12 @@
 import { Exclude, Expose } from 'class-transformer';
 import { IsEmail } from 'class-validator';
+
 import { ApiProperty } from '@nestjs/swagger';
-import { ReferenceIdDto } from '@concepta/nestjs-common';
-import { InvitationUserInterface } from '@concepta/nestjs-common';
+
+import {
+  ReferenceIdDto,
+  InvitationUserInterface,
+} from '@concepta/nestjs-common';
 
 @Exclude()
 export class InvitationUserDto

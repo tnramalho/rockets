@@ -1,15 +1,17 @@
 import { Controller, Inject, Get, UseGuards, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import {
-  AuthenticatedUserInterface,
-  AuthenticationResponseInterface,
-} from '@concepta/nestjs-common';
+
 import {
   AuthUser,
   IssueTokenServiceInterface,
   AuthenticationJwtResponseDto,
   AuthPublic,
 } from '@concepta/nestjs-authentication';
+import {
+  AuthenticatedUserInterface,
+  AuthenticationResponseInterface,
+} from '@concepta/nestjs-common';
+
 import { AUTH_APPLE_ISSUE_TOKEN_SERVICE_TOKEN } from '../auth-apple.constants';
 import { AuthAppleGuard } from '../auth-apple.guard';
 

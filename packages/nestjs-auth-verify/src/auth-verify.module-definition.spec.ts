@@ -1,7 +1,7 @@
-import { FactoryProvider } from '@nestjs/common';
 import { mock } from 'jest-mock-extended';
-import { OtpServiceFixture } from './__fixtures__/otp/otp.service.fixture';
-import { UserModelServiceFixture } from './__fixtures__/user/services/user-model.service.fixture';
+
+import { FactoryProvider } from '@nestjs/common';
+
 import {
   AUTH_VERIFY_MODULE_SETTINGS_TOKEN,
   AuthVerifyEmailService,
@@ -16,10 +16,13 @@ import {
   createAuthVerifyUserModelServiceProvider,
 } from './auth-verify.module-definition';
 import { AuthVerifyEmailServiceInterface } from './interfaces/auth-verify-email.service.interface';
-import { AuthVerifyService } from './services/auth-verify.service';
-import { AuthVerifyUserModelServiceInterface } from './interfaces/auth-verify-user-model.service.interface';
 import { AuthVerifyNotificationServiceInterface } from './interfaces/auth-verify-notification.service.interface';
+import { AuthVerifyUserModelServiceInterface } from './interfaces/auth-verify-user-model.service.interface';
 import { AuthVerifyNotificationService } from './services/auth-verify-notification.service';
+import { AuthVerifyService } from './services/auth-verify.service';
+
+import { OtpServiceFixture } from './__fixtures__/otp/otp.service.fixture';
+import { UserModelServiceFixture } from './__fixtures__/user/services/user-model.service.fixture';
 
 describe('AuthVerifyModuleDefinition', () => {
   const mockEmailService = mock<AuthVerifyEmailServiceInterface>();

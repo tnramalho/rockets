@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { PasswordStrengthEnum } from '../enum/password-strength.enum';
 import { PASSWORD_MODULE_SETTINGS_TOKEN } from '../password.constants';
+
 import { PasswordStrengthService } from './password-strength.service';
 
 describe('PasswordStrengthService', () => {

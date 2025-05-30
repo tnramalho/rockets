@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+
 import {
   UserCreatableInterface,
   UserUpdatableInterface,
@@ -12,10 +13,10 @@ import {
   UserEntityInterface,
 } from '@concepta/nestjs-common';
 
-import { UserModelServiceInterface } from '../interfaces/user-model-service.interface';
-import { USER_MODULE_USER_ENTITY_KEY } from '../user.constants';
 import { UserCreateDto } from '../dto/user-create.dto';
 import { UserUpdateDto } from '../dto/user-update.dto';
+import { UserModelServiceInterface } from '../interfaces/user-model-service.interface';
+import { USER_MODULE_USER_ENTITY_KEY } from '../user.constants';
 
 /**
  * User model service

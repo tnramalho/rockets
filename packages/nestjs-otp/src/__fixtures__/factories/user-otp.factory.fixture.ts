@@ -1,5 +1,7 @@
 import { randomUUID } from 'crypto';
+
 import { Factory } from '@concepta/typeorm-seeding';
+
 import { UserOtpEntityFixture } from '../entities/user-otp-entity.fixture';
 
 export class UserOtpFactoryFixture extends Factory<UserOtpEntityFixture> {

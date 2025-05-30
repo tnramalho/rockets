@@ -1,6 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
 import { IsString } from 'class-validator';
+
+import { ApiProperty } from '@nestjs/swagger';
 
 import { ReferenceIdInterface } from '../interfaces/reference-id.interface';
 

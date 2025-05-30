@@ -1,6 +1,8 @@
 import { EventEmitter2, Listener as EmitterListener } from 'eventemitter2';
+
 import { Event } from '../events/event';
 import { EventListenerException } from '../exceptions/event-listener.exception';
+
 import { EventListener } from './event-listener';
 import { EventListenerOn } from './event-listener-on';
 

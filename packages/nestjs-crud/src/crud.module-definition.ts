@@ -4,13 +4,14 @@ import {
   Provider,
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+
 import { createSettingsProvider } from '@concepta/nestjs-common';
 
-import { CrudOptionsInterface } from './interfaces/crud-options.interface';
+import { crudDefaultConfig } from './config/crud-default.config';
 import { CRUD_MODULE_SETTINGS_TOKEN } from './crud.constants';
 import { CrudOptionsExtrasInterface } from './interfaces/crud-options-extras.interface';
+import { CrudOptionsInterface } from './interfaces/crud-options.interface';
 import { CrudSettingsInterface } from './interfaces/crud-settings.interface';
-import { crudDefaultConfig } from './config/crud-default.config';
 import { CrudReflectionService } from './services/crud-reflection.service';
 
 const RAW_OPTIONS_TOKEN = Symbol('__CRUD_MODULE_RAW_OPTIONS_TOKEN__');

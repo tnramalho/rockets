@@ -1,12 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserPasswordService } from './user-password.service';
-import { UserModelService } from './user-model.service';
-import { PasswordCreationService } from '@concepta/nestjs-password';
-import { PasswordStorageService } from '@concepta/nestjs-password';
-import { UserPasswordHistoryService } from './user-password-history.service';
+
+import { ReferenceId, PasswordStorageInterface } from '@concepta/nestjs-common';
+import {
+  PasswordCreationService,
+  PasswordStorageService,
+} from '@concepta/nestjs-password';
+
 import { UserException } from '../exceptions/user-exception';
 import { UserNotFoundException } from '../exceptions/user-not-found-exception';
-import { ReferenceId, PasswordStorageInterface } from '@concepta/nestjs-common';
+
+import { UserModelService } from './user-model.service';
+import { UserPasswordHistoryService } from './user-password-history.service';
+import { UserPasswordService } from './user-password.service';
 
 describe(UserPasswordService.name, () => {
   let service: UserPasswordService;

@@ -1,9 +1,12 @@
-import { TypeOrmExtModule } from '@concepta/nestjs-typeorm-ext';
 import { Module } from '@nestjs/common';
+
+import { TypeOrmExtModule } from '@concepta/nestjs-typeorm-ext';
+
+import { OtpEntitiesOptionsInterface } from '../interfaces/otp-entities-options.interface';
 import { OtpModule } from '../otp.module';
+
 import { UserEntityFixture } from './entities/user-entity.fixture';
 import { UserOtpEntityFixture } from './entities/user-otp-entity.fixture';
-import { OtpEntitiesOptionsInterface } from '../interfaces/otp-entities-options.interface';
 
 @Module({
   imports: [

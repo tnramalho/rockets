@@ -1,25 +1,26 @@
-import { Strategy } from 'passport-local';
 import { validateOrReject } from 'class-validator';
+import { Strategy } from 'passport-local';
+
 import { Inject, Injectable } from '@nestjs/common';
+
+import { PassportStrategyFactory } from '@concepta/nestjs-authentication';
 import {
   ReferenceIdInterface,
   ReferenceUsername,
 } from '@concepta/nestjs-common';
-import { PassportStrategyFactory } from '@concepta/nestjs-authentication';
 
 import {
   AUTH_LOCAL_MODULE_SETTINGS_TOKEN,
   AUTH_LOCAL_STRATEGY_NAME,
 } from './auth-local.constants';
-
-import { AuthLocalSettingsInterface } from './interfaces/auth-local-settings.interface';
-import { AuthLocalValidateUserServiceInterface } from './interfaces/auth-local-validate-user-service.interface';
-import { AuthLocalException } from './exceptions/auth-local.exception';
 import { AuthLocalInvalidCredentialsException } from './exceptions/auth-local-invalid-credentials.exception';
 import { AuthLocalInvalidLoginDataException } from './exceptions/auth-local-invalid-login-data.exception';
 import { AuthLocalMissingLoginDtoException } from './exceptions/auth-local-missing-login-dto.exception';
-import { AuthLocalMissingUsernameFieldException } from './exceptions/auth-local-missing-username-field.exception';
 import { AuthLocalMissingPasswordFieldException } from './exceptions/auth-local-missing-password-field.exception';
+import { AuthLocalMissingUsernameFieldException } from './exceptions/auth-local-missing-username-field.exception';
+import { AuthLocalException } from './exceptions/auth-local.exception';
+import { AuthLocalSettingsInterface } from './interfaces/auth-local-settings.interface';
+import { AuthLocalValidateUserServiceInterface } from './interfaces/auth-local-validate-user-service.interface';
 import { AuthLocalValidateUserService } from './services/auth-local-validate-user.service';
 
 /**

@@ -2,6 +2,7 @@ import {
   RuntimeException,
   RuntimeExceptionOptions,
 } from '@concepta/nestjs-common';
+
 import { FederatedException } from './federated.exception';
 
 export class FederatedCreateUserException extends FederatedException {

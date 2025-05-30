@@ -14,14 +14,12 @@ import {
   CACHE_MODULE_REPOSITORIES_TOKEN,
   CACHE_MODULE_SETTINGS_TOKEN,
 } from './cache.constants';
-
+import { cacheDefaultConfig } from './config/cache-default.config';
+import { CacheMissingEntitiesOptionException } from './exceptions/cache-missing-entities-option.exception';
 import { CacheOptionsExtrasInterface } from './interfaces/cache-options-extras.interface';
 import { CacheOptionsInterface } from './interfaces/cache-options.interface';
 import { CacheSettingsInterface } from './interfaces/cache-settings.interface';
-
-import { cacheDefaultConfig } from './config/cache-default.config';
 import { CacheService } from './services/cache.service';
-import { CacheMissingEntitiesOptionException } from './exceptions/cache-missing-entities-option.exception';
 
 const RAW_OPTIONS_TOKEN = Symbol('__CACHE_MODULE_RAW_OPTIONS_TOKEN__');
 

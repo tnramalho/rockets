@@ -1,4 +1,3 @@
-import { AuthPublic } from '@concepta/nestjs-authentication';
 import {
   Body,
   Controller,
@@ -16,6 +15,9 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+
+import { AuthPublic } from '@concepta/nestjs-authentication';
+
 import { AuthRecoveryRecoverLoginDto } from '../dto/auth-recovery-recover-login.dto';
 import { AuthRecoveryRecoverPasswordDto } from '../dto/auth-recovery-recover-password.dto';
 import { AuthRecoveryUpdatePasswordDto } from '../dto/auth-recovery-update-password.dto';

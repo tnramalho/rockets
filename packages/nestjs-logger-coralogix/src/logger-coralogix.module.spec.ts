@@ -1,9 +1,10 @@
 import { DynamicModule, ModuleMetadata } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { LoggerCoralogixModule } from './logger-coralogix.module';
-import { LoggerCoralogixTransport } from './transports/logger-coralogix.transport';
+
 import { LoggerCoralogixConfigInterface } from './interfaces/logger-coralogix-config.interface';
 import { LoggerCoralogixSettingsInterface } from './interfaces/logger-coralogix-settings.interface';
+import { LoggerCoralogixModule } from './logger-coralogix.module';
+import { LoggerCoralogixTransport } from './transports/logger-coralogix.transport';
 
 jest.mock('axios', () => {
   return {

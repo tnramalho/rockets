@@ -1,14 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { FederatedOAuthService } from './federated-oauth.service';
-import { FederatedService } from './federated.service';
-import { FederatedModelService } from './federated-model.service';
-import { FederatedUserModelServiceInterface } from '../interfaces/federated-user-model-service.interface';
+
 import { FederatedEntityInterface } from '@concepta/nestjs-common';
-import { FederatedCredentialsInterface } from '../interfaces/federated-credentials.interface';
+
 import { FederatedCreateUserException } from '../exceptions/federated-create-user.exception';
 import { FederatedFindUserException } from '../exceptions/federated-find-user.exception';
 import { FederatedUserRelationshipException } from '../exceptions/federated-user-relationship.exception';
 import { FEDERATED_MODULE_USER_MODEL_SERVICE_TOKEN } from '../federated.constants';
+import { FederatedCredentialsInterface } from '../interfaces/federated-credentials.interface';
+import { FederatedUserModelServiceInterface } from '../interfaces/federated-user-model-service.interface';
+
+import { FederatedModelService } from './federated-model.service';
+import { FederatedOAuthService } from './federated-oauth.service';
+import { FederatedService } from './federated.service';
 
 describe('FederatedOAuthService', () => {
   let service: FederatedOAuthService;

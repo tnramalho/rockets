@@ -1,26 +1,30 @@
 import supertest from 'supertest';
+
+import { INestApplication } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
 import { getDataSourceToken } from '@nestjs/typeorm';
-import { OtpInterface, UserInterface } from '@concepta/nestjs-common';
-import { SeedingSource } from '@concepta/typeorm-seeding';
+
+import {
+  OtpInterface,
+  UserInterface,
+  ExceptionsFilter,
+} from '@concepta/nestjs-common';
 import { EmailService } from '@concepta/nestjs-email';
 import { OtpService } from '@concepta/nestjs-otp';
-import { ExceptionsFilter } from '@concepta/nestjs-common';
+import { UserModelService } from '@concepta/nestjs-user';
 import { UserFactory } from '@concepta/nestjs-user/src/seeding';
+import { SeedingSource } from '@concepta/typeorm-seeding';
 
 import { AUTH_RECOVERY_MODULE_SETTINGS_TOKEN } from './auth-recovery.constants';
-
-import { AuthRecoveryController } from './__fixtures__/auth-recovery.controller.fixture';
-import { AuthRecoverySettingsInterface } from './interfaces/auth-recovery-settings.interface';
-import { AuthRecoveryRecoverPasswordDto } from './dto/auth-recovery-recover-password.dto';
 import { AuthRecoveryRecoverLoginDto } from './dto/auth-recovery-recover-login.dto';
+import { AuthRecoveryRecoverPasswordDto } from './dto/auth-recovery-recover-password.dto';
 import { AuthRecoveryUpdatePasswordDto } from './dto/auth-recovery-update-password.dto';
+import { AuthRecoverySettingsInterface } from './interfaces/auth-recovery-settings.interface';
 
-import { UserEntityFixture } from './__fixtures__/user/entities/user-entity.fixture';
 import { AppModuleDbFixture } from './__fixtures__/app.module.db.fixture';
-import { UserModelService } from '@concepta/nestjs-user';
+import { AuthRecoveryController } from './__fixtures__/auth-recovery.controller.fixture';
+import { UserEntityFixture } from './__fixtures__/user/entities/user-entity.fixture';
 
 describe(AuthRecoveryController, () => {
   let app: INestApplication;

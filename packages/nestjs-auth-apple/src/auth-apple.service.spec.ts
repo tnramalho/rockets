@@ -1,20 +1,23 @@
+import { JwksClient } from 'jwks-rsa';
+
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthAppleService } from './auth-apple.service';
+
+import { JwtVerifyServiceInterface } from '@concepta/nestjs-jwt';
+
 import {
   AUTH_APPLE_JWT_SERVICE_TOKEN,
   AUTH_APPLE_MODULE_SETTINGS_TOKEN,
   AUTH_APPLE_TOKEN_ISSUER,
   AUTH_APPLE_VERIFY_ALGORITHM,
 } from './auth-apple.constants';
+import { AuthAppleService } from './auth-apple.service';
 import { AuthAppleDecodeException } from './exceptions/auth-apple-decode.exception';
-import { AuthApplePublicKeyException } from './exceptions/auth-apple-public-key.exception';
-import { AuthAppleInvalidIssuerException } from './exceptions/auth-apple-invalid-issuer.exception';
-import { AuthAppleInvalidAudienceException } from './exceptions/auth-apple-invalid-audience.exception';
-import { AuthAppleTokenExpiredException } from './exceptions/auth-apple-token-expired.exception';
 import { AuthAppleEmailNotVerifiedException } from './exceptions/auth-apple-email-not-verified.exception';
-import { JwksClient } from 'jwks-rsa';
+import { AuthAppleInvalidAudienceException } from './exceptions/auth-apple-invalid-audience.exception';
+import { AuthAppleInvalidIssuerException } from './exceptions/auth-apple-invalid-issuer.exception';
+import { AuthApplePublicKeyException } from './exceptions/auth-apple-public-key.exception';
+import { AuthAppleTokenExpiredException } from './exceptions/auth-apple-token-expired.exception';
 import { AuthAppleProfileInterface } from './interfaces/auth-apple-profile.interface';
-import { JwtVerifyServiceInterface } from '@concepta/nestjs-jwt';
 
 // Mock jwks-rsa
 jest.mock('jwks-rsa');

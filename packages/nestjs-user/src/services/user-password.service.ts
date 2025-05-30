@@ -5,6 +5,7 @@ import {
   Injectable,
   Optional,
 } from '@nestjs/common';
+
 import {
   ReferenceId,
   ReferenceIdInterface,
@@ -21,13 +22,14 @@ import {
   PasswordStorageServiceInterface,
 } from '@concepta/nestjs-password';
 
-import { UserPasswordServiceInterface } from '../interfaces/user-password-service.interface';
-import { UserPasswordHistoryServiceInterface } from '../interfaces/user-password-history-service.interface';
-import { UserPasswordHistoryService } from './user-password-history.service';
 import { UserException } from '../exceptions/user-exception';
 import { UserNotFoundException } from '../exceptions/user-not-found-exception';
 import { UserModelServiceInterface } from '../interfaces/user-model-service.interface';
+import { UserPasswordHistoryServiceInterface } from '../interfaces/user-password-history-service.interface';
+import { UserPasswordServiceInterface } from '../interfaces/user-password-service.interface';
+
 import { UserModelService } from './user-model.service';
+import { UserPasswordHistoryService } from './user-password-history.service';
 
 /**
  * User password service

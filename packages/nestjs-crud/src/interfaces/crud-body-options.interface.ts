@@ -1,4 +1,5 @@
 import { Body } from '@nestjs/common';
+
 import { CrudValidationOptions } from '../crud.types';
 
 export interface CrudBodyOptionsInterface {

@@ -28,7 +28,36 @@ module.exports = {
     },
   },
   rules: {
+    'import/no-duplicates': 'error',
     'import/no-extraneous-dependencies': 'error',
+    'import/order': [
+      'error',
+      {
+        pathGroups: [
+          {
+            pattern: '@nestjs/**',
+            group: 'external',
+            position: 'after',
+          },
+          {
+            pattern: '@concepta/**',
+            group: 'external',
+            position: 'after',
+          },
+          {
+            pattern: '{./__fixtures__/**,../__fixtures__/**}',
+            group: 'sibling',
+            position: 'after',
+          },
+        ],
+        alphabetize: {
+          order: 'asc',
+          caseInsensitive: false
+        },
+        pathGroupsExcludedImportTypes: ['builtin', 'object'],
+        'newlines-between': 'always',
+      },
+    ],
     '@darraghor/nestjs-typed/param-decorator-name-matches-route-param': 'off',
     'jsdoc/tag-lines': ['error', 'any', { startLines: 1 }],
     'tsdoc/syntax': 'error',

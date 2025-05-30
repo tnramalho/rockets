@@ -1,12 +1,15 @@
-import { isObject } from 'class-validator';
-import { HttpException, Inject, Injectable, LogLevel } from '@nestjs/common';
 import * as Sentry from '@sentry/node';
+import { isObject } from 'class-validator';
+
+import { HttpException, Inject, Injectable, LogLevel } from '@nestjs/common';
+
 import { RuntimeException, mapHttpStatus } from '@concepta/nestjs-common';
 import { LoggerTransportInterface } from '@concepta/nestjs-logger';
-import { LoggerSentrySettingsInterface } from '../interfaces/logger-sentry-settings.interface';
+
 import { LOGGER_SENTRY_MODULE_SETTINGS_TOKEN } from '../config/logger-sentry.config';
-import { LoggerSentryExtrasInterface } from '../interfaces/logger-sentry-extras.interface';
 import { LoggerSentryException } from '../exceptions/logger-sentry.exceptions';
+import { LoggerSentryExtrasInterface } from '../interfaces/logger-sentry-extras.interface';
+import { LoggerSentrySettingsInterface } from '../interfaces/logger-sentry-settings.interface';
 
 /**
  * The transport that implements {@link LoggerTransportInterface}

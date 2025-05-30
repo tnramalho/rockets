@@ -1,6 +1,7 @@
 import { ValidationError } from 'class-validator';
-import { RuntimeException } from '../../exceptions/runtime.exception';
+
 import { RuntimeExceptionOptions } from '../../exceptions/interfaces/runtime-exception-options.interface';
+import { RuntimeException } from '../../exceptions/runtime.exception';
 
 export class ModelValidationException extends RuntimeException {
   context: RuntimeException['context'] & {

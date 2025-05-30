@@ -1,8 +1,11 @@
 import { Repository } from 'typeorm';
+
 import { Injectable } from '@nestjs/common';
-import { TypeOrmCrudService } from '@concepta/nestjs-crud';
-import { CacheInterface } from '@concepta/nestjs-common';
 import { InjectRepository } from '@nestjs/typeorm';
+
+import { CacheInterface } from '@concepta/nestjs-common';
+import { TypeOrmCrudService } from '@concepta/nestjs-crud';
+
 import { UserCacheEntityFixture } from './entities/user-cache-entity.fixture';
 
 /**

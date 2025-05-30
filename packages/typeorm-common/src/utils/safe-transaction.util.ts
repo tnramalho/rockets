@@ -1,9 +1,11 @@
+import { EntityManager } from 'typeorm';
+
 import { Logger } from '@nestjs/common';
+
+import { RuntimeException } from '@concepta/nestjs-common';
 
 import { SafeTransactionOptionsInterface } from '../interfaces/safe-transaction-options.interface';
 import { RunInTransactionCallback } from '../typeorm-common.types';
-import { RuntimeException } from '@concepta/nestjs-common';
-import { EntityManager } from 'typeorm';
 
 /**
  * Safe transaction wrapper.

@@ -1,7 +1,8 @@
 import { Column, Unique } from 'typeorm';
-import { ReferenceId } from '@concepta/nestjs-common';
+
+import { ReferenceId, OrgMemberEntityInterface } from '@concepta/nestjs-common';
+
 import { CommonSqliteEntity } from '../common/common-sqlite.entity';
-import { OrgMemberEntityInterface } from '@concepta/nestjs-common';
 
 @Unique(['userId', 'orgId'])
 export abstract class OrgMemberSqliteEntity

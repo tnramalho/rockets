@@ -1,19 +1,23 @@
 import ms from 'ms';
+
 import { Test, TestingModule } from '@nestjs/testing';
 import { getDataSourceToken } from '@nestjs/typeorm';
+
 import { OtpInterface, RepositoryInterface } from '@concepta/nestjs-common';
 import { TypeOrmExtModule } from '@concepta/nestjs-typeorm-ext';
 import { SeedingSource } from '@concepta/typeorm-seeding';
-import { OtpModule } from '../otp.module';
-import { OtpService } from './otp.service';
+
+import { OtpLimitReachedException } from '../exceptions/otp-limit-reached.exception';
 import { OtpTypeNotDefinedException } from '../exceptions/otp-type-not-defined.exception';
+import { OTP_MODULE_REPOSITORIES_TOKEN } from '../otp.constants';
+import { OtpModule } from '../otp.module';
+
+import { OtpService } from './otp.service';
 
 import { UserEntityFixture } from '../__fixtures__/entities/user-entity.fixture';
 import { UserOtpEntityFixture } from '../__fixtures__/entities/user-otp-entity.fixture';
-import { UserFactoryFixture } from '../__fixtures__/factories/user.factory.fixture';
 import { UserOtpFactoryFixture } from '../__fixtures__/factories/user-otp.factory.fixture';
-import { OTP_MODULE_REPOSITORIES_TOKEN } from '../otp.constants';
-import { OtpLimitReachedException } from '../exceptions/otp-limit-reached.exception';
+import { UserFactoryFixture } from '../__fixtures__/factories/user.factory.fixture';
 
 describe('OtpModule', () => {
   const CATEGORY_DEFAULT = 'CATEGORY_DEFAULT';

@@ -1,4 +1,5 @@
 import { Listener as EmitterListener } from 'eventemitter2';
+
 import { EventInstance, EventReturnType } from '../../event-types';
 
 /**

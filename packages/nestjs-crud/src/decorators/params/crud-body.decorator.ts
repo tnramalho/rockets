@@ -1,10 +1,11 @@
 import { SetMetadata } from '@nestjs/common';
+
 import { CRUD_MODULE_PARAM_BODY_METADATA } from '../../crud.constants';
 import { DecoratorTargetObject } from '../../crud.types';
+import { CrudException } from '../../exceptions/crud.exception';
 import { CrudBodyOptionsInterface } from '../../interfaces/crud-body-options.interface';
 import { CrudValidationMetadataInterface } from '../../interfaces/crud-validation-metadata.interface';
 import { CrudReflectionService } from '../../services/crud-reflection.service';
-import { CrudException } from '../../exceptions/crud.exception';
 
 /**
  * \@CrudBody() parameter decorator

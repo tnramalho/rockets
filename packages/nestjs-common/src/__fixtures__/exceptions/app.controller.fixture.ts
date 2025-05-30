@@ -10,9 +10,11 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+
 import { RuntimeException } from '../../exceptions/runtime.exception';
-import { DummyDto } from './dummy.dto';
+
 import { CustomNotFoundExceptionFixture } from './custom-not-found.exception.fixture';
+import { DummyDto } from './dummy.dto';
 
 /**
  * Controller.

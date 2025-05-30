@@ -1,8 +1,11 @@
-import { OrgEntityInterface } from '@concepta/nestjs-common';
-import { TypeOrmCrudService } from '@concepta/nestjs-crud';
+import { Repository } from 'typeorm';
+
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+
+import { OrgEntityInterface } from '@concepta/nestjs-common';
+import { TypeOrmCrudService } from '@concepta/nestjs-crud';
+
 import { OrgEntityFixture } from './org-entity.fixture';
 
 /**

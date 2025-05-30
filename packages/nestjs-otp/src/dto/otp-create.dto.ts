@@ -1,5 +1,6 @@
 import { Exclude, Expose } from 'class-transformer';
 import { IsOptional, IsString } from 'class-validator';
+
 import { OtpCreatableInterface } from '@concepta/nestjs-common';
 
 /**

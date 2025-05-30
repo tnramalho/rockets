@@ -1,11 +1,13 @@
 import { DynamicModule } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+
 import { CacheInterface, RepositoryInterface } from '@concepta/nestjs-common';
+
 import { CACHE_MODULE_REPOSITORIES_TOKEN } from './cache.constants';
 import { CacheModule } from './cache.module';
+import { CacheService } from './services/cache.service';
 
 import { AppModuleFixture } from './__fixtures__/app.module.fixture';
-import { CacheService } from './services/cache.service';
 
 describe(CacheModule.name, () => {
   let cacheModule: CacheModule;

@@ -1,4 +1,5 @@
 import { Seeder } from '@concepta/typeorm-seeding';
+
 import { PhotoFactoryFixture } from './photo.factory.fixture';
 
 export class PhotoSeederFixture extends Seeder {

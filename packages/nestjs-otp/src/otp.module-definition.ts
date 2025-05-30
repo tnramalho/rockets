@@ -10,18 +10,16 @@ import {
   getDynamicRepositoryToken,
 } from '@concepta/nestjs-common';
 
+import { otpDefaultConfig } from './config/otp-default.config';
+import { OtpMissingEntitiesOptionsException } from './exceptions/otp-missing-entities-options.exception';
+import { OtpOptionsExtrasInterface } from './interfaces/otp-options-extras.interface';
+import { OtpOptionsInterface } from './interfaces/otp-options.interface';
+import { OtpSettingsInterface } from './interfaces/otp-settings.interface';
 import {
   OTP_MODULE_REPOSITORIES_TOKEN,
   OTP_MODULE_SETTINGS_TOKEN,
 } from './otp.constants';
-
-import { OtpOptionsInterface } from './interfaces/otp-options.interface';
-import { OtpOptionsExtrasInterface } from './interfaces/otp-options-extras.interface';
-import { OtpSettingsInterface } from './interfaces/otp-settings.interface';
-
 import { OtpService } from './services/otp.service';
-import { otpDefaultConfig } from './config/otp-default.config';
-import { OtpMissingEntitiesOptionsException } from './exceptions/otp-missing-entities-options.exception';
 
 const RAW_OPTIONS_TOKEN = Symbol('__OTP_MODULE_RAW_OPTIONS_TOKEN__');
 

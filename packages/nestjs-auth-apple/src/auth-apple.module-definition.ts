@@ -5,13 +5,13 @@ import {
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-import { createSettingsProvider } from '@concepta/nestjs-common';
-import { FederatedOAuthService } from '@concepta/nestjs-federated';
-import { JwtService } from '@concepta/nestjs-jwt';
 import {
   IssueTokenService,
   IssueTokenServiceInterface,
 } from '@concepta/nestjs-authentication';
+import { createSettingsProvider } from '@concepta/nestjs-common';
+import { FederatedOAuthService } from '@concepta/nestjs-federated';
+import { JwtService } from '@concepta/nestjs-jwt';
 
 import {
   AUTH_APPLE_ISSUE_TOKEN_SERVICE_TOKEN,
@@ -19,14 +19,13 @@ import {
   AUTH_APPLE_MODULE_SETTINGS_TOKEN,
   AUTH_APPLE_SERVICE_TOKEN,
 } from './auth-apple.constants';
-
-import { AuthAppleOptionsInterface } from './interfaces/auth-apple-options.interface';
-import { AuthAppleOptionsExtrasInterface } from './interfaces/auth-apple-options-extras.interface';
-import { authAppleDefaultConfig } from './config/auth-apple-default.config';
-import { AuthAppleSettingsInterface } from './interfaces/auth-apple-settings.interface';
-import { AuthAppleStrategy } from './auth-apple.strategy';
 import { AuthAppleService } from './auth-apple.service';
+import { AuthAppleStrategy } from './auth-apple.strategy';
+import { authAppleDefaultConfig } from './config/auth-apple-default.config';
+import { AuthAppleOptionsExtrasInterface } from './interfaces/auth-apple-options-extras.interface';
+import { AuthAppleOptionsInterface } from './interfaces/auth-apple-options.interface';
 import { AuthAppleServiceInterface } from './interfaces/auth-apple-service.interface';
+import { AuthAppleSettingsInterface } from './interfaces/auth-apple-settings.interface';
 
 const RAW_OPTIONS_TOKEN = Symbol('__AUTH_APPLE_MODULE_RAW_OPTIONS_TOKEN__');
 

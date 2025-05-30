@@ -1,4 +1,5 @@
 import { RuntimeExceptionOptions } from '@concepta/nestjs-common';
+
 import { AuthLocalInvalidCredentialsException } from './auth-local-invalid-credentials.exception';
 
 export class AuthLocalUsernameNotFoundException extends AuthLocalInvalidCredentialsException {

@@ -1,4 +1,5 @@
 import { Strategy } from 'passport-github';
+
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 
@@ -11,11 +12,10 @@ import {
   AUTH_GITHUB_MODULE_SETTINGS_TOKEN,
   AUTH_GITHUB_STRATEGY_NAME,
 } from './auth-github.constants';
-
-import { AuthGithubSettingsInterface } from './interfaces/auth-github-settings.interface';
-import { AuthGithubProfileInterface } from './interfaces/auth-github-profile.interface';
 import { AuthGithubMissingEmailException } from './exceptions/auth-github-missing-email.exception';
 import { AuthGithubMissingIdException } from './exceptions/auth-github-missing-id.exception';
+import { AuthGithubProfileInterface } from './interfaces/auth-github-profile.interface';
+import { AuthGithubSettingsInterface } from './interfaces/auth-github-settings.interface';
 import { mapProfile } from './utils/auth-github-map-profile';
 
 @Injectable()

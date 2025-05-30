@@ -1,5 +1,7 @@
 import { DynamicModule, Global, Module } from '@nestjs/common';
+
 import { TypeOrmExtModule } from '@concepta/nestjs-typeorm-ext';
+
 import { OwnerEntityFixture } from './owner-entity.fixture';
 
 @Global()

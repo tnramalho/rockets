@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
+
 import { AuthGuard } from '@concepta/nestjs-authentication';
+
 import { AUTH_REFRESH_MODULE_STRATEGY_NAME } from './auth-refresh.constants';
 
 @Injectable()

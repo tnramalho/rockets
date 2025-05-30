@@ -1,6 +1,8 @@
 import { Controller, Post, Body } from '@nestjs/common';
-import { EmailService } from '@concepta/nestjs-email';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+
+import { EmailService } from '@concepta/nestjs-email';
+
 import { CreateNotificationDto } from './dto/create-notification.dto';
 
 @Controller('notification')

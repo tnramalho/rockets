@@ -2,6 +2,7 @@ import {
   PasswordPlainInterface,
   PasswordStorageInterface,
 } from '@concepta/nestjs-common';
+
 import { PasswordHashObjectOptionsInterface } from './password-hash-object-options.interface';
 import { PasswordHashOptionsInterface } from './password-hash-options.interface';
 

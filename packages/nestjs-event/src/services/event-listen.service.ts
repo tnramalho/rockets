@@ -1,15 +1,18 @@
-import { Inject, Injectable } from '@nestjs/common';
 import {
   EventEmitter2,
   OnOptions,
   Listener as EmitterListener,
 } from 'eventemitter2';
-import { EventListenException } from '../exceptions/event-listen.exception';
-import { EventListenOnOptionsInterface } from './interfaces/event-listen-on-options.interface';
-import { EventListenOnInterface } from './interfaces/event-listen-on.interface';
-import { EventClassInterface } from '../events/interfaces/event-class.interface';
+
+import { Inject, Injectable } from '@nestjs/common';
+
 import { EVENT_MODULE_EMITTER_SERVICE_TOKEN } from '../event-constants';
 import { EventInstance } from '../event-types';
+import { EventClassInterface } from '../events/interfaces/event-class.interface';
+import { EventListenException } from '../exceptions/event-listen.exception';
+
+import { EventListenOnOptionsInterface } from './interfaces/event-listen-on-options.interface';
+import { EventListenOnInterface } from './interfaces/event-listen-on.interface';
 
 /**
  * Event Listen Service

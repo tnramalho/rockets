@@ -1,5 +1,6 @@
-import { Factory } from '@concepta/typeorm-seeding';
 import { UserProfileEntityInterface } from '@concepta/nestjs-common';
+import { Factory } from '@concepta/typeorm-seeding';
+
 import { UserFactory } from './user.factory';
 
 /**

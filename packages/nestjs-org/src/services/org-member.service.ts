@@ -1,16 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
+
 import {
   RepositoryInterface,
   InjectDynamicRepository,
+  OrgMemberEntityInterface,
 } from '@concepta/nestjs-common';
 
-import { ORG_MODULE_ORG_MEMBER_ENTITY_KEY } from '../org.constants';
-import { OrgMemberEntityInterface } from '@concepta/nestjs-common';
-import { OrgMemberServiceInterface } from '../interfaces/org-member-service.interface';
-import { OrgMemberCreatableInterface } from '../interfaces/org-member-creatable.interface';
-import { OrgMemberModelService } from './org-member-model.service';
 import { OrgMemberException } from '../exceptions/org-member.exception';
+import { OrgMemberCreatableInterface } from '../interfaces/org-member-creatable.interface';
 import { OrgMemberModelServiceInterface } from '../interfaces/org-member-model-service.interface';
+import { OrgMemberServiceInterface } from '../interfaces/org-member-service.interface';
+import { ORG_MODULE_ORG_MEMBER_ENTITY_KEY } from '../org.constants';
+
+import { OrgMemberModelService } from './org-member-model.service';
 
 @Injectable()
 export class OrgMemberService implements OrgMemberServiceInterface {

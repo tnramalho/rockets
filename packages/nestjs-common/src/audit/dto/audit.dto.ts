@@ -1,6 +1,8 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose, Type } from 'class-transformer';
 import { IsDate, IsNumber, IsOptional } from 'class-validator';
+
+import { ApiProperty } from '@nestjs/swagger';
+
 import { AuditInterface } from '../interfaces/audit.interface';
 import {
   AuditDateCreated,

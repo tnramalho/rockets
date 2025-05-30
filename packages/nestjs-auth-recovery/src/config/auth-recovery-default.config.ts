@@ -1,7 +1,8 @@
 import { registerAs } from '@nestjs/config';
+
 import { AUTH_RECOVERY_MODULE_DEFAULT_SETTINGS_TOKEN } from '../auth-recovery.constants';
-import { AuthRecoverySettingsInterface } from '../interfaces/auth-recovery-settings.interface';
 import { formatTokenUrl } from '../auth-recovery.utils';
+import { AuthRecoverySettingsInterface } from '../interfaces/auth-recovery-settings.interface';
 
 /**
  * Default configuration for auth recovery.

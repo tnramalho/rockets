@@ -1,6 +1,7 @@
-import { EventAsyncInterface } from './interfaces/event-async.interface';
-import { EventBase } from './event-base';
 import { EventManager } from '../event-manager';
+
+import { EventBase } from './event-base';
+import { EventAsyncInterface } from './interfaces/event-async.interface';
 
 /**
  * Abstract async event class.

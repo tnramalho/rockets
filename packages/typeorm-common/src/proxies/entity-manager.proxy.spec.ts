@@ -1,7 +1,8 @@
 import { mock } from 'jest-mock-extended';
+import { EntityManager, Repository } from 'typeorm';
+
 import { EntityManagerProxy } from './entity-manager.proxy';
 import { TransactionProxy } from './transaction.proxy';
-import { EntityManager, Repository } from 'typeorm';
 
 class TestEntity {}
 describe(EntityManagerProxy.name, () => {

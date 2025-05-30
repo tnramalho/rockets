@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+
 import {
   ReferenceActiveInterface,
   ReferenceEmail,
@@ -7,7 +8,6 @@ import {
 } from '@concepta/nestjs-common';
 
 import { AuthVerifyUserModelServiceInterface } from '../../../interfaces/auth-verify-user-model.service.interface';
-
 import { UserFixture } from '../user.fixture';
 
 @Injectable()

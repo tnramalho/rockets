@@ -1,5 +1,7 @@
 import { faker } from '@faker-js/faker';
+
 import { Factory } from '@concepta/typeorm-seeding';
+
 import { PhotoFixture } from './photo.entity.fixture';
 
 export class PhotoFactoryFixture extends Factory<PhotoFixture> {

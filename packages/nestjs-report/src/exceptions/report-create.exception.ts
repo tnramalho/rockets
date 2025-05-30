@@ -1,4 +1,5 @@
 import { RuntimeExceptionOptions } from '@concepta/nestjs-common';
+
 import { ReportException } from './report.exception';
 
 export class ReportCreateException extends ReportException {

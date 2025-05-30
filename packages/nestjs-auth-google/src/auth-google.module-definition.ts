@@ -5,23 +5,22 @@ import {
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-import { createSettingsProvider } from '@concepta/nestjs-common';
-import { FederatedOAuthService } from '@concepta/nestjs-federated';
 import {
   IssueTokenService,
   IssueTokenServiceInterface,
 } from '@concepta/nestjs-authentication';
+import { createSettingsProvider } from '@concepta/nestjs-common';
+import { FederatedOAuthService } from '@concepta/nestjs-federated';
 
 import {
   AUTH_GOOGLE_ISSUE_TOKEN_SERVICE_TOKEN,
   AUTH_GOOGLE_MODULE_SETTINGS_TOKEN,
 } from './auth-google.constants';
-
-import { AuthGoogleOptionsInterface } from './interfaces/auth-google-options.interface';
-import { AuthGoogleOptionsExtrasInterface } from './interfaces/auth-google-options-extras.interface';
-import { authGoogleDefaultConfig } from './config/auth-google-default.config';
-import { AuthGoogleSettingsInterface } from './interfaces/auth-google-settings.interface';
 import { AuthGoogleStrategy } from './auth-google.strategy';
+import { authGoogleDefaultConfig } from './config/auth-google-default.config';
+import { AuthGoogleOptionsExtrasInterface } from './interfaces/auth-google-options-extras.interface';
+import { AuthGoogleOptionsInterface } from './interfaces/auth-google-options.interface';
+import { AuthGoogleSettingsInterface } from './interfaces/auth-google-settings.interface';
 
 const RAW_OPTIONS_TOKEN = Symbol('__AUTH_GOOGLE_MODULE_RAW_OPTIONS_TOKEN__');
 

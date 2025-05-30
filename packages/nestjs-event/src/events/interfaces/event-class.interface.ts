@@ -1,4 +1,5 @@
 import { EventInstance } from '../../event-types';
+
 import { EventKeyInterface } from './event-key.interface';
 
 /**

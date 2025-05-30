@@ -1,6 +1,7 @@
-import { EventInterface } from './interfaces/event.interface';
-import { EventBase } from './event-base';
 import { EventManager } from '../event-manager';
+
+import { EventBase } from './event-base';
+import { EventInterface } from './interfaces/event.interface';
 
 /**
  * Abstract event class.

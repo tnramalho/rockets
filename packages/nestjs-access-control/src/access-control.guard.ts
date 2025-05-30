@@ -1,29 +1,27 @@
 import { IQueryInfo } from 'accesscontrol';
-import { ModuleRef, Reflector } from '@nestjs/core';
+
 import {
   CanActivate,
   ExecutionContext,
   Inject,
   Injectable,
 } from '@nestjs/common';
+import { ModuleRef, Reflector } from '@nestjs/core';
 
+import { AccessControlContext } from './access-control.context';
 import {
   ACCESS_CONTROL_MODULE_QUERY_METADATA,
   ACCESS_CONTROL_MODULE_GRANT_METADATA,
   ACCESS_CONTROL_MODULE_SETTINGS_TOKEN,
 } from './constants';
-
 import { PossessionEnum } from './enums/possession.enum';
-
-import { CanAccess } from './interfaces/can-access.interface';
-import { AccessControlQueryOptionInterface } from './interfaces/access-control-query-option.interface';
+import { AccessControllerException } from './exceptions/access-controller.exception';
 import { AccessControlGrantOptionInterface } from './interfaces/access-control-grant-option.interface';
+import { AccessControlQueryOptionInterface } from './interfaces/access-control-query-option.interface';
 import { AccessControlServiceInterface } from './interfaces/access-control-service.interface';
 import { AccessControlSettingsInterface } from './interfaces/access-control-settings.interface';
-
+import { CanAccess } from './interfaces/can-access.interface';
 import { AccessControlService } from './services/access-control.service';
-import { AccessControlContext } from './access-control.context';
-import { AccessControllerException } from './exceptions/access-controller.exception';
 
 @Injectable()
 export class AccessControlGuard implements CanActivate {

@@ -1,8 +1,10 @@
 import { Log } from 'coralogix-logger';
+
 import { LoggerCoralogixConfigInterface } from '../interfaces/logger-coralogix-config.interface';
 import { LoggerCoralogixSettingsInterface } from '../interfaces/logger-coralogix-settings.interface';
-import { LoggerCoralogixTransport } from './logger-coralogix.transport';
 import { formatMessage, logLevelMap } from '../utils';
+
+import { LoggerCoralogixTransport } from './logger-coralogix.transport';
 
 jest.mock('axios', () => {
   return {

@@ -1,5 +1,5 @@
-import { UserInterface } from './user.interface';
 import { UserCreatableInterface } from './user-creatable.interface';
+import { UserInterface } from './user.interface';
 
 export interface UserUpdatableInterface
   extends Pick<UserInterface, 'id'>,

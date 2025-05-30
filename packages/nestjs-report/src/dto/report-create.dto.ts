@@ -1,6 +1,9 @@
-import { ReportCreatableInterface } from '@concepta/nestjs-common';
-import { PickType } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
+
+import { PickType } from '@nestjs/swagger';
+
+import { ReportCreatableInterface } from '@concepta/nestjs-common';
+
 import { ReportDto } from './report.dto';
 
 /**

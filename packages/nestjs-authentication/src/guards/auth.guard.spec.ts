@@ -1,7 +1,8 @@
 import { ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { AuthGuard } from './auth.guard';
 import { AuthGuard as PassportAuthGuard } from '@nestjs/passport';
+
+import { AuthGuard } from './auth.guard';
 
 jest.mock('@nestjs/passport', () => ({
   AuthGuard: jest.fn().mockImplementation(() => jest.fn()),

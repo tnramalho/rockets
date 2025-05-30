@@ -1,4 +1,5 @@
 import { RuntimeException } from '@concepta/nestjs-common';
+
 import { AuthenticationException } from './authentication.exception';
 
 describe(AuthenticationException.name, () => {

@@ -1,7 +1,10 @@
 import { Exclude } from 'class-transformer';
+
 import { PickType } from '@nestjs/swagger';
-import { UserPasswordHistoryDto } from './user-password-history.dto';
+
 import { UserPasswordHistoryCreatableInterface } from '@concepta/nestjs-common';
+
+import { UserPasswordHistoryDto } from './user-password-history.dto';
 
 /**
  * User Password History Create DTO

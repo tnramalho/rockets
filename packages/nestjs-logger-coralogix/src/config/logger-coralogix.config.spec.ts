@@ -1,11 +1,12 @@
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { LoggerCoralogixSettingsInterface } from '../interfaces/logger-coralogix-settings.interface';
+
 import {
   coralogixConfig,
   LOGGER_CORALOGIX_MODULE_SETTINGS_TOKEN,
 } from './logger-coralogix.config';
-import { LoggerCoralogixSettingsInterface } from '../interfaces/logger-coralogix-settings.interface';
 
 jest.mock('axios', () => {
   return {

@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
-import { Factory } from '@concepta/typeorm-seeding';
+
 import { UserEntityInterface } from '@concepta/nestjs-common';
+import { Factory } from '@concepta/typeorm-seeding';
 
 /**
  * User factory

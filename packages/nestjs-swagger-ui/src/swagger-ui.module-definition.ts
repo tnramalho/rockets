@@ -4,18 +4,19 @@ import {
   Provider,
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+
 import { createSettingsProvider } from '@concepta/nestjs-common';
 
 import { swaggerUiDefaultConfig } from './config/swagger-ui-default.config';
+import { SwaggerUiOptionsExtrasInterface } from './interfaces/swagger-ui-options-extras.interface';
 import { SwaggerUiOptionsInterface } from './interfaces/swagger-ui-options.interface';
 import { SwaggerUiSettingsInterface } from './interfaces/swagger-ui-settings.interface';
 import {
   SWAGGER_UI_MODULE_DOCUMENT_BUILDER_TOKEN,
   SWAGGER_UI_MODULE_SETTINGS_TOKEN,
 } from './swagger-ui.constants';
-import { createDefaultDocumentBuilder } from './utils/create-default-document-builder';
-import { SwaggerUiOptionsExtrasInterface } from './interfaces/swagger-ui-options-extras.interface';
 import { SwaggerUiService } from './swagger-ui.service';
+import { createDefaultDocumentBuilder } from './utils/create-default-document-builder';
 
 const RAW_OPTIONS_TOKEN = Symbol('__SWAGGER_UI_MODULE_RAW_OPTIONS_TOKEN__');
 

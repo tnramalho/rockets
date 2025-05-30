@@ -1,12 +1,24 @@
 import { Inject, Logger } from '@nestjs/common';
+
 import {
   AssigneeRelationInterface,
   InvitationInterface,
   LiteralObject,
   RepositoryInterface,
   InjectDynamicRepository,
+  InvitationEntityInterface,
 } from '@concepta/nestjs-common';
 
+import { InvitationAcceptedEventAsync } from '../events/invitation-accepted.event';
+import { InvitationNotFoundException } from '../exceptions/invitation-not-found.exception';
+import { InvitationSendMailException } from '../exceptions/invitation-send-mail.exception';
+import { InvitationUserUndefinedException } from '../exceptions/invitation-user-undefined.exception';
+import { InvitationException } from '../exceptions/invitation.exception';
+import { InvitationAcceptOptionsInterface } from '../interfaces/options/invitation-accept-options.interface';
+import { InvitationSettingsInterface } from '../interfaces/options/invitation-settings.interface';
+import { InvitationEmailServiceInterface } from '../interfaces/services/invitation-email-service.interface';
+import { InvitationOtpServiceInterface } from '../interfaces/services/invitation-otp-service.interface';
+import { InvitationUserModelServiceInterface } from '../interfaces/services/invitation-user-model.service.interface';
 import {
   INVITATION_MODULE_EMAIL_SERVICE_TOKEN,
   INVITATION_MODULE_INVITATION_ENTITY_KEY,
@@ -15,18 +27,7 @@ import {
   INVITATION_MODULE_USER_MODEL_SERVICE_TOKEN,
 } from '../invitation.constants';
 
-import { InvitationAcceptedEventAsync } from '../events/invitation-accepted.event';
 import { InvitationRevocationService } from './invitation-revocation.service';
-import { InvitationEntityInterface } from '@concepta/nestjs-common';
-import { InvitationSettingsInterface } from '../interfaces/options/invitation-settings.interface';
-import { InvitationOtpServiceInterface } from '../interfaces/services/invitation-otp-service.interface';
-import { InvitationEmailServiceInterface } from '../interfaces/services/invitation-email-service.interface';
-import { InvitationSendMailException } from '../exceptions/invitation-send-mail.exception';
-import { InvitationAcceptOptionsInterface } from '../interfaces/options/invitation-accept-options.interface';
-import { InvitationException } from '../exceptions/invitation.exception';
-import { InvitationNotFoundException } from '../exceptions/invitation-not-found.exception';
-import { InvitationUserModelServiceInterface } from '../interfaces/services/invitation-user-model.service.interface';
-import { InvitationUserUndefinedException } from '../exceptions/invitation-user-undefined.exception';
 
 export class InvitationAcceptanceService {
   constructor(

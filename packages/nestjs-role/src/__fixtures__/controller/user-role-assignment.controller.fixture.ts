@@ -1,4 +1,12 @@
 import { ApiTags } from '@nestjs/swagger';
+
+import {
+  AccessControlCreateMany,
+  AccessControlCreateOne,
+  AccessControlDeleteOne,
+  AccessControlReadMany,
+  AccessControlReadOne,
+} from '@concepta/nestjs-access-control';
 import {
   RoleAssignmentCreatableInterface,
   RoleAssignmentInterface,
@@ -16,18 +24,10 @@ import {
   CrudReadMany,
 } from '@concepta/nestjs-crud';
 
-import { RoleAssignmentDto } from '../../dto/role-assignment.dto';
+import { RoleAssignmentCreateManyDto } from '../../dto/role-assignment-create-many.dto';
 import { RoleAssignmentCreateDto } from '../../dto/role-assignment-create.dto';
 import { RoleAssignmentPaginatedDto } from '../../dto/role-assignment-paginated.dto';
-import { RoleAssignmentCreateManyDto } from '../../dto/role-assignment-create-many.dto';
-
-import {
-  AccessControlCreateMany,
-  AccessControlCreateOne,
-  AccessControlDeleteOne,
-  AccessControlReadMany,
-  AccessControlReadOne,
-} from '@concepta/nestjs-access-control';
+import { RoleAssignmentDto } from '../../dto/role-assignment.dto';
 import { RoleAssignmentResource } from '../../role.types';
 import { UserRoleAssignmentCrudServiceFixture } from '../service/user-role-assignment-crud.service.fixture';
 

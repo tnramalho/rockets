@@ -12,17 +12,17 @@ import {
 } from '@concepta/nestjs-authentication';
 import { createSettingsProvider } from '@concepta/nestjs-common';
 
-import { AuthJwtOptionsInterface } from './interfaces/auth-jwt-options.interface';
-import { AuthJwtOptionsExtrasInterface } from './interfaces/auth-jwt-options-extras.interface';
-import { AuthJwtSettingsInterface } from './interfaces/auth-jwt-settings.interface';
 import {
   AUTH_JWT_MODULE_SETTINGS_TOKEN,
   AuthJwtUserModelService,
   AuthJwtVerifyTokenService,
 } from './auth-jwt.constants';
-import { authJwtDefaultConfig } from './config/auth-jwt-default.config';
-import { AuthJwtStrategy } from './auth-jwt.strategy';
 import { AuthJwtGuard } from './auth-jwt.guard';
+import { AuthJwtStrategy } from './auth-jwt.strategy';
+import { authJwtDefaultConfig } from './config/auth-jwt-default.config';
+import { AuthJwtOptionsExtrasInterface } from './interfaces/auth-jwt-options-extras.interface';
+import { AuthJwtOptionsInterface } from './interfaces/auth-jwt-options.interface';
+import { AuthJwtSettingsInterface } from './interfaces/auth-jwt-settings.interface';
 
 const RAW_OPTIONS_TOKEN = Symbol('__AUTH_JWT_MODULE_RAW_OPTIONS_TOKEN__');
 

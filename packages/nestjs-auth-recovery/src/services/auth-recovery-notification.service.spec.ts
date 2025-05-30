@@ -1,8 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
 import { EmailService } from '@concepta/nestjs-email';
 
 import { AuthRecoveryEmailService } from '../auth-recovery.constants';
+
 import { AuthRecoveryNotificationService } from './auth-recovery-notification.service';
 
 import { AppModuleFixture } from '../__fixtures__/app.module.fixture';

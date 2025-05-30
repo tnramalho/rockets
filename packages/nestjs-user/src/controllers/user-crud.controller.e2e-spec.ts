@@ -1,23 +1,25 @@
 import supertest from 'supertest';
-import { Test, TestingModule } from '@nestjs/testing';
+
 import {
   CallHandler,
   ExecutionContext,
   INestApplication,
 } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 import { getDataSourceToken } from '@nestjs/typeorm';
-import { SeedingSource } from '@concepta/typeorm-seeding';
+
 import {
   AccessControlFilter,
   AccessControlGuard,
 } from '@concepta/nestjs-access-control';
 import { AuthJwtGuard } from '@concepta/nestjs-auth-jwt';
+import { SeedingSource } from '@concepta/typeorm-seeding';
 
 import { UserFactory } from '../user.factory';
 import { UserSeeder } from '../user.seeder';
 
-import { UserEntityFixture } from '../__fixtures__/user.entity.fixture';
 import { AppModuleCrudFixture } from '../__fixtures__/app.module.crud.fixture';
+import { UserEntityFixture } from '../__fixtures__/user.entity.fixture';
 
 describe('UserCrudController (e2e)', () => {
   describe('Normal CRUD flow', () => {

@@ -1,24 +1,24 @@
-import { APP_FILTER, APP_INTERCEPTOR, BaseExceptionFilter } from '@nestjs/core';
 import {
   ConfigurableModuleBuilder,
   DynamicModule,
   Provider,
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_FILTER, APP_INTERCEPTOR, BaseExceptionFilter } from '@nestjs/core';
+
 import { createSettingsProvider } from '@concepta/nestjs-common';
-import { LoggerOptionsInterface } from './interfaces/logger-options.interface';
-import { LoggerOptionsExtrasInterface } from './interfaces/logger-options-extras.interface';
 
 import {
   LOGGER_MODULE_SETTINGS_TOKEN,
   loggerConfig,
 } from './config/logger.config';
-
+import { LoggerOptionsExtrasInterface } from './interfaces/logger-options-extras.interface';
+import { LoggerOptionsInterface } from './interfaces/logger-options.interface';
 import { LoggerSettingsInterface } from './interfaces/logger-settings.interface';
-import { LoggerService } from './logger.service';
-import { LoggerTransportService } from './logger-transport.service';
-import { LoggerRequestInterceptor } from './logger-request.interceptor';
 import { LoggerExceptionFilter } from './logger-exception.filter';
+import { LoggerRequestInterceptor } from './logger-request.interceptor';
+import { LoggerTransportService } from './logger-transport.service';
+import { LoggerService } from './logger.service';
 
 const RAW_OPTIONS_TOKEN = Symbol('__LOGGER_MODULE_RAW_OPTIONS_TOKEN__');
 

@@ -1,10 +1,11 @@
-import supertest from 'supertest';
 import { plainToInstance } from 'class-transformer';
-import { Test, TestingModule } from '@nestjs/testing';
+import supertest from 'supertest';
+
 import { INestApplication } from '@nestjs/common';
-import { UserFactory } from '@concepta/nestjs-user/src/seeding';
 import { ConfigService, ConfigType } from '@nestjs/config';
-import { OtpService } from '@concepta/nestjs-otp';
+import { Test, TestingModule } from '@nestjs/testing';
+import { getDataSourceToken } from '@nestjs/typeorm';
+
 import {
   INVITATION_MODULE_CATEGORY_ORG_KEY,
   INVITATION_MODULE_CATEGORY_USER_KEY,
@@ -13,21 +14,21 @@ import {
   InvitationEntityInterface,
 } from '@concepta/nestjs-common';
 import { EmailService } from '@concepta/nestjs-email';
+import { OtpService } from '@concepta/nestjs-otp';
+import { UserFactory } from '@concepta/nestjs-user/src/seeding';
 import { SeedingSource } from '@concepta/typeorm-seeding';
-import { getDataSourceToken } from '@nestjs/typeorm';
 
-import { INVITATION_MODULE_DEFAULT_SETTINGS_TOKEN } from '../invitation.constants';
-import { InvitationDto } from '../dto/invitation.dto';
+import { invitationDefaultConfig } from '../config/invitation-default.config';
 import { InvitationAcceptInviteDto } from '../dto/invitation-accept-invite.dto';
 import { InvitationCreateInviteDto } from '../dto/invitation-create-invite.dto';
-import { invitationDefaultConfig } from '../config/invitation-default.config';
+import { InvitationDto } from '../dto/invitation.dto';
+import { InvitationSettingsInterface } from '../interfaces/options/invitation-settings.interface';
+import { INVITATION_MODULE_DEFAULT_SETTINGS_TOKEN } from '../invitation.constants';
 import { InvitationFactory } from '../seeding/invitation.factory';
 
-import { InvitationSettingsInterface } from '../interfaces/options/invitation-settings.interface';
-
+import { AppCrudModuleFixture } from '../__fixtures__/app-crud.module.fixture';
 import { InvitationEntityFixture } from '../__fixtures__/invitation/entities/invitation.entity.fixture';
 import { UserEntityFixture } from '../__fixtures__/user/entities/user.entity.fixture';
-import { AppCrudModuleFixture } from '../__fixtures__/app-crud.module.fixture';
 
 describe('InvitationController (e2e)', () => {
   const userCategory = INVITATION_MODULE_CATEGORY_USER_KEY;

@@ -5,15 +5,15 @@ import {
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
+import {
+  IssueTokenService,
+  IssueTokenServiceInterface,
+} from '@concepta/nestjs-authentication';
 import { createSettingsProvider } from '@concepta/nestjs-common';
 import {
   PasswordValidationService,
   PasswordValidationServiceInterface,
 } from '@concepta/nestjs-password';
-import {
-  IssueTokenService,
-  IssueTokenServiceInterface,
-} from '@concepta/nestjs-authentication';
 
 import {
   AUTH_LOCAL_MODULE_SETTINGS_TOKEN,
@@ -21,13 +21,12 @@ import {
   AuthLocalUserModelService,
   AuthLocalPasswordValidationService,
 } from './auth-local.constants';
-
+import { AuthLocalStrategy } from './auth-local.strategy';
+import { authLocalDefaultConfig } from './config/auth-local-default.config';
 import { AuthLocalOptionsExtrasInterface } from './interfaces/auth-local-options-extras.interface';
 import { AuthLocalOptionsInterface } from './interfaces/auth-local-options.interface';
 import { AuthLocalSettingsInterface } from './interfaces/auth-local-settings.interface';
 import { AuthLocalUserModelServiceInterface } from './interfaces/auth-local-user-model-service.interface';
-import { authLocalDefaultConfig } from './config/auth-local-default.config';
-import { AuthLocalStrategy } from './auth-local.strategy';
 import { AuthLocalValidateUserService } from './services/auth-local-validate-user.service';
 
 const RAW_OPTIONS_TOKEN = Symbol('__AUTH_LOCAL_MODULE_RAW_OPTIONS_TOKEN__');

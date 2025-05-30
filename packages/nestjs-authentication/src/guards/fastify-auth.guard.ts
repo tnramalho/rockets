@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   NotImplementedException,
 } from '@nestjs/common';
+
 import { AuthGuardCtr } from '../authentication.types';
 
 export const FastifyAuthGuard = (_strategyName: string): AuthGuardCtr => {

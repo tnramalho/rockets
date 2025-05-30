@@ -1,6 +1,8 @@
 import { Column } from 'typeorm';
-import { CommonPostgresEntity } from '../common/common-postgres.entity';
+
 import { UserProfileEntityInterface } from '@concepta/nestjs-common';
+
+import { CommonPostgresEntity } from '../common/common-postgres.entity';
 
 /**
  * User Profile Postgres Entity

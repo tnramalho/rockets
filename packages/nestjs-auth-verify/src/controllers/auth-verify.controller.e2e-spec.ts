@@ -1,23 +1,24 @@
 import supertest from 'supertest';
-import { Test, TestingModule } from '@nestjs/testing';
+
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 import { getDataSourceToken } from '@nestjs/typeorm';
+
 import { OtpInterface, UserInterface } from '@concepta/nestjs-common';
-import { SeedingSource } from '@concepta/typeorm-seeding';
 import { EmailService } from '@concepta/nestjs-email';
 import { OtpService } from '@concepta/nestjs-otp';
+import { UserModelService } from '@concepta/nestjs-user';
 import { UserFactory } from '@concepta/nestjs-user/src/seeding';
+import { SeedingSource } from '@concepta/typeorm-seeding';
 
 import { AUTH_VERIFY_MODULE_SETTINGS_TOKEN } from '../auth-verify.constants';
-
-import { AuthVerifyControllerFixture } from '../__fixtures__/auth-verify.controller.fixture';
-import { AuthVerifySettingsInterface } from '../interfaces/auth-verify-settings.interface';
-import { AuthVerifyDto } from '../dto/auth-verify.dto';
 import { AuthVerifyUpdateDto } from '../dto/auth-verify-update.dto';
+import { AuthVerifyDto } from '../dto/auth-verify.dto';
+import { AuthVerifySettingsInterface } from '../interfaces/auth-verify-settings.interface';
 
-import { UserEntityFixture } from '../__fixtures__/user/entities/user-entity.fixture';
 import { AppModuleDbFixture } from '../__fixtures__/app.module.db.fixture';
-import { UserModelService } from '@concepta/nestjs-user';
+import { AuthVerifyControllerFixture } from '../__fixtures__/auth-verify.controller.fixture';
+import { UserEntityFixture } from '../__fixtures__/user/entities/user-entity.fixture';
 
 describe(AuthVerifyControllerFixture, () => {
   let app: INestApplication;

@@ -1,22 +1,23 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 import { getDataSourceToken } from '@nestjs/typeorm';
+
 import {
   RepositoryInterface,
   UserEntityInterface,
+  INVITATION_MODULE_CATEGORY_USER_KEY,
+  getDynamicRepositoryToken,
+  InvitationEntityInterface,
 } from '@concepta/nestjs-common';
 import { OtpService } from '@concepta/nestjs-otp';
 import { UserFactory } from '@concepta/nestjs-user/src/seeding';
 import { SeedingSource } from '@concepta/typeorm-seeding';
-import {
-  INVITATION_MODULE_CATEGORY_USER_KEY,
-  getDynamicRepositoryToken,
-} from '@concepta/nestjs-common';
 
 import { INVITATION_MODULE_INVITATION_ENTITY_KEY } from '../invitation.constants';
 import { InvitationFactory } from '../seeding/invitation.factory';
+
 import { InvitationRevocationService } from './invitation-revocation.service';
-import { InvitationEntityInterface } from '@concepta/nestjs-common';
+
 import { AppModuleFixture } from '../__fixtures__/app.module.fixture';
 import { InvitationEntityFixture } from '../__fixtures__/invitation/entities/invitation.entity.fixture';
 import { UserEntityFixture } from '../__fixtures__/user/entities/user.entity.fixture';

@@ -1,4 +1,5 @@
 import { ReferenceIdInterface } from '@concepta/nestjs-common';
+
 import { AuthLocalCredentialsInterface } from '../../interfaces/auth-local-credentials.interface';
 
 export class UserFixture

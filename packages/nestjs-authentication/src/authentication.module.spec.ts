@@ -3,19 +3,18 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { JwtModule } from '@concepta/nestjs-jwt';
 
-import { IssueTokenServiceInterface } from './interfaces/issue-token-service.interface';
-import { VerifyTokenServiceInterface } from './interfaces/verify-token-service.interface';
-import { ValidateTokenServiceInterface } from './interfaces/validate-token-service.interface';
-
-import { AuthenticationModule } from './authentication.module';
 import { ValidateTokenService } from './authentication.constants';
-import { VerifyTokenService } from './services/verify-token.service';
+import { AuthenticationModule } from './authentication.module';
+import { IssueTokenServiceInterface } from './interfaces/issue-token-service.interface';
+import { ValidateTokenServiceInterface } from './interfaces/validate-token-service.interface';
+import { VerifyTokenServiceInterface } from './interfaces/verify-token-service.interface';
 import { IssueTokenService } from './services/issue-token.service';
+import { VerifyTokenService } from './services/verify-token.service';
 
 import { GlobalModuleFixture } from './__fixtures__/global.module.fixture';
+import { IssueTokenServiceFixture } from './__fixtures__/services/issue-token.service.fixture';
 import { ValidateTokenServiceFixture } from './__fixtures__/services/validate-token.service.fixture';
 import { VerifyTokenServiceFixture } from './__fixtures__/services/verify-token.service.fixture';
-import { IssueTokenServiceFixture } from './__fixtures__/services/issue-token.service.fixture';
 
 describe(AuthenticationModule, () => {
   let testModule: TestingModule;

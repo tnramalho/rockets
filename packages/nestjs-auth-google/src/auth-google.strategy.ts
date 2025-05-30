@@ -1,3 +1,5 @@
+import { Strategy } from 'passport-google-oauth20';
+
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 
@@ -10,13 +12,11 @@ import {
   AUTH_GOOGLE_MODULE_SETTINGS_TOKEN,
   AUTH_GOOGLE_STRATEGY_NAME,
 } from './auth-google.constants';
-
-import { AuthGoogleSettingsInterface } from './interfaces/auth-google-settings.interface';
-import { AuthGoogleProfileInterface } from './interfaces/auth-google-profile.interface';
 import { AuthGoogleMissingEmailException } from './exceptions/auth-google-missing-email.exception';
 import { AuthGoogleMissingIdException } from './exceptions/auth-google-missing-id.exception';
+import { AuthGoogleProfileInterface } from './interfaces/auth-google-profile.interface';
+import { AuthGoogleSettingsInterface } from './interfaces/auth-google-settings.interface';
 import { mapProfile } from './utils/auth-google-map-profile';
-import { Strategy } from 'passport-google-oauth20';
 
 @Injectable()
 export class AuthGoogleStrategy extends PassportStrategy(

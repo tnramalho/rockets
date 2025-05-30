@@ -1,15 +1,17 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { getDataSourceToken } from '@nestjs/typeorm';
+
 import {
   CacheCreatableInterface,
   CacheInterface,
 } from '@concepta/nestjs-common';
 import { SeedingSource } from '@concepta/typeorm-seeding';
-import { getDataSourceToken } from '@nestjs/typeorm';
 
-import { Test, TestingModule } from '@nestjs/testing';
+import { CacheService } from './cache.service';
+
 import { AppModuleFixture } from '../__fixtures__/app.module.fixture';
 import { UserEntityFixture } from '../__fixtures__/entities/user-entity.fixture';
 import { UserFactoryFixture } from '../__fixtures__/factories/user.factory.fixture';
-import { CacheService } from './cache.service';
 
 const expirationDate = new Date();
 expirationDate.setHours(expirationDate.getHours() + 1);

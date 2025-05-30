@@ -1,5 +1,5 @@
-import { FileService } from '../services/file.service';
 import { FileCreateDto } from '../dto/file-create.dto';
+import { FileService } from '../services/file.service';
 
 export class AwsController {
   constructor(private fileService: FileService) {}

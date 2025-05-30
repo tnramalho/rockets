@@ -1,4 +1,5 @@
 import { Possession } from 'accesscontrol/lib/enums';
+
 import { PossessionEnum } from './possession.enum';
 
 describe('Access control possession enumeration', () => {

@@ -1,4 +1,5 @@
 import { DocumentBuilder } from '@nestjs/swagger';
+
 import { SwaggerUiSettingsInterface } from '../interfaces/swagger-ui-settings.interface';
 
 export function createDefaultDocumentBuilder(

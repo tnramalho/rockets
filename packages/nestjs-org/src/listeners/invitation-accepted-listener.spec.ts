@@ -1,35 +1,36 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 import { getDataSourceToken } from '@nestjs/typeorm';
-import { TypeOrmExtModule } from '@concepta/nestjs-typeorm-ext';
-import { CrudModule } from '@concepta/nestjs-crud';
+
 import {
   INVITATION_MODULE_CATEGORY_ORG_KEY,
   InvitationEntityInterface,
+  UserEntityInterface,
+  OrgEntityInterface,
 } from '@concepta/nestjs-common';
-import { SeedingSource } from '@concepta/typeorm-seeding';
+import { CrudModule } from '@concepta/nestjs-crud';
 import { EventModule } from '@concepta/nestjs-event';
-import { UserEntityInterface } from '@concepta/nestjs-common';
-import { UserModule } from '@concepta/nestjs-user';
-import { PasswordModule } from '@concepta/nestjs-password';
-
-import { UserFactory } from '@concepta/nestjs-user/dist/seeding';
 import { InvitationFactory } from '@concepta/nestjs-invitation/dist/seeding';
+import { PasswordModule } from '@concepta/nestjs-password';
+import { TypeOrmExtModule } from '@concepta/nestjs-typeorm-ext';
+import { UserModule } from '@concepta/nestjs-user';
+import { UserFactory } from '@concepta/nestjs-user/dist/seeding';
+import { SeedingSource } from '@concepta/typeorm-seeding';
 
 import { OrgModule } from '../org.module';
 import { OrgFactory } from '../seeding/org.factory';
-import { OrgEntityInterface } from '@concepta/nestjs-common';
 
 import { InvitationAcceptedListener } from './invitation-accepted-listener';
-import { OrgEntityFixture } from '../__fixtures__/org-entity.fixture';
-import { OwnerEntityFixture } from '../__fixtures__/owner-entity.fixture';
-import { OrgMemberEntityFixture } from '../__fixtures__/org-member.entity.fixture';
-import { UserEntityFixture } from '../__fixtures__/user-entity.fixture';
-import { OwnerModuleFixture } from '../__fixtures__/owner.module.fixture';
+
 import { InvitationAcceptedEventAsync } from '../__fixtures__/invitation-accepted.event';
 import { InvitationEntityFixture } from '../__fixtures__/invitation.entity.fixture';
-import { OwnerFactoryFixture } from '../__fixtures__/owner-factory.fixture';
+import { OrgEntityFixture } from '../__fixtures__/org-entity.fixture';
+import { OrgMemberEntityFixture } from '../__fixtures__/org-member.entity.fixture';
 import { OrgProfileEntityFixture } from '../__fixtures__/org-profile.entity.fixture';
+import { OwnerEntityFixture } from '../__fixtures__/owner-entity.fixture';
+import { OwnerFactoryFixture } from '../__fixtures__/owner-factory.fixture';
+import { OwnerModuleFixture } from '../__fixtures__/owner.module.fixture';
+import { UserEntityFixture } from '../__fixtures__/user-entity.fixture';
 
 describe(InvitationAcceptedListener, () => {
   const category = INVITATION_MODULE_CATEGORY_ORG_KEY;

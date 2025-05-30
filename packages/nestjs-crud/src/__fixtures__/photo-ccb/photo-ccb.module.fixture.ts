@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { PhotoFixture } from '../photo/photo.entity.fixture';
+
 import {
   PhotoCcbControllerFixture,
   PhotoCcbCrudServiceFixture,

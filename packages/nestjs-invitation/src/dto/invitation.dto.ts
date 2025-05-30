@@ -1,6 +1,8 @@
 import { Exclude, Expose } from 'class-transformer';
 import { IsBoolean, IsObject, IsOptional, IsString } from 'class-validator';
+
 import { ApiProperty } from '@nestjs/swagger';
+
 import {
   LiteralObject,
   CommonEntityDto,

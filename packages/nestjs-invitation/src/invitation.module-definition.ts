@@ -7,26 +7,25 @@ import { ConfigModule } from '@nestjs/config';
 
 import { createSettingsProvider } from '@concepta/nestjs-common';
 
+import { invitationDefaultConfig } from './config/invitation-default.config';
+import { InvitationOptionsExtrasInterface } from './interfaces/options/invitation-options-extras.interface';
+import { InvitationOptionsInterface } from './interfaces/options/invitation-options.interface';
+import { InvitationSettingsInterface } from './interfaces/options/invitation-settings.interface';
+import { InvitationEmailServiceInterface } from './interfaces/services/invitation-email-service.interface';
+import { InvitationOtpServiceInterface } from './interfaces/services/invitation-otp-service.interface';
+import { InvitationUserModelServiceInterface } from './interfaces/services/invitation-user-model.service.interface';
 import {
   INVITATION_MODULE_EMAIL_SERVICE_TOKEN,
   INVITATION_MODULE_OTP_SERVICE_TOKEN,
   INVITATION_MODULE_SETTINGS_TOKEN,
   INVITATION_MODULE_USER_MODEL_SERVICE_TOKEN,
 } from './invitation.constants';
-
-import { InvitationOptionsInterface } from './interfaces/options/invitation-options.interface';
-import { InvitationOptionsExtrasInterface } from './interfaces/options/invitation-options-extras.interface';
-import { InvitationSettingsInterface } from './interfaces/options/invitation-settings.interface';
-import { InvitationService } from './services/invitation.service';
 import { InvitationAcceptanceService } from './services/invitation-acceptance.service';
-import { InvitationSendService } from './services/invitation-send.service';
-import { InvitationRevocationService } from './services/invitation-revocation.service';
-import { invitationDefaultConfig } from './config/invitation-default.config';
-import { InvitationModelService } from './services/invitation-model.service';
-import { InvitationEmailServiceInterface } from './interfaces/services/invitation-email-service.interface';
-import { InvitationOtpServiceInterface } from './interfaces/services/invitation-otp-service.interface';
-import { InvitationUserModelServiceInterface } from './interfaces/services/invitation-user-model.service.interface';
 import { InvitationAttemptService } from './services/invitation-attempt.service';
+import { InvitationModelService } from './services/invitation-model.service';
+import { InvitationRevocationService } from './services/invitation-revocation.service';
+import { InvitationSendService } from './services/invitation-send.service';
+import { InvitationService } from './services/invitation.service';
 
 const RAW_OPTIONS_TOKEN = Symbol('__INVITATION_MODULE_RAW_OPTIONS_TOKEN__');
 

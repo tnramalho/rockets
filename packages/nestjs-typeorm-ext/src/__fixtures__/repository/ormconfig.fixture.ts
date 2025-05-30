@@ -1,4 +1,5 @@
 import { DataSourceOptions } from 'typeorm';
+
 import { TestEntityFixture } from './test.entity.fixture';
 
 export const ormConfig: DataSourceOptions = {

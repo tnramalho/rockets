@@ -1,9 +1,11 @@
 import EventEmitter2 from 'eventemitter2';
+
 import { EventManager } from '../event-manager';
 import { Event } from '../events/event';
 import { EventAsync } from '../events/event-async';
 import { EventDispatchService } from '../services/event-dispatch.service';
 import { EventListenService } from '../services/event-listen.service';
+
 import { EventListenerOn } from './event-listener-on';
 
 describe(EventListenerOn, () => {

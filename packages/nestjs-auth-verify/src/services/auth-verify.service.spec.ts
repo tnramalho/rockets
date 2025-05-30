@@ -1,19 +1,18 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import {
   AUTH_VERIFY_MODULE_SETTINGS_TOKEN,
   AuthVerifyUserModelService,
 } from '../auth-verify.constants';
-
-import { AuthVerifyService } from './auth-verify.service';
-import { AuthVerifyNotificationService } from './auth-verify-notification.service';
-
-import { AuthVerifySettingsInterface } from '../interfaces/auth-verify-settings.interface';
-import { AuthVerifyOtpServiceInterface } from '../interfaces/auth-verify-otp.service.interface';
-import { AuthVerifyUserModelServiceInterface } from '../interfaces/auth-verify-user-model.service.interface';
-import { AuthVerifyNotificationServiceInterface } from '../interfaces/auth-verify-notification.service.interface';
 import { AuthRecoveryOtpInvalidException } from '../exceptions/auth-verify-otp-invalid.exception';
+import { AuthVerifyNotificationServiceInterface } from '../interfaces/auth-verify-notification.service.interface';
+import { AuthVerifyOtpServiceInterface } from '../interfaces/auth-verify-otp.service.interface';
+import { AuthVerifySettingsInterface } from '../interfaces/auth-verify-settings.interface';
+import { AuthVerifyUserModelServiceInterface } from '../interfaces/auth-verify-user-model.service.interface';
+
+import { AuthVerifyNotificationService } from './auth-verify-notification.service';
+import { AuthVerifyService } from './auth-verify.service';
 
 import { AppModuleFixture } from '../__fixtures__/app.module.fixture';
 import { OtpServiceFixture } from '../__fixtures__/otp/otp.service.fixture';

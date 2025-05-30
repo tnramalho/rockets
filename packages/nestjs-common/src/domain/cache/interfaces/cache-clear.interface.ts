@@ -1,4 +1,5 @@
 import { ReferenceAssignment } from '../../../reference/interfaces/reference.types';
+
 import { CacheInterface } from './cache.interface';
 
 export interface CacheClearInterface {

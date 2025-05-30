@@ -1,15 +1,18 @@
+import { EventEmitter2 } from 'eventemitter2';
+
+import { Test } from '@nestjs/testing';
+
 import {
   EVENT_MODULE_EMITTER_SERVICE_TOKEN,
   EVENT_MODULE_SETTINGS_TOKEN,
 } from '../event-constants';
-import { EventAsync } from '../events/event-async';
-import { EventDispatchService } from './event-dispatch.service';
-import { EventEmitter2 } from 'eventemitter2';
-import { Test } from '@nestjs/testing';
-import { Event } from '../events/event';
-import { EventDispatchException } from '../exceptions/event-dispatch.exception';
 import { EventReturnType } from '../event-types';
+import { Event } from '../events/event';
+import { EventAsync } from '../events/event-async';
+import { EventDispatchException } from '../exceptions/event-dispatch.exception';
 import { EventSettingsInterface } from '../interfaces/event-settings.interface';
+
+import { EventDispatchService } from './event-dispatch.service';
 
 describe(EventDispatchService, () => {
   const config: EventSettingsInterface = {};

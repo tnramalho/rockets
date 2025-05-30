@@ -1,4 +1,5 @@
 import { RuntimeExceptionOptions } from '@concepta/nestjs-common';
+
 import { AuthGithubException } from './auth-github.exception';
 
 export class AuthGithubMissingIdException extends AuthGithubException {

@@ -1,10 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AppModule } from './app.module';
-import { IssueTokenService } from '@concepta/nestjs-authentication';
+
 import {
   AuthLocalUserModelService,
   AuthLocalUserModelServiceInterface,
 } from '@concepta/nestjs-auth-local';
+import { IssueTokenService } from '@concepta/nestjs-authentication';
+
+import { AppModule } from './app.module';
 
 describe('AppModule', () => {
   it('should be imported', async () => {

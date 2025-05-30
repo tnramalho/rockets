@@ -1,7 +1,9 @@
-import { NotAnErrorException } from '@concepta/nestjs-common';
 import { Request } from 'express-serve-static-core';
 import { mock } from 'jest-mock-extended';
 import { VerifyCallback } from 'passport-jwt';
+
+import { NotAnErrorException } from '@concepta/nestjs-common';
+
 import { JwtStrategyOptionsInterface } from './interfaces/jwt-strategy-options.interface';
 import { JwtStrategy } from './jwt.strategy';
 

@@ -5,25 +5,25 @@ import {
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-import { createSettingsProvider } from '@concepta/nestjs-common';
 import {
+  createSettingsProvider,
   RepositoryInterface,
   getDynamicRepositoryToken,
+  OrgEntityInterface,
 } from '@concepta/nestjs-common';
+
+import { orgDefaultConfig } from './config/org-default.config';
+import { OrgOptionsExtrasInterface } from './interfaces/org-options-extras.interface';
+import { OrgOptionsInterface } from './interfaces/org-options.interface';
+import { OrgSettingsInterface } from './interfaces/org-settings.interface';
+import { InvitationAcceptedListener } from './listeners/invitation-accepted-listener';
 import {
   ORG_MODULE_SETTINGS_TOKEN,
   ORG_MODULE_ORG_ENTITY_KEY,
 } from './org.constants';
-import { OrgOptionsInterface } from './interfaces/org-options.interface';
-import { OrgOptionsExtrasInterface } from './interfaces/org-options-extras.interface';
-import { OrgSettingsInterface } from './interfaces/org-settings.interface';
-import { OrgEntityInterface } from '@concepta/nestjs-common';
-import { OrgModelService } from './services/org-model.service';
-import { OrgMemberService } from './services/org-member.service';
 import { OrgMemberModelService } from './services/org-member-model.service';
-
-import { orgDefaultConfig } from './config/org-default.config';
-import { InvitationAcceptedListener } from './listeners/invitation-accepted-listener';
+import { OrgMemberService } from './services/org-member.service';
+import { OrgModelService } from './services/org-model.service';
 
 const RAW_OPTIONS_TOKEN = Symbol('__ORG_MODULE_RAW_OPTIONS_TOKEN__');
 

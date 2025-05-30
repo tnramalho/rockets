@@ -1,33 +1,31 @@
 import { AccessControl } from 'accesscontrol';
 import { mock } from 'jest-mock-extended';
-import { Reflector } from '@nestjs/core';
+
 import { Controller, ExecutionContext, Injectable } from '@nestjs/common';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
+import { Reflector } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
+
+import { AccessControlContext } from './access-control.context';
+import { AccessControlGuard } from './access-control.guard';
 import {
   ACCESS_CONTROL_MODULE_QUERY_METADATA,
   ACCESS_CONTROL_MODULE_GRANT_METADATA,
   ACCESS_CONTROL_MODULE_SETTINGS_TOKEN,
 } from './constants';
-
-import { ActionEnum } from './enums/action.enum';
-import { PossessionEnum } from './enums/possession.enum';
-
-import { AccessControlServiceInterface } from './interfaces/access-control-service.interface';
-import { AccessControlContextInterface } from './interfaces/access-control-context.interface';
-import { AccessControlOptionsInterface } from './interfaces/access-control-options.interface';
-import { AccessControlQueryOptionInterface } from './interfaces/access-control-query-option.interface';
-import { AccessControlGrantOptionInterface } from './interfaces/access-control-grant-option.interface';
-import { CanAccess } from './interfaces/can-access.interface';
-
 import { AccessControlCreateOne } from './decorators/access-control-create-one.decorator';
 import { AccessControlQuery } from './decorators/access-control-query.decorator';
 import { AccessControlReadMany } from './decorators/access-control-read-many.decorator';
 import { AccessControlReadOne } from './decorators/access-control-read-one.decorator';
-
-import { AccessControlGuard } from './access-control.guard';
+import { ActionEnum } from './enums/action.enum';
+import { PossessionEnum } from './enums/possession.enum';
+import { AccessControlContextInterface } from './interfaces/access-control-context.interface';
+import { AccessControlGrantOptionInterface } from './interfaces/access-control-grant-option.interface';
+import { AccessControlOptionsInterface } from './interfaces/access-control-options.interface';
+import { AccessControlQueryOptionInterface } from './interfaces/access-control-query-option.interface';
+import { AccessControlServiceInterface } from './interfaces/access-control-service.interface';
+import { CanAccess } from './interfaces/can-access.interface';
 import { AccessControlService } from './services/access-control.service';
-import { AccessControlContext } from './access-control.context';
 
 describe('AccessControlModule', () => {
   const resourceNoAccess = 'protected_resource_no_access';
