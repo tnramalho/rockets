@@ -5,10 +5,12 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+
 import {
-  AuthenticatedUserInterface,
-  AuthenticationResponseInterface,
-} from '@concepta/nestjs-common';
+  AuthRefreshGuard,
+  AuthRefreshIssueTokenService,
+  AuthRefreshDto,
+} from '@concepta/nestjs-auth-refresh';
 import {
   IssueTokenServiceInterface,
   AuthUser,
@@ -16,10 +18,9 @@ import {
   AuthPublic,
 } from '@concepta/nestjs-authentication';
 import {
-  AuthRefreshGuard,
-  AuthRefreshIssueTokenService,
-  AuthRefreshDto,
-} from '@concepta/nestjs-auth-refresh';
+  AuthenticatedUserInterface,
+  AuthenticationResponseInterface,
+} from '@concepta/nestjs-common';
 
 /**
  * Auth Local controller

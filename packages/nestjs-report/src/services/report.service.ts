@@ -1,3 +1,5 @@
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+
 import {
   ReportCreatableInterface,
   ReportInterface,
@@ -5,7 +7,6 @@ import {
   ReportEntityInterface,
   mapNonErrorToException,
 } from '@concepta/nestjs-common';
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 
 import { ReportCreateException } from '../exceptions/report-create.exception';
 import { ReportDuplicateEntryException } from '../exceptions/report-duplicated.exception';
@@ -15,6 +16,7 @@ import { ReportGeneratorResultInterface } from '../interfaces/report-generator-r
 import { ReportModelServiceInterface } from '../interfaces/report-model-service.interface';
 import { ReportServiceInterface } from '../interfaces/report-service.interface';
 import { REPORT_STRATEGY_SERVICE_KEY } from '../report.constants';
+
 import { ReportModelService } from './report-model.service';
 import { ReportStrategyService } from './report-strategy.service';
 

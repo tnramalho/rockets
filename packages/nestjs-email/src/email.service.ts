@@ -1,8 +1,12 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { NotAnErrorException } from '@concepta/nestjs-common';
-import { EmailSendOptionsInterface } from '@concepta/nestjs-common';
-import { EmailServiceInterface } from './interfaces/email-service.interface';
+
+import {
+  NotAnErrorException,
+  EmailSendOptionsInterface,
+} from '@concepta/nestjs-common';
+
 import { EmailSendException } from './exceptions/email-send.exception';
+import { EmailServiceInterface } from './interfaces/email-service.interface';
 
 @Injectable()
 export class EmailService implements EmailServiceInterface {

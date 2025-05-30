@@ -1,4 +1,5 @@
 import { Seeder } from '@concepta/typeorm-seeding';
+
 import { RoleFactory } from './role.factory';
 
 /**

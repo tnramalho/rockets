@@ -1,5 +1,6 @@
 import { Global, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
 import {
   ConfigurableCrudOptions,
   ConfigurableCrudOptionsTransformer,
@@ -7,13 +8,14 @@ import {
 } from '@concepta/nestjs-crud';
 import { EventModule } from '@concepta/nestjs-event';
 
-import { ormConfig } from './ormconfig.fixture';
-import { UserProfileEntityFixture } from './user-profile.entity.fixture';
 import { UserProfileCrudBuilder } from '../utils/user-profile.crud-builder';
-import { UserProfileDtoFixture } from './dto/user-profile.dto.fixture';
+
 import { UserProfileCreateDtoFixture } from './dto/user-profile-create.dto.fixture';
 import { UserProfileUpdateDtoFixture } from './dto/user-profile-update.dto.fixture';
+import { UserProfileDtoFixture } from './dto/user-profile.dto.fixture';
+import { ormConfig } from './ormconfig.fixture';
 import { UserCrudModelServiceFixture } from './services/user-crud-model.service.fixture';
+import { UserProfileEntityFixture } from './user-profile.entity.fixture';
 
 type UserProfileExtras = {
   model: {

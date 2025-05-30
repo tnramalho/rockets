@@ -1,4 +1,18 @@
 import { ApiTags } from '@nestjs/swagger';
+
+import {
+  AccessControlCreateMany,
+  AccessControlCreateOne,
+  AccessControlDeleteOne,
+  AccessControlReadMany,
+  AccessControlReadOne,
+  AccessControlUpdateOne,
+} from '@concepta/nestjs-access-control';
+import {
+  RoleCreatableInterface,
+  RoleUpdatableInterface,
+  RoleEntityInterface,
+} from '@concepta/nestjs-common';
 import {
   CrudBody,
   CrudCreateOne,
@@ -12,26 +26,14 @@ import {
   CrudCreateMany,
   CrudReadMany,
 } from '@concepta/nestjs-crud';
-import {
-  AccessControlCreateMany,
-  AccessControlCreateOne,
-  AccessControlDeleteOne,
-  AccessControlReadMany,
-  AccessControlReadOne,
-  AccessControlUpdateOne,
-} from '@concepta/nestjs-access-control';
-import {
-  RoleCreatableInterface,
-  RoleUpdatableInterface,
-} from '@concepta/nestjs-common';
-import { RoleCrudServiceFixture } from '../service/role-crud.service.fixture';
-import { RoleDto } from '../../dto/role.dto';
-import { RoleCreateDto } from '../../dto/role-create.dto';
+
 import { RoleCreateManyDto } from '../../dto/role-create-many.dto';
-import { RoleUpdateDto } from '../../dto/role-update.dto';
+import { RoleCreateDto } from '../../dto/role-create.dto';
 import { RolePaginatedDto } from '../../dto/role-paginated.dto';
-import { RoleEntityInterface } from '@concepta/nestjs-common';
+import { RoleUpdateDto } from '../../dto/role-update.dto';
+import { RoleDto } from '../../dto/role.dto';
 import { RoleResource } from '../../role.types';
+import { RoleCrudServiceFixture } from '../service/role-crud.service.fixture';
 
 /**
  * Role controller.

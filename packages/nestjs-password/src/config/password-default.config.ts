@@ -1,4 +1,5 @@
 import { registerAs } from '@nestjs/config';
+
 import { PasswordSettingsInterface } from '../interfaces/password-settings.interface';
 import { PASSWORD_MODULE_DEFAULT_SETTINGS_TOKEN } from '../password.constants';
 

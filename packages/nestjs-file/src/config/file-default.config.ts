@@ -1,4 +1,5 @@
 import { registerAs } from '@nestjs/config';
+
 import { FILE_MODULE_DEFAULT_SETTINGS_TOKEN } from '../file.constants';
 import { FileSettingsInterface } from '../interfaces/file-settings.interface';
 

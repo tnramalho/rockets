@@ -1,16 +1,18 @@
 import { Injectable } from '@nestjs/common';
+
 import {
   ModelService,
   RepositoryInterface,
   FederatedCreatableInterface,
   FederatedUpdatableInterface,
   InjectDynamicRepository,
+  FederatedEntityInterface,
 } from '@concepta/nestjs-common';
-import { FederatedEntityInterface } from '@concepta/nestjs-common';
-import { FederatedModelServiceInterface } from '../interfaces/federated-model-service.interface';
+
 import { FederatedCreateDto } from '../dto/federated-create.dto';
 import { FederatedUpdateDto } from '../dto/federated-update.dto';
 import { FEDERATED_MODULE_FEDERATED_ENTITY_KEY } from '../federated.constants';
+import { FederatedModelServiceInterface } from '../interfaces/federated-model-service.interface';
 
 /**
  * Federated model service

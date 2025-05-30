@@ -2,8 +2,9 @@ import {
   IssueTokenServiceInterface,
   VerifyTokenService,
 } from '@concepta/nestjs-authentication';
-import { AuthRefreshUserModelServiceInterface } from './auth-refresh-user-model-service.interface';
+
 import { AuthRefreshSettingsInterface } from './auth-refresh-settings.interface';
+import { AuthRefreshUserModelServiceInterface } from './auth-refresh-user-model-service.interface';
 
 export interface AuthRefreshOptionsInterface {
   /**

@@ -1,4 +1,5 @@
 import { RuntimeExceptionOptions } from '@concepta/nestjs-common';
+
 import { LoggerException } from './logger.exceptions';
 
 /**

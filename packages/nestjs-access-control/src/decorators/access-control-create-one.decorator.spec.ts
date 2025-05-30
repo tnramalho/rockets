@@ -1,6 +1,8 @@
 import { Controller } from '@nestjs/common';
+
 import { ACCESS_CONTROL_MODULE_GRANT_METADATA } from '../constants';
 import { ActionEnum } from '../enums/action.enum';
+
 import { AccessControlCreateOne } from './access-control-create-one.decorator';
 
 describe('@AccessControlCreateOne', () => {

@@ -1,9 +1,6 @@
 import { PlainLiteralObject } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import {
-  ConfigurableCrudBuilder,
-  ConfigurableCrudOptions,
-} from '@concepta/nestjs-crud';
+
 import {
   AccessControlCreateOne,
   AccessControlDeleteOne,
@@ -16,14 +13,19 @@ import {
 import {
   DeepPartial,
   UserProfileCreatableInterface,
+  UserProfileEntityInterface,
 } from '@concepta/nestjs-common';
-import { USER_MODULE_CONFIGURABLE_CRUD_PROFILE_SERVICE_TOKEN } from '../user.constants';
+import {
+  ConfigurableCrudBuilder,
+  ConfigurableCrudOptions,
+} from '@concepta/nestjs-crud';
 import { UserProfileSqliteEntity } from '@concepta/nestjs-typeorm-ext';
-import { UserProfileDto } from '../dto/profile/user-profile.dto';
-import { UserProfilePaginatedDto } from '../dto/profile/user-profile-paginated.dto';
+
 import { UserProfileCreateDto } from '../dto/profile/user-profile-create.dto';
+import { UserProfilePaginatedDto } from '../dto/profile/user-profile-paginated.dto';
 import { UserProfileUpdateDto } from '../dto/profile/user-profile-update.dto';
-import { UserProfileEntityInterface } from '@concepta/nestjs-common';
+import { UserProfileDto } from '../dto/profile/user-profile.dto';
+import { USER_MODULE_CONFIGURABLE_CRUD_PROFILE_SERVICE_TOKEN } from '../user.constants';
 import { UserProfileResource } from '../user.types';
 
 const userProfileCrudBuilderDefaultOptions: ConfigurableCrudOptions = {

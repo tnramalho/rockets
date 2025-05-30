@@ -1,4 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
+
 import { RuntimeException } from '../../exceptions/runtime.exception';
 
 export class CustomNotFoundExceptionFixture extends RuntimeException {

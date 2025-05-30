@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
+
 import {
   AuthenticatedUserInterface,
   PasswordPlainCurrentInterface,
   PasswordStorageInterface,
   ReferenceIdInterface,
+  PasswordPlainInterface,
 } from '@concepta/nestjs-common';
-import { PasswordPlainInterface } from '@concepta/nestjs-common';
 import { UserPasswordServiceInterface } from '@concepta/nestjs-user';
 
 @Injectable()

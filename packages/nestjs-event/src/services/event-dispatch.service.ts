@@ -1,9 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from 'eventemitter2';
-import { EventDispatchException } from '../exceptions/event-dispatch.exception';
-import { EventInterface } from '../events/interfaces/event.interface';
-import { EventAsyncInstance, EventReturnPayload } from '../event-types';
+
+import { Inject, Injectable } from '@nestjs/common';
+
 import { EVENT_MODULE_EMITTER_SERVICE_TOKEN } from '../event-constants';
+import { EventAsyncInstance, EventReturnPayload } from '../event-types';
+import { EventInterface } from '../events/interfaces/event.interface';
+import { EventDispatchException } from '../exceptions/event-dispatch.exception';
 
 /**
  * Event Dispatch Service

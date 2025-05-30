@@ -7,6 +7,7 @@ import {
   ReferenceId,
   ReferenceUsernameInterface,
 } from '@concepta/nestjs-common';
+
 import { FederatedCredentialsInterface } from './federated-credentials.interface';
 
 export interface FederatedUserModelServiceInterface

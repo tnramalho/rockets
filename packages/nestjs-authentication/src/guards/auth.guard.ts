@@ -6,12 +6,14 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard as PassportAuthGuard } from '@nestjs/passport';
+
 import {
   AUTHENTICATION_MODULE_DISABLE_GUARDS_TOKEN,
   AUTHENTICATION_MODULE_SETTINGS_TOKEN,
 } from '../authentication.constants';
 import { AuthGuardCtr, AuthGuardOptions } from '../authentication.types';
 import { AuthenticationSettingsInterface } from '../interfaces/authentication-settings.interface';
+
 import { FastifyAuthGuard } from './fastify-auth.guard';
 
 /**

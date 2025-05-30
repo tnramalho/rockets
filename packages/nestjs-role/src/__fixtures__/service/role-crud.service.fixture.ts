@@ -1,8 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { TypeOrmCrudService } from '@concepta/nestjs-crud';
 import { Repository } from 'typeorm';
-import { RoleEntityInterface } from '@concepta/nestjs-common';
+
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+
+import { RoleEntityInterface } from '@concepta/nestjs-common';
+import { TypeOrmCrudService } from '@concepta/nestjs-crud';
+
 import { RoleEntityFixture } from '../entities/role-entity.fixture';
 
 /**

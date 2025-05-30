@@ -1,4 +1,5 @@
 import { StrategyOptions } from 'passport-jwt';
+
 import { JwtVerifyTokenCallback } from '../jwt.types';
 
 export interface JwtStrategyOptionsInterface

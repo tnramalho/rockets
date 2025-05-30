@@ -1,12 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
-import {
-  ReferenceIdInterface,
-  AuthorizationPayloadInterface,
-} from '@concepta/nestjs-common';
+
 import {
   PassportStrategyFactory,
   VerifyTokenServiceInterface,
 } from '@concepta/nestjs-authentication';
+import {
+  ReferenceIdInterface,
+  AuthorizationPayloadInterface,
+} from '@concepta/nestjs-common';
 import {
   createVerifyAccessTokenCallback,
   JwtStrategy,
@@ -19,10 +20,9 @@ import {
   AuthJwtUserModelService,
   AuthJwtVerifyTokenService,
 } from './auth-jwt.constants';
-
+import { AuthJwtUnauthorizedException } from './exceptions/auth-jwt-unauthorized.exception';
 import { AuthJwtSettingsInterface } from './interfaces/auth-jwt-settings.interface';
 import { AuthJwtUserModelServiceInterface } from './interfaces/auth-jwt-user-model-service.interface';
-import { AuthJwtUnauthorizedException } from './exceptions/auth-jwt-unauthorized.exception';
 
 @Injectable()
 export class AuthJwtStrategy extends PassportStrategyFactory<JwtStrategy>(

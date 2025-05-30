@@ -1,6 +1,7 @@
 import { mock } from 'jest-mock-extended';
-import { ReferenceAssignment } from '@concepta/nestjs-common';
+
 import {
+  ReferenceAssignment,
   CacheCreatableInterface,
   CacheInterface,
   RepositoryInterface,
@@ -8,9 +9,10 @@ import {
   ModelValidationException,
 } from '@concepta/nestjs-common';
 
-import { CacheService } from './cache.service';
-import { CacheSettingsInterface } from '../interfaces/cache-settings.interface';
 import { CacheCreateDto } from '../dto/cache-create.dto';
+import { CacheSettingsInterface } from '../interfaces/cache-settings.interface';
+
+import { CacheService } from './cache.service';
 
 const expirationDate = new Date();
 expirationDate.setHours(expirationDate.getHours() + 1);

@@ -1,12 +1,12 @@
+import { LogLevel } from '@nestjs/common';
 import {
   ConfigFactory,
   ConfigFactoryKeyHost,
   registerAs,
 } from '@nestjs/config';
 
-import { LogLevel } from '@nestjs/common';
-import { splitLogLevel } from '../utils/config-parser.util';
 import { LoggerSettingsInterface } from '../interfaces/logger-settings.interface';
+import { splitLogLevel } from '../utils/config-parser.util';
 
 /**
  * The token to which all logger module settings are set.

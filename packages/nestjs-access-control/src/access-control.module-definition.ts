@@ -1,22 +1,21 @@
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import {
   ConfigurableModuleBuilder,
   DynamicModule,
   Provider,
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+
 import { createSettingsProvider } from '@concepta/nestjs-common';
 
-import { ACCESS_CONTROL_MODULE_SETTINGS_TOKEN } from './constants';
-
-import { AccessControlOptionsInterface } from './interfaces/access-control-options.interface';
-import { AccessControlOptionsExtrasInterface } from './interfaces/access-control-options-extras.interface';
-import { AccessControlSettingsInterface } from './interfaces/access-control-settings.interface';
-
 import { AccessControlGuard } from './access-control.guard';
-import { AccessControlService } from './services/access-control.service';
 import { accessControlDefaultConfig } from './config/acess-control-default.config';
+import { ACCESS_CONTROL_MODULE_SETTINGS_TOKEN } from './constants';
 import { AccessControlFilter } from './filter/access-control.filter';
+import { AccessControlOptionsExtrasInterface } from './interfaces/access-control-options-extras.interface';
+import { AccessControlOptionsInterface } from './interfaces/access-control-options.interface';
+import { AccessControlSettingsInterface } from './interfaces/access-control-settings.interface';
+import { AccessControlService } from './services/access-control.service';
 
 const RAW_OPTIONS_TOKEN = Symbol('__ACCESS_CONTROL_MODULE_RAW_OPTIONS_TOKEN__');
 

@@ -1,11 +1,13 @@
+import { AccessControl } from 'accesscontrol';
+
 import { Module } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { AccessControl } from 'accesscontrol';
-import { AccessControlService } from './services/access-control.service';
+
 import { AccessControlModule } from './access-control.module';
+import { ACCESS_CONTROL_MODULE_SETTINGS_TOKEN } from './constants';
 import { AccessControlServiceInterface } from './interfaces/access-control-service.interface';
 import { AccessControlSettingsInterface } from './interfaces/access-control-settings.interface';
-import { ACCESS_CONTROL_MODULE_SETTINGS_TOKEN } from './constants';
+import { AccessControlService } from './services/access-control.service';
 
 describe('AccessControlModule', () => {
   let accessControlModule: AccessControlModule;

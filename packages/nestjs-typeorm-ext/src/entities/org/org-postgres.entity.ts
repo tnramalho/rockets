@@ -1,11 +1,13 @@
 import { Column } from 'typeorm';
+
 import {
   OrgProfileInterface,
   ReferenceId,
   ReferenceIdInterface,
+  OrgEntityInterface,
 } from '@concepta/nestjs-common';
+
 import { CommonPostgresEntity } from '../common/common-postgres.entity';
-import { OrgEntityInterface } from '@concepta/nestjs-common';
 
 /**
  * Org Postgres Entity

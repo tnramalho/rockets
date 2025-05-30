@@ -1,38 +1,37 @@
 import { mock } from 'jest-mock-extended';
+
 import { DynamicModule, ModuleMetadata } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { CrudModule } from '@concepta/nestjs-crud';
+import { EmailModule, EmailService } from '@concepta/nestjs-email';
 import { EventModule } from '@concepta/nestjs-event';
 import { TypeOrmExtModule } from '@concepta/nestjs-typeorm-ext';
-import { EmailModule, EmailService } from '@concepta/nestjs-email';
-import { CrudModule } from '@concepta/nestjs-crud';
 
+import { InvitationEmailServiceInterface } from './interfaces/services/invitation-email-service.interface';
+import { InvitationOtpServiceInterface } from './interfaces/services/invitation-otp-service.interface';
+import { InvitationSendServiceInterface } from './interfaces/services/invitation-send-service.interface';
+import { InvitationServiceInterface } from './interfaces/services/invitation-service.interface';
+import { InvitationUserModelServiceInterface } from './interfaces/services/invitation-user-model.service.interface';
 import {
   INVITATION_MODULE_OTP_SERVICE_TOKEN,
   INVITATION_MODULE_USER_MODEL_SERVICE_TOKEN,
 } from './invitation.constants';
-
 import { InvitationModule } from './invitation.module';
-import { InvitationOtpServiceInterface } from './interfaces/services/invitation-otp-service.interface';
-
-import { InvitationUserModelServiceInterface } from './interfaces/services/invitation-user-model.service.interface';
-import { InvitationServiceInterface } from './interfaces/services/invitation-service.interface';
-import { InvitationService } from './services/invitation.service';
-import { InvitationSendService } from './services/invitation-send.service';
 import { InvitationAcceptanceService } from './services/invitation-acceptance.service';
 import { InvitationRevocationService } from './services/invitation-revocation.service';
-import { InvitationEmailServiceInterface } from './interfaces/services/invitation-email-service.interface';
+import { InvitationSendService } from './services/invitation-send.service';
+import { InvitationService } from './services/invitation.service';
 
-import { UserModuleFixture } from './__fixtures__/user/user.module.fixture';
-import { UserModelServiceFixture } from './__fixtures__/user/services/user-model.service.fixture';
-import { OtpModuleFixture } from './__fixtures__/otp/otp.module.fixture';
-import { OtpServiceFixture } from './__fixtures__/otp/otp.service.fixture';
 import { MailerServiceFixture } from './__fixtures__/email/mailer.service.fixture';
+import { InvitationLocalModuleFixture } from './__fixtures__/invitation/entities/invitation-local.module.fixture';
+import { InvitationSendServiceFixture } from './__fixtures__/invitation/entities/invitation-send.service.fixture';
 import { InvitationEntityFixture } from './__fixtures__/invitation/entities/invitation.entity.fixture';
 import { default as ormConfig } from './__fixtures__/ormconfig.fixture';
-import { InvitationSendServiceInterface } from './interfaces/services/invitation-send-service.interface';
-import { InvitationSendServiceFixture } from './__fixtures__/invitation/entities/invitation-send.service.fixture';
-import { InvitationLocalModuleFixture } from './__fixtures__/invitation/entities/invitation-local.module.fixture';
+import { OtpModuleFixture } from './__fixtures__/otp/otp.module.fixture';
+import { OtpServiceFixture } from './__fixtures__/otp/otp.service.fixture';
+import { UserModelServiceFixture } from './__fixtures__/user/services/user-model.service.fixture';
+import { UserModuleFixture } from './__fixtures__/user/user.module.fixture';
 
 describe(InvitationModule, () => {
   let testModule: TestingModule;

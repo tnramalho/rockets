@@ -1,6 +1,8 @@
 import { Exclude, Expose } from 'class-transformer';
 import { IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
+
 import { ApiProperty } from '@nestjs/swagger';
+
 import {
   ReportInterface,
   ReportStatusEnum,

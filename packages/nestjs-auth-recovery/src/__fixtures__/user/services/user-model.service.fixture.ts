@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+
 import {
   ReferenceEmail,
   ReferenceIdInterface,
@@ -6,7 +7,6 @@ import {
 } from '@concepta/nestjs-common';
 
 import { AuthRecoveryUserModelServiceInterface } from '../../../interfaces/auth-recovery-user-model.service.interface';
-
 import { UserFixture } from '../user.fixture';
 
 @Injectable()

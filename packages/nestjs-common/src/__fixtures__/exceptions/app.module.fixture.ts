@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+
 import { AppControllerFixture } from './app.controller.fixture';
 
 @Module({

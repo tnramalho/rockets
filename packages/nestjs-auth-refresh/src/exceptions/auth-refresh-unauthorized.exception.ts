@@ -1,5 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
+
 import { RuntimeExceptionOptions } from '@concepta/nestjs-common';
+
 import { AuthRefreshException } from './auth-refresh.exception';
 
 export class AuthRefreshUnauthorizedException extends AuthRefreshException {

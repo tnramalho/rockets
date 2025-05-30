@@ -1,12 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { InvitationService } from './invitation.service';
-import { InvitationSendService } from './invitation-send.service';
-import { InvitationAcceptanceService } from './invitation-acceptance.service';
-import { InvitationRevocationService } from './invitation-revocation.service';
+
 import { InvitationInterface } from '@concepta/nestjs-common';
+
 import { InvitationCreateInviteInterface } from '../interfaces/domain/invitation-create-invite.interface';
 import { InvitationAcceptOptionsInterface } from '../interfaces/options/invitation-accept-options.interface';
 import { InvitationRevokeOptionsInterface } from '../interfaces/options/invitation-revoke-options.interface';
+
+import { InvitationAcceptanceService } from './invitation-acceptance.service';
+import { InvitationRevocationService } from './invitation-revocation.service';
+import { InvitationSendService } from './invitation-send.service';
+import { InvitationService } from './invitation.service';
 
 describe(InvitationService.name, () => {
   let service: InvitationService;

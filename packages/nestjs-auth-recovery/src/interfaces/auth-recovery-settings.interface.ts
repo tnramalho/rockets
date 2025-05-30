@@ -1,5 +1,7 @@
-import { ReferenceAssignment } from '@concepta/nestjs-common';
-import { OtpCreatableInterface } from '@concepta/nestjs-common';
+import {
+  ReferenceAssignment,
+  OtpCreatableInterface,
+} from '@concepta/nestjs-common';
 
 export interface AuthRecoveryOtpSettingsInterface
   extends Pick<OtpCreatableInterface, 'category' | 'type' | 'expiresIn'>,

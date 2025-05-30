@@ -1,10 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserAccessQueryService } from './user-access-query.service';
-import { AccessControlContext } from '@concepta/nestjs-access-control';
-import { UserDto } from '../dto/user.dto';
+
+import {
+  AccessControlContext,
+  ActionEnum,
+} from '@concepta/nestjs-access-control';
+
 import { UserPasswordDto } from '../dto/user-password.dto';
+import { UserDto } from '../dto/user.dto';
 import { UserResource } from '../user.types';
-import { ActionEnum } from '@concepta/nestjs-access-control';
+
+import { UserAccessQueryService } from './user-access-query.service';
 
 describe(UserAccessQueryService.name, () => {
   let service: UserAccessQueryService;

@@ -1,6 +1,9 @@
-import { ReportUpdatableInterface } from '@concepta/nestjs-common';
-import { IntersectionType, PartialType, PickType } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
+
+import { IntersectionType, PartialType, PickType } from '@nestjs/swagger';
+
+import { ReportUpdatableInterface } from '@concepta/nestjs-common';
+
 import { ReportDto } from './report.dto';
 
 /**

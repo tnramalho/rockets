@@ -1,4 +1,5 @@
 import * as jwt from 'jsonwebtoken';
+
 import { JwtSignOptions as NestJwtSignOptions } from '@nestjs/jwt';
 
 export {

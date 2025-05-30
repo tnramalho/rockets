@@ -1,4 +1,5 @@
 import { IsOptional, IsString, MinLength } from 'class-validator';
+
 import { TestCreatableInterfaceFixture } from '../interface/test-creatable.interface.fixture';
 
 export class TestCreateDtoFixture implements TestCreatableInterfaceFixture {

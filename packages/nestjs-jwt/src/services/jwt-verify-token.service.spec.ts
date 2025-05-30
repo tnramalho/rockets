@@ -1,6 +1,7 @@
+import { mock } from 'jest-mock-extended';
+
 import { JwtVerifyTokenService } from './jwt-verify-token.service';
 import { JwtService } from './jwt.service';
-import { mock } from 'jest-mock-extended';
 
 describe(JwtVerifyTokenService, () => {
   let jwtService: JwtService;

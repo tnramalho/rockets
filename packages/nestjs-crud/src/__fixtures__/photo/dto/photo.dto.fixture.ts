@@ -7,7 +7,9 @@ import {
   IsString,
   IsUUID,
 } from 'class-validator';
+
 import { ApiProperty } from '@nestjs/swagger';
+
 import { PhotoEntityInterfaceFixture } from '../interfaces/photo-entity.interface.fixture';
 
 @Exclude()

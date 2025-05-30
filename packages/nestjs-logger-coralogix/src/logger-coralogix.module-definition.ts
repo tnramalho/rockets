@@ -4,15 +4,15 @@ import {
   Provider,
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+
 import { createSettingsProvider } from '@concepta/nestjs-common';
-import { CoralogixOptionsInterface } from './interfaces/logger-coralogix-options.interface';
-import { CoralogixOptionsExtrasInterface } from './interfaces/logger-coralogix-options-extras.interface';
 
 import {
   LOGGER_CORALOGIX_MODULE_SETTINGS_TOKEN,
   coralogixConfig,
 } from './config/logger-coralogix.config';
-
+import { CoralogixOptionsExtrasInterface } from './interfaces/logger-coralogix-options-extras.interface';
+import { CoralogixOptionsInterface } from './interfaces/logger-coralogix-options.interface';
 import { LoggerCoralogixSettingsInterface } from './interfaces/logger-coralogix-settings.interface';
 import { LoggerCoralogixTransport } from './transports/logger-coralogix.transport';
 

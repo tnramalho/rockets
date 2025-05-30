@@ -1,12 +1,13 @@
+import { DynamicModule } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { OtpInterface } from '@concepta/nestjs-common';
+
+import { OtpInterface, RepositoryInterface } from '@concepta/nestjs-common';
+
 import { OTP_MODULE_REPOSITORIES_TOKEN } from './otp.constants';
 import { OtpModule } from './otp.module';
 import { OtpService } from './services/otp.service';
 
 import { AppModuleFixture } from './__fixtures__/app.module.fixture';
-import { DynamicModule } from '@nestjs/common';
-import { RepositoryInterface } from '@concepta/nestjs-common';
 
 describe(OtpModule.name, () => {
   let otpModule: OtpModule;

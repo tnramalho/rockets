@@ -1,4 +1,5 @@
 import { registerAs } from '@nestjs/config';
+
 import { EVENT_MODULE_DEFAULT_EMITTER_SERVICE_SETTINGS_TOKEN } from '../event-constants';
 import { EventSettingsInterface } from '../interfaces/event-settings.interface';
 

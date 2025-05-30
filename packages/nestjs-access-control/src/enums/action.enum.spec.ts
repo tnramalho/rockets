@@ -1,4 +1,5 @@
 import { Action } from 'accesscontrol/lib/enums';
+
 import { ActionEnum } from './action.enum';
 
 describe('Access control action enumeration', () => {

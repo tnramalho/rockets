@@ -4,15 +4,15 @@ import {
   Provider,
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+
 import { createSettingsProvider } from '@concepta/nestjs-common';
-import { LoggerSentryOptionsInterface } from './interfaces/logger-sentry-options.interface';
-import { LoggerSentryOptionsExtrasInterface } from './interfaces/logger-sentry-options-extras.interface';
 
 import {
   LOGGER_SENTRY_MODULE_SETTINGS_TOKEN,
   loggerSentryConfig,
 } from './config/logger-sentry.config';
-
+import { LoggerSentryOptionsExtrasInterface } from './interfaces/logger-sentry-options-extras.interface';
+import { LoggerSentryOptionsInterface } from './interfaces/logger-sentry-options.interface';
 import { LoggerSentrySettingsInterface } from './interfaces/logger-sentry-settings.interface';
 import { LoggerSentryTransport } from './transports/logger-sentry.transport';
 

@@ -1,6 +1,10 @@
 import { Inject } from '@nestjs/common';
-import { ReportCreatableInterface } from '@concepta/nestjs-common';
-import { mapNonErrorToException } from '@concepta/nestjs-common';
+
+import {
+  ReportCreatableInterface,
+  mapNonErrorToException,
+} from '@concepta/nestjs-common';
+
 import { ReportGeneratorServiceNotFoundException } from '../exceptions/report-generator-service-not-found.exception';
 import { ReportTimeoutException } from '../exceptions/report-timeout.exception';
 import { ReportGeneratorResultInterface } from '../interfaces/report-generator-result.interface';

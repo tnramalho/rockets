@@ -1,12 +1,14 @@
-import { CallHandler, ExecutionContext } from '@nestjs/common';
-import { Test } from '@nestjs/testing';
-import { LoggerRequestInterceptor } from './logger-request.interceptor';
-import { LoggerService } from './logger.service';
-import { MessageFormatUtil } from './utils/message-format.util';
 import {
   FastifyRequest as Request,
   LightMyRequestResponse as Response,
 } from 'fastify';
+
+import { CallHandler, ExecutionContext } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
+
+import { LoggerRequestInterceptor } from './logger-request.interceptor';
+import { LoggerService } from './logger.service';
+import { MessageFormatUtil } from './utils/message-format.util';
 
 describe('LoggerRequestInterceptor', () => {
   let loggerRequestInterceptor: LoggerRequestInterceptor;

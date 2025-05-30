@@ -1,14 +1,16 @@
-import { AuthVerifyNotificationServiceInterface } from '../interfaces/auth-verify-notification.service.interface';
-import { EmailSendOptionsInterface } from '@concepta/nestjs-common';
 import { Inject, Injectable } from '@nestjs/common';
+
+import { EmailSendOptionsInterface } from '@concepta/nestjs-common';
+
 import {
   AUTH_VERIFY_MODULE_SETTINGS_TOKEN,
   AuthVerifyEmailService,
 } from '../auth-verify.constants';
-import { AuthVerifyEmailServiceInterface } from '../interfaces/auth-verify-email.service.interface';
-import { AuthVerifySettingsInterface } from '../interfaces/auth-verify-settings.interface';
 import { formatTokenUrl } from '../auth-verify.utils';
 import { AuthVerifyEmailParamsInterface } from '../interfaces/auth-verify-email-params.interface';
+import { AuthVerifyEmailServiceInterface } from '../interfaces/auth-verify-email.service.interface';
+import { AuthVerifyNotificationServiceInterface } from '../interfaces/auth-verify-notification.service.interface';
+import { AuthVerifySettingsInterface } from '../interfaces/auth-verify-settings.interface';
 
 @Injectable()
 export class AuthVerifyNotificationService

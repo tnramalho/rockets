@@ -1,13 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
+
 import {
   PassportStrategyFactory,
   VerifyTokenServiceInterface,
 } from '@concepta/nestjs-authentication';
+import { AuthorizationPayloadInterface } from '@concepta/nestjs-common';
 import {
   createVerifyRefreshTokenCallback,
   JwtStrategy,
 } from '@concepta/nestjs-jwt';
-import { AuthorizationPayloadInterface } from '@concepta/nestjs-common';
 
 import {
   AUTH_REFRESH_MODULE_SETTINGS_TOKEN,
@@ -15,10 +16,9 @@ import {
   AuthRefreshUserModelService,
   AuthRefreshVerifyService,
 } from './auth-refresh.constants';
-
+import { AuthRefreshUnauthorizedException } from './exceptions/auth-refresh-unauthorized.exception';
 import { AuthRefreshSettingsInterface } from './interfaces/auth-refresh-settings.interface';
 import { AuthRefreshUserModelServiceInterface } from './interfaces/auth-refresh-user-model-service.interface';
-import { AuthRefreshUnauthorizedException } from './exceptions/auth-refresh-unauthorized.exception';
 
 @Injectable()
 export class AuthRefreshStrategy extends PassportStrategyFactory<JwtStrategy>(

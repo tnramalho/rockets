@@ -1,6 +1,10 @@
 import { Column, Entity } from 'typeorm';
-import { ReferenceIdInterface } from '@concepta/nestjs-common';
-import { FederatedEntityInterface } from '@concepta/nestjs-common';
+
+import {
+  ReferenceIdInterface,
+  FederatedEntityInterface,
+} from '@concepta/nestjs-common';
+
 import { CommonSqliteEntity } from '../common/common-sqlite.entity';
 
 /**

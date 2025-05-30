@@ -1,7 +1,8 @@
 import { registerAs } from '@nestjs/config';
+
 import { AUTH_GITHUB_MODULE_DEFAULT_SETTINGS_TOKEN } from '../auth-github.constants';
-import { AuthGithubSettingsInterface } from '../interfaces/auth-github-settings.interface';
 import { AuthGithubLoginDto } from '../dto/auth-github-login.dto';
+import { AuthGithubSettingsInterface } from '../interfaces/auth-github-settings.interface';
 import { mapProfile } from '../utils/auth-github-map-profile';
 
 /**

@@ -4,12 +4,10 @@ import {
   RemoveOneInterface,
   ReplaceOneInterface,
   UpdateOneInterface,
-} from '@concepta/nestjs-common';
-import {
   FederatedCreatableInterface,
   FederatedUpdatableInterface,
+  FederatedEntityInterface,
 } from '@concepta/nestjs-common';
-import { FederatedEntityInterface } from '@concepta/nestjs-common';
 
 export interface FederatedModelServiceInterface
   extends CreateOneInterface<

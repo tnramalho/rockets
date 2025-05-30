@@ -1,22 +1,24 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { AuthRecoveryServiceInterface } from '../interfaces/auth-recovery.service.interface';
-import { AuthRecoverySettingsInterface } from '../interfaces/auth-recovery-settings.interface';
-import { AuthRecoveryOtpServiceInterface } from '../interfaces/auth-recovery-otp.service.interface';
-import { AuthRecoveryUserModelServiceInterface } from '../interfaces/auth-recovery-user-model.service.interface';
+import {
+  AssigneeRelationInterface,
+  ReferenceIdInterface,
+} from '@concepta/nestjs-common';
+import { UserPasswordServiceInterface } from '@concepta/nestjs-user';
+
 import {
   AUTH_RECOVERY_MODULE_SETTINGS_TOKEN,
   AuthRecoveryOtpService,
   AuthRecoveryUserModelService,
   AuthRecoveryUserPasswordService,
 } from '../auth-recovery.constants';
-import { AuthRecoveryNotificationService } from './auth-recovery-notification.service';
-import {
-  AssigneeRelationInterface,
-  ReferenceIdInterface,
-} from '@concepta/nestjs-common';
 import { AuthRecoveryNotificationServiceInterface } from '../interfaces/auth-recovery-notification.service.interface';
-import { UserPasswordServiceInterface } from '@concepta/nestjs-user';
+import { AuthRecoveryOtpServiceInterface } from '../interfaces/auth-recovery-otp.service.interface';
+import { AuthRecoverySettingsInterface } from '../interfaces/auth-recovery-settings.interface';
+import { AuthRecoveryUserModelServiceInterface } from '../interfaces/auth-recovery-user-model.service.interface';
+import { AuthRecoveryServiceInterface } from '../interfaces/auth-recovery.service.interface';
+
+import { AuthRecoveryNotificationService } from './auth-recovery-notification.service';
 
 @Injectable()
 export class AuthRecoveryService implements AuthRecoveryServiceInterface {

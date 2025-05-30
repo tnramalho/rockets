@@ -14,14 +14,13 @@ import {
   AuthRecoveryUserModelService,
   AuthRecoveryUserPasswordService,
 } from './auth-recovery.constants';
-
-import { AuthRecoveryOptionsInterface } from './interfaces/auth-recovery-options.interface';
-import { AuthRecoveryOptionsExtrasInterface } from './interfaces/auth-recovery-options-extras.interface';
-import { AuthRecoverySettingsInterface } from './interfaces/auth-recovery-settings.interface';
 import { authRecoveryDefaultConfig } from './config/auth-recovery-default.config';
-import { AuthRecoveryService } from './services/auth-recovery.service';
-import { AuthRecoveryNotificationService } from './services/auth-recovery-notification.service';
 import { AuthRecoveryEmailServiceInterface } from './interfaces/auth-recovery-email.service.interface';
+import { AuthRecoveryOptionsExtrasInterface } from './interfaces/auth-recovery-options-extras.interface';
+import { AuthRecoveryOptionsInterface } from './interfaces/auth-recovery-options.interface';
+import { AuthRecoverySettingsInterface } from './interfaces/auth-recovery-settings.interface';
+import { AuthRecoveryNotificationService } from './services/auth-recovery-notification.service';
+import { AuthRecoveryService } from './services/auth-recovery.service';
 
 const RAW_OPTIONS_TOKEN = Symbol('__AUTH_RECOVERY_MODULE_RAW_OPTIONS_TOKEN__');
 

@@ -1,7 +1,9 @@
 import { Listener as EmitterListener } from 'eventemitter2';
-import { EventListenerInterface } from './interfaces/event-listener.interface';
-import { EventListenerException } from '../exceptions/event-listener.exception';
+
 import { EventInstance, EventReturnType } from '../event-types';
+import { EventListenerException } from '../exceptions/event-listener.exception';
+
+import { EventListenerInterface } from './interfaces/event-listener.interface';
 
 /**
  * Abstract event listener class.

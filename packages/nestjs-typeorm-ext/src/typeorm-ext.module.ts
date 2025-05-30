@@ -2,22 +2,19 @@ import { DynamicModule, Global, Module, Provider } from '@nestjs/common';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { EntityClassOrSchema } from '@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type';
 
+import { TypeOrmExtEntityOptionInterface } from './interfaces/typeorm-ext-entity-options.interface';
 import {
   TYPEORM_EXT_MODULE_DEFAULT_DATA_SOURCE_NAME,
   TYPEORM_EXT_MODULE_OPTIONS_TOKEN,
 } from './typeorm-ext.constants';
-
-import { TypeOrmExtDataSourceToken } from './typeorm-ext.types';
-
-import { TypeOrmExtEntityOptionInterface } from './interfaces/typeorm-ext-entity-options.interface';
-import { resolveDataSourceName } from './utils/resolve-data-source-name';
-import { createDynamicRepositoryProvider } from './utils/create-dynamic-repository-provider';
-
 import {
   TypeOrmExtModuleClass,
   TypeOrmExtOptions,
   TypeOrmExtAsyncOptions,
 } from './typeorm-ext.module-definition';
+import { TypeOrmExtDataSourceToken } from './typeorm-ext.types';
+import { createDynamicRepositoryProvider } from './utils/create-dynamic-repository-provider';
+import { resolveDataSourceName } from './utils/resolve-data-source-name';
 
 @Global()
 @Module({})

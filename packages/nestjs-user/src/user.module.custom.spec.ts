@@ -1,11 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
+
+import { UserModelServiceInterface } from './interfaces/user-model-service.interface';
 import { UserModelService } from './services/user-model.service';
 import { UserPasswordService } from './services/user-password.service';
 
 import { AppModuleCustomFixture } from './__fixtures__/app.module.custom.fixture';
 import { UserModelCustomService } from './__fixtures__/services/user-model.custom.service';
 import { UserModuleCustomFixture } from './__fixtures__/user.module.custom.fixture';
-import { UserModelServiceInterface } from './interfaces/user-model-service.interface';
 
 describe('AppModule', () => {
   let testModule: TestingModule;

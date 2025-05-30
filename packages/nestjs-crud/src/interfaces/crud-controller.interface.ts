@@ -1,8 +1,10 @@
 import { DeepPartial } from '@concepta/nestjs-common';
-import { CrudCreateManyInterface } from './crud-create-many.interface';
-import { CrudRequestInterface } from '../interfaces/crud-request.interface';
-import { CrudResponsePaginatedInterface } from './crud-response-paginated.interface';
+
 import { AdditionalCrudMethodArgs } from '../crud.types';
+import { CrudRequestInterface } from '../interfaces/crud-request.interface';
+
+import { CrudCreateManyInterface } from './crud-create-many.interface';
+import { CrudResponsePaginatedInterface } from './crud-response-paginated.interface';
 
 export interface CrudControllerInterface<
   Entity,

@@ -1,8 +1,10 @@
 import { Controller } from '@nestjs/common';
+
 import { ACCESS_CONTROL_MODULE_QUERY_METADATA } from '../constants';
-import { CanAccess } from '../interfaces/can-access.interface';
-import { AccessControlQuery } from './access-control-query.decorator';
 import { AccessControlContextInterface } from '../interfaces/access-control-context.interface';
+import { CanAccess } from '../interfaces/can-access.interface';
+
+import { AccessControlQuery } from './access-control-query.decorator';
 
 describe('@AccessControlQuery', () => {
   class TestQueryService implements CanAccess {

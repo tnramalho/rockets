@@ -1,5 +1,5 @@
-import { ReferenceAssignment } from '@concepta/nestjs-common';
 import {
+  ReferenceAssignment,
   CacheClearInterface,
   CacheCreatableInterface,
   CacheCreateInterface,

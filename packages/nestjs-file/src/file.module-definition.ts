@@ -7,19 +7,17 @@ import { ConfigModule } from '@nestjs/config';
 
 import { createSettingsProvider } from '@concepta/nestjs-common';
 
+import { fileDefaultConfig } from './config/file-default.config';
 import {
   FILE_MODULE_SETTINGS_TOKEN,
   FILE_STRATEGY_SERVICE_KEY,
 } from './file.constants';
-
-import { FileOptionsInterface } from './interfaces/file-options.interface';
 import { FileOptionsExtrasInterface } from './interfaces/file-options-extras.interface';
+import { FileOptionsInterface } from './interfaces/file-options.interface';
 import { FileSettingsInterface } from './interfaces/file-settings.interface';
-import { FileService } from './services/file.service';
-import { FileStrategyService } from './services/file-strategy.service';
-
-import { fileDefaultConfig } from './config/file-default.config';
 import { FileModelService } from './services/file-model.service';
+import { FileStrategyService } from './services/file-strategy.service';
+import { FileService } from './services/file.service';
 
 const RAW_OPTIONS_TOKEN = Symbol('__FILE_MODULE_RAW_OPTIONS_TOKEN__');
 

@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+
 import { EventModule } from '@concepta/nestjs-event';
 
 import { OrderController } from './order.controller';

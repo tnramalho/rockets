@@ -1,4 +1,5 @@
 import { registerAs } from '@nestjs/config';
+
 import { FEDERATED_MODULE_DEFAULT_SETTINGS_TOKEN } from '../federated.constants';
 import { FederatedSettingsInterface } from '../interfaces/federated-settings.interface';
 

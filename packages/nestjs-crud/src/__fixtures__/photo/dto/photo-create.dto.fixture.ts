@@ -1,6 +1,9 @@
-import { PickType } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
+
+import { PickType } from '@nestjs/swagger';
+
 import { PhotoCreatableInterfaceFixture } from '../interfaces/photo-creatable.interface.fixture';
+
 import { PhotoDtoFixture } from './photo.dto.fixture';
 
 @Exclude()

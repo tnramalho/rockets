@@ -1,7 +1,8 @@
 import { PasswordStorageInterface } from '@concepta/nestjs-common';
+
 import { PasswordCurrentPasswordInterface } from './password-current-password.interface';
-import { PasswordHistoryPasswordInterface } from './password-history-password.interface';
 import { PasswordHashOptionsInterface } from './password-hash-options.interface';
+import { PasswordHistoryPasswordInterface } from './password-history-password.interface';
 
 /**
  * Password Creation Service Interface

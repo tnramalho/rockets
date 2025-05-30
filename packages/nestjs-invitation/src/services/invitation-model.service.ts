@@ -1,15 +1,16 @@
 import { Injectable } from '@nestjs/common';
+
 import {
   ModelService,
   RepositoryInterface,
   InjectDynamicRepository,
+  InvitationEntityInterface,
 } from '@concepta/nestjs-common';
 
-import { InvitationEntityInterface } from '@concepta/nestjs-common';
+import { InvitationCreateDto } from '../dto/invitation-create.dto';
+import { InvitationCreatableInterface } from '../interfaces/domain/invitation-creatable.interface';
 import { InvitationModelServiceInterface } from '../interfaces/services/invitation-model-service.interface';
 import { INVITATION_MODULE_INVITATION_ENTITY_KEY } from '../invitation.constants';
-import { InvitationCreatableInterface } from '../interfaces/domain/invitation-creatable.interface';
-import { InvitationCreateDto } from '../dto/invitation-create.dto';
 
 /**
  * Invitation model service

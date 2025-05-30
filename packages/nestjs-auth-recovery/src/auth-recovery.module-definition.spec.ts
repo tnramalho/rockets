@@ -1,8 +1,9 @@
-import { FactoryProvider } from '@nestjs/common';
 import { mock } from 'jest-mock-extended';
-import { OtpServiceFixture } from './__fixtures__/otp/otp.service.fixture';
-import { UserModelServiceFixture } from './__fixtures__/user/services/user-model.service.fixture';
-import { UserPasswordServiceFixture } from './__fixtures__/user/services/user-password.service.fixture';
+
+import { FactoryProvider } from '@nestjs/common';
+
+import { UserPasswordServiceInterface } from '@concepta/nestjs-user';
+
 import {
   AUTH_RECOVERY_MODULE_SETTINGS_TOKEN,
   AuthRecoveryOtpService,
@@ -19,11 +20,14 @@ import {
   createAuthRecoveryUserPasswordServiceProvider,
 } from './auth-recovery.module-definition';
 import { AuthRecoveryEmailServiceInterface } from './interfaces/auth-recovery-email.service.interface';
-import { AuthRecoveryService } from './services/auth-recovery.service';
-import { AuthRecoveryUserModelServiceInterface } from './interfaces/auth-recovery-user-model.service.interface';
 import { AuthRecoveryNotificationServiceInterface } from './interfaces/auth-recovery-notification.service.interface';
+import { AuthRecoveryUserModelServiceInterface } from './interfaces/auth-recovery-user-model.service.interface';
 import { AuthRecoveryNotificationService } from './services/auth-recovery-notification.service';
-import { UserPasswordServiceInterface } from '@concepta/nestjs-user';
+import { AuthRecoveryService } from './services/auth-recovery.service';
+
+import { OtpServiceFixture } from './__fixtures__/otp/otp.service.fixture';
+import { UserModelServiceFixture } from './__fixtures__/user/services/user-model.service.fixture';
+import { UserPasswordServiceFixture } from './__fixtures__/user/services/user-password.service.fixture';
 
 describe('AuthRecoveryModuleDefinition', () => {
   const mockEmailService = mock<AuthRecoveryEmailServiceInterface>();

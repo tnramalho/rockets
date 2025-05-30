@@ -1,6 +1,7 @@
 import { ConfigModule } from '@nestjs/config';
-import { LoggerOptionsInterface } from '../interfaces/logger-options.interface';
 import { Test, TestingModule } from '@nestjs/testing';
+
+import { LoggerOptionsInterface } from '../interfaces/logger-options.interface';
 
 import { loggerConfig, LOGGER_MODULE_SETTINGS_TOKEN } from './logger.config';
 

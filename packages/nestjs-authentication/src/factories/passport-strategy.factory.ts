@@ -1,6 +1,7 @@
+import { Strategy } from 'passport-strategy';
+
 import { NotImplementedException, Type } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy } from 'passport-strategy';
 
 export const PassportStrategyFactory = <T extends Strategy>(
   strategy: Type<T>,

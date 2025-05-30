@@ -1,6 +1,9 @@
 import { JwksClient } from 'jwks-rsa';
+
 import { Inject, Injectable } from '@nestjs/common';
+
 import { JwtVerifyServiceInterface } from '@concepta/nestjs-jwt';
+
 import {
   AUTH_APPLE_JWT_KEYS,
   AUTH_APPLE_JWT_SERVICE_TOKEN,
@@ -8,15 +11,15 @@ import {
   AUTH_APPLE_TOKEN_ISSUER,
   AUTH_APPLE_VERIFY_ALGORITHM,
 } from './auth-apple.constants';
-import { AuthAppleSettingsInterface } from './interfaces/auth-apple-settings.interface';
+import { AuthAppleDecodeException } from './exceptions/auth-apple-decode.exception';
+import { AuthAppleEmailNotVerifiedException } from './exceptions/auth-apple-email-not-verified.exception';
+import { AuthAppleInvalidAudienceException } from './exceptions/auth-apple-invalid-audience.exception';
+import { AuthAppleInvalidIssuerException } from './exceptions/auth-apple-invalid-issuer.exception';
+import { AuthApplePublicKeyException } from './exceptions/auth-apple-public-key.exception';
+import { AuthAppleTokenExpiredException } from './exceptions/auth-apple-token-expired.exception';
 import { AuthAppleProfileInterface } from './interfaces/auth-apple-profile.interface';
 import { AuthAppleServiceInterface } from './interfaces/auth-apple-service.interface';
-import { AuthAppleInvalidIssuerException } from './exceptions/auth-apple-invalid-issuer.exception';
-import { AuthAppleInvalidAudienceException } from './exceptions/auth-apple-invalid-audience.exception';
-import { AuthAppleTokenExpiredException } from './exceptions/auth-apple-token-expired.exception';
-import { AuthAppleEmailNotVerifiedException } from './exceptions/auth-apple-email-not-verified.exception';
-import { AuthAppleDecodeException } from './exceptions/auth-apple-decode.exception';
-import { AuthApplePublicKeyException } from './exceptions/auth-apple-public-key.exception';
+import { AuthAppleSettingsInterface } from './interfaces/auth-apple-settings.interface';
 
 @Injectable()
 export class AuthAppleService implements AuthAppleServiceInterface {

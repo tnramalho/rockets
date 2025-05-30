@@ -1,17 +1,17 @@
-import { EventAsyncInterface, EventListenerOn } from '@concepta/nestjs-event';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+
 import {
   INVITATION_MODULE_CATEGORY_USER_KEY,
   InvitationAcceptedEventPayloadInterface,
 } from '@concepta/nestjs-common';
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { EventAsyncInterface, EventListenerOn } from '@concepta/nestjs-event';
 
-import { USER_MODULE_SETTINGS_TOKEN } from '../user.constants';
-import { UserSettingsInterface } from '../interfaces/user-settings.interface';
-import { UserNotFoundException } from '../exceptions/user-not-found-exception';
 import { UserException } from '../exceptions/user-exception';
-
+import { UserNotFoundException } from '../exceptions/user-not-found-exception';
 import { UserModelServiceInterface } from '../interfaces/user-model-service.interface';
+import { UserSettingsInterface } from '../interfaces/user-settings.interface';
 import { UserModelService } from '../services/user-model.service';
+import { USER_MODULE_SETTINGS_TOKEN } from '../user.constants';
 
 @Injectable()
 export class InvitationAcceptedListener

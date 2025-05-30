@@ -1,9 +1,11 @@
-import { AuthRecoveryController } from './__fixtures__/auth-recovery.controller.fixture';
-import { AuthRecoveryService } from './services/auth-recovery.service';
+import { mock } from 'jest-mock-extended';
+
 import { AuthRecoveryRecoverLoginDto } from './dto/auth-recovery-recover-login.dto';
 import { AuthRecoveryUpdatePasswordDto } from './dto/auth-recovery-update-password.dto';
-import { mock } from 'jest-mock-extended';
 import { AuthRecoveryOtpInvalidException } from './exceptions/auth-recovery-otp-invalid.exception';
+import { AuthRecoveryService } from './services/auth-recovery.service';
+
+import { AuthRecoveryController } from './__fixtures__/auth-recovery.controller.fixture';
 
 describe(AuthRecoveryController.name, () => {
   let controller: AuthRecoveryController;

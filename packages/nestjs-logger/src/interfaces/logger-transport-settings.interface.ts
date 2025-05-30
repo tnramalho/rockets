@@ -1,4 +1,5 @@
 import { LogLevel } from '@nestjs/common';
+
 import { LoggerMessageInterface } from './logger-message.interface';
 
 /**

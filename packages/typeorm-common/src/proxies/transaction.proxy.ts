@@ -1,8 +1,10 @@
-import { EntityManagerProxy } from './entity-manager.proxy';
+import { EntityManager, ObjectLiteral, Repository } from 'typeorm';
+
 import { SafeTransactionOptionsInterface } from '../interfaces/safe-transaction-options.interface';
 import { RunInTransactionCallback } from '../typeorm-common.types';
 import { safeTransaction } from '../utils/safe-transaction.util';
-import { EntityManager, ObjectLiteral, Repository } from 'typeorm';
+
+import { EntityManagerProxy } from './entity-manager.proxy';
 
 type TransactionCallback<T> =
   | (() => Promise<T>)

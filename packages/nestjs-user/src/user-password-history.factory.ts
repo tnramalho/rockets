@@ -1,6 +1,6 @@
-import { Factory } from '@concepta/typeorm-seeding';
-import { PasswordStorageService } from '@concepta/nestjs-password';
 import { UserPasswordHistoryEntityInterface } from '@concepta/nestjs-common';
+import { PasswordStorageService } from '@concepta/nestjs-password';
+import { Factory } from '@concepta/typeorm-seeding';
 
 /**
  * User password history factory

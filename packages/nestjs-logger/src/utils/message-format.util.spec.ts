@@ -3,6 +3,7 @@ import {
   LightMyRequestResponse as Response,
 } from 'fastify';
 import { mock } from 'jest-mock-extended';
+
 import { MessageFormatUtil } from './message-format.util';
 
 describe('message format util', () => {

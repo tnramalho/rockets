@@ -1,9 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { InvitationAttemptService } from './invitation-attempt.service';
-import { InvitationAcceptanceService } from './invitation-acceptance.service';
-import { InvitationSendService } from './invitation-send.service';
-import { InvitationNotFoundException } from '../exceptions/invitation-not-found.exception';
+
 import { InvitationInterface } from '@concepta/nestjs-common';
+
+import { InvitationNotFoundException } from '../exceptions/invitation-not-found.exception';
+
+import { InvitationAcceptanceService } from './invitation-acceptance.service';
+import { InvitationAttemptService } from './invitation-attempt.service';
+import { InvitationSendService } from './invitation-send.service';
 
 describe('InvitationAttemptService', () => {
   let service: InvitationAttemptService;

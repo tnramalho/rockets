@@ -1,8 +1,11 @@
 import { DynamicModule, ModuleMetadata } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+
 import {
   ReportStatusEnum,
   getDynamicRepositoryToken,
+  ReportEntityInterface,
+  RepositoryInterface,
 } from '@concepta/nestjs-common';
 import { FileModule } from '@concepta/nestjs-file';
 import {
@@ -10,11 +13,10 @@ import {
   TypeOrmRepositoryAdapter,
 } from '@concepta/nestjs-typeorm-ext';
 
-import { ReportService } from './services/report.service';
-
 import { REPORT_MODULE_REPORT_ENTITY_KEY } from './report.constants';
-
-import { ReportEntityInterface } from '@concepta/nestjs-common';
+import { ReportModule } from './report.module';
+import { ReportService } from './services/report.service';
+import { delay } from './utils/delay.util';
 
 import { AwsStorageService } from './__fixtures__/aws-storage.service';
 import {
@@ -25,12 +27,9 @@ import {
 import { FileEntityFixture } from './__fixtures__/file/file-entity.fixture';
 import { MyReportGeneratorShortDelayService } from './__fixtures__/my-report-generator-short-delay.service';
 import { MyReportGeneratorService } from './__fixtures__/my-report-generator.service';
-import { ReportGeneratorModuleFixture } from './__fixtures__/report-generator.module.fixture';
 import { ReportEntityFixture } from './__fixtures__/report/report-entity.fixture';
+import { ReportGeneratorModuleFixture } from './__fixtures__/report-generator.module.fixture';
 import { UserEntityFixture } from './__fixtures__/user/entities/user.entity.fixture';
-import { ReportModule } from './report.module';
-import { delay } from './utils/delay.util';
-import { RepositoryInterface } from '@concepta/nestjs-common';
 
 describe(ReportModule, () => {
   let testModule: TestingModule;

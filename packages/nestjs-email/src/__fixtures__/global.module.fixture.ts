@@ -1,4 +1,5 @@
 import { Global, Module } from '@nestjs/common';
+
 import { MailerServiceFixture } from './mailer.service.fixture';
 
 @Global()

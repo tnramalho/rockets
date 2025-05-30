@@ -1,6 +1,7 @@
-import { Seeder } from '@concepta/typeorm-seeding';
-import { PasswordStorageService } from '@concepta/nestjs-password';
 import { UserEntityInterface } from '@concepta/nestjs-common';
+import { PasswordStorageService } from '@concepta/nestjs-password';
+import { Seeder } from '@concepta/typeorm-seeding';
+
 import { UserFactory } from './user.factory';
 
 /**

@@ -1,21 +1,23 @@
 import { AccessControl } from 'accesscontrol';
-import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { Global, Module } from '@nestjs/common';
-import { AuthenticationModule } from '@concepta/nestjs-authentication';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { AccessControlModule } from '@concepta/nestjs-access-control';
-import { JwtModule } from '@concepta/nestjs-jwt';
 import { AuthJwtModule } from '@concepta/nestjs-auth-jwt';
+import { AuthenticationModule } from '@concepta/nestjs-authentication';
 import { CrudModule } from '@concepta/nestjs-crud';
 import { EventModule } from '@concepta/nestjs-event';
+import { JwtModule } from '@concepta/nestjs-jwt';
 
-import { UserResource } from '../user.types';
 import { UserAccessQueryService } from '../services/user-access-query.service';
+import { UserResource } from '../user.types';
 
+import { UserCrudControllerFixture } from './controllers/user-crud.controller.fixture';
 import { ormConfig } from './ormconfig.fixture';
 import { UserCrudModelServiceFixture } from './services/user-crud-model.service.fixture';
 import { UserCrudServiceFixture } from './services/user-crud.service.fixture';
 import { UserEntityFixture } from './user.entity.fixture';
-import { UserCrudControllerFixture } from './controllers/user-crud.controller.fixture';
 
 const rules = new AccessControl();
 rules

@@ -1,4 +1,3 @@
-import { EmailSendInterface } from '@concepta/nestjs-common';
 import {
   DynamicModule,
   Inject,
@@ -8,8 +7,9 @@ import {
 } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { EMAIL_MODULE_MAILER_SERVICE_TOKEN } from './email.constants';
+import { EmailSendInterface } from '@concepta/nestjs-common';
 
+import { EMAIL_MODULE_MAILER_SERVICE_TOKEN } from './email.constants';
 import { EmailModule } from './email.module';
 import { EmailService } from './email.service';
 import { EmailServiceInterface } from './interfaces/email-service.interface';

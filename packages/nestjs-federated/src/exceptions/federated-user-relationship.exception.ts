@@ -1,8 +1,10 @@
 import { HttpStatus } from '@nestjs/common';
+
 import {
   RuntimeException,
   RuntimeExceptionOptions,
 } from '@concepta/nestjs-common';
+
 import { FederatedException } from './federated.exception';
 
 export class FederatedUserRelationshipException extends FederatedException {

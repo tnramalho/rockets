@@ -1,11 +1,6 @@
 import { DynamicModule, ModuleMetadata } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import {
-  JwtIssueTokenService,
-  JwtModule,
-  JwtService,
-  JwtVerifyTokenService,
-} from '@concepta/nestjs-jwt';
+
 import {
   AuthenticationModule,
   IssueTokenService,
@@ -13,9 +8,15 @@ import {
   VerifyTokenService,
   VerifyTokenServiceInterface,
 } from '@concepta/nestjs-authentication';
+import {
+  JwtIssueTokenService,
+  JwtModule,
+  JwtService,
+  JwtVerifyTokenService,
+} from '@concepta/nestjs-jwt';
 
-import { AuthRefreshUserModelServiceInterface } from './interfaces/auth-refresh-user-model-service.interface';
 import { AuthRefreshModule } from './auth-refresh.module';
+import { AuthRefreshUserModelServiceInterface } from './interfaces/auth-refresh-user-model-service.interface';
 
 import { UserModelServiceFixture } from './__fixtures__/user/user-model.service.fixture';
 import { UserModuleFixture } from './__fixtures__/user/user.module.fixture';

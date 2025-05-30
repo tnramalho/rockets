@@ -1,4 +1,5 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+
 import { AuthenticatedUserInterface } from '../domain/authentication/interfaces/authenticated-user.interface';
 
 /**

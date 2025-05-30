@@ -1,9 +1,12 @@
 import { Module } from '@nestjs/common';
-import { AppControllerFixture } from './app.controller.fixture';
-import { LoggerSentryModule } from '../logger-sentry.module';
+
 import { LoggerModule } from '@concepta/nestjs-logger';
+
+import { LoggerSentryModule } from '../logger-sentry.module';
 import { LoggerSentryTransport } from '../transports/logger-sentry.transport';
 import { formatMessage, logLevelMap } from '../utils';
+
+import { AppControllerFixture } from './app.controller.fixture';
 
 @Module({
   controllers: [AppControllerFixture],

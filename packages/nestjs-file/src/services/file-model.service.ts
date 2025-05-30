@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+
 import {
   FileCreatableInterface,
   FileInterface,
@@ -6,15 +7,15 @@ import {
   ModelService,
   RepositoryInterface,
   InjectDynamicRepository,
+  FileEntityInterface,
 } from '@concepta/nestjs-common';
-import { FileEntityInterface } from '@concepta/nestjs-common';
-import { FileModelServiceInterface } from '../interfaces/file-model-service.interface';
 
 import { FileCreateDto } from '../dto/file-create.dto';
-import { FILE_MODULE_FILE_ENTITY_KEY } from '../file.constants';
-import { FileServiceKeyMissingException } from '../exceptions/file-service-key-missing.exception';
-import { FilenameMissingException } from '../exceptions/file-name-missing.exception';
 import { FileUpdateDto } from '../dto/file-update.dto';
+import { FilenameMissingException } from '../exceptions/file-name-missing.exception';
+import { FileServiceKeyMissingException } from '../exceptions/file-service-key-missing.exception';
+import { FILE_MODULE_FILE_ENTITY_KEY } from '../file.constants';
+import { FileModelServiceInterface } from '../interfaces/file-model-service.interface';
 
 /**
  * File model service

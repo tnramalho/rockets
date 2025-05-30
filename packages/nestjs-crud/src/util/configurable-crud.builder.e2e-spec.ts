@@ -1,17 +1,17 @@
 import supertest from 'supertest';
 
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 import { getDataSourceToken } from '@nestjs/typeorm';
+
 import { SeedingSource } from '@concepta/typeorm-seeding';
 
-import { AppCcbModuleFixture } from '../__fixtures__/app-ccb.module.fixture';
-import { AppCcbSubModuleFixture } from '../__fixtures__/app-ccb-sub.module.fixture';
 import { AppCcbCustomModuleFixture } from '../__fixtures__/app-ccb-custom.module.fixture';
-
+import { AppCcbSubModuleFixture } from '../__fixtures__/app-ccb-sub.module.fixture';
+import { AppCcbModuleFixture } from '../__fixtures__/app-ccb.module.fixture';
 import { PhotoFixture } from '../__fixtures__/photo/photo.entity.fixture';
-import { PhotoSeederFixture } from '../__fixtures__/photo/photo.seeder.fixture';
 import { PhotoFactoryFixture } from '../__fixtures__/photo/photo.factory.fixture';
+import { PhotoSeederFixture } from '../__fixtures__/photo/photo.seeder.fixture';
 
 describe.each([
   { testModule: AppCcbModuleFixture },

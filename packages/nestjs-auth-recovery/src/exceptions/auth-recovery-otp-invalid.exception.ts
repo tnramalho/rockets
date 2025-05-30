@@ -1,5 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
+
 import { RuntimeExceptionOptions } from '@concepta/nestjs-common';
+
 import { AuthRecoveryException } from './auth-recovery.exception';
 
 export class AuthRecoveryOtpInvalidException extends AuthRecoveryException {

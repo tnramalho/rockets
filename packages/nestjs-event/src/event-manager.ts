@@ -1,4 +1,5 @@
 import { Logger } from '@nestjs/common';
+
 import { EventException } from './exceptions/event.exception';
 import { EventDispatchService } from './services/event-dispatch.service';
 import { EventListenService } from './services/event-listen.service';

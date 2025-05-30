@@ -1,6 +1,7 @@
+import { Module } from '@nestjs/common';
+
 import { CrudModule } from '@concepta/nestjs-crud';
 import { TypeOrmExtModule } from '@concepta/nestjs-typeorm-ext';
-import { Module } from '@nestjs/common';
 
 import { RoleModule } from '../role.module';
 

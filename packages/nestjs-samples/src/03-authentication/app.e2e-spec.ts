@@ -1,9 +1,10 @@
-import supertest from 'supertest';
 import { mock } from 'jest-mock-extended';
+import supertest from 'supertest';
 
-import { HttpAdapterHost } from '@nestjs/core';
 import { INestApplication, Logger } from '@nestjs/common';
+import { HttpAdapterHost } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
+
 import {
   AuthenticationResponseInterface,
   ExceptionsFilter,
@@ -11,10 +12,10 @@ import {
 } from '@concepta/nestjs-common';
 
 import { AppModule } from './app.module';
-import { UserEntity } from './user/user.entity';
-import { UserDto } from './user/user.controller';
 import { AuthLocalControllerFixture } from './auth-local.controller.fixture';
 import { AuthRefreshControllerFixture } from './auth-refresh.controller.fixture';
+import { UserDto } from './user/user.controller';
+import { UserEntity } from './user/user.entity';
 
 const sleep = (ms: number) => {
   return new Promise((resolve) => {

@@ -1,21 +1,24 @@
 import assert from 'assert';
+
 import supertest from 'supertest';
-import { Test, TestingModule } from '@nestjs/testing';
+
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 import { getDataSourceToken, getRepositoryToken } from '@nestjs/typeorm';
-import { SeedingSource } from '@concepta/typeorm-seeding';
+
 import {
   RepositoryInterface,
   RoleAssignmentCreatableInterface,
 } from '@concepta/nestjs-common';
+import { SeedingSource } from '@concepta/typeorm-seeding';
 
 import { RoleFactory } from '../role.factory';
 import { RoleSeeder } from '../role.seeder';
 
-import { RoleEntityFixture } from '../__fixtures__/entities/role-entity.fixture';
-import { UserFactoryFixture } from '../__fixtures__/factories/user.factory.fixture';
-import { UserRoleFactoryFixture } from '../__fixtures__/factories/user-role.factory.fixture';
 import { AppModuleCrudFixture } from '../__fixtures__/app.module.crud.fixture';
+import { RoleEntityFixture } from '../__fixtures__/entities/role-entity.fixture';
+import { UserRoleFactoryFixture } from '../__fixtures__/factories/user-role.factory.fixture';
+import { UserFactoryFixture } from '../__fixtures__/factories/user.factory.fixture';
 
 describe('RoleAssignmentController (e2e)', () => {
   let app: INestApplication;

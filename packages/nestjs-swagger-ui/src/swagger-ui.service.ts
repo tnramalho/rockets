@@ -1,5 +1,6 @@
 import { INestApplication, Inject, Injectable } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
 import { SwaggerUiSettingsInterface } from './interfaces/swagger-ui-settings.interface';
 import {
   SWAGGER_UI_MODULE_SETTINGS_TOKEN,

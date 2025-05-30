@@ -1,5 +1,5 @@
-import { AuthAppleProfileInterface } from '../interfaces/auth-apple-profile.interface';
 import { AuthAppleCredentialsInterface as AuthAppleCredentialsInterface } from '../interfaces/auth-apple-credentials.interface';
+import { AuthAppleProfileInterface } from '../interfaces/auth-apple-profile.interface';
 
 export const mapProfile = (
   profile: AuthAppleProfileInterface,

@@ -1,10 +1,13 @@
-import { JwtIssueTokenService } from '@concepta/nestjs-jwt';
+import { randomUUID } from 'crypto';
+
+import { mock } from 'jest-mock-extended';
+
 import {
   AuthenticatedUserInterface,
   AuthenticationResponseInterface,
 } from '@concepta/nestjs-common';
-import { randomUUID } from 'crypto';
-import { mock } from 'jest-mock-extended';
+import { JwtIssueTokenService } from '@concepta/nestjs-jwt';
+
 import { IssueTokenService } from './issue-token.service';
 
 describe(IssueTokenService, () => {

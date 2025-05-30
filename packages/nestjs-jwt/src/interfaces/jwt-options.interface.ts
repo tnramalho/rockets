@@ -1,5 +1,5 @@
-import { JwtServiceInterface } from './jwt-service.interface';
 import { JwtIssueTokenServiceInterface } from './jwt-issue-token-service.interface';
+import { JwtServiceInterface } from './jwt-service.interface';
 import { JwtSettingsInterface } from './jwt-settings.interface';
 import { JwtVerifyTokenServiceInterface } from './jwt-verify-token-service.interface';
 

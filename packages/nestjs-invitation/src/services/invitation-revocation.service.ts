@@ -1,23 +1,23 @@
 import { Inject } from '@nestjs/common';
-import { ReferenceIdInterface } from '@concepta/nestjs-common';
+
 import {
+  ReferenceIdInterface,
   RepositoryInterface,
   InjectDynamicRepository,
+  InvitationEntityInterface,
 } from '@concepta/nestjs-common';
 
+import { InvitationException } from '../exceptions/invitation.exception';
+import { InvitationRevokeOptionsInterface } from '../interfaces/options/invitation-revoke-options.interface';
+import { InvitationSettingsInterface } from '../interfaces/options/invitation-settings.interface';
+import { InvitationOtpServiceInterface } from '../interfaces/services/invitation-otp-service.interface';
+import { InvitationUserModelServiceInterface } from '../interfaces/services/invitation-user-model.service.interface';
 import {
   INVITATION_MODULE_INVITATION_ENTITY_KEY,
   INVITATION_MODULE_OTP_SERVICE_TOKEN,
   INVITATION_MODULE_SETTINGS_TOKEN,
   INVITATION_MODULE_USER_MODEL_SERVICE_TOKEN,
 } from '../invitation.constants';
-
-import { InvitationSettingsInterface } from '../interfaces/options/invitation-settings.interface';
-import { InvitationOtpServiceInterface } from '../interfaces/services/invitation-otp-service.interface';
-import { InvitationUserModelServiceInterface } from '../interfaces/services/invitation-user-model.service.interface';
-import { InvitationEntityInterface } from '@concepta/nestjs-common';
-import { InvitationException } from '../exceptions/invitation.exception';
-import { InvitationRevokeOptionsInterface } from '../interfaces/options/invitation-revoke-options.interface';
 
 export class InvitationRevocationService {
   constructor(

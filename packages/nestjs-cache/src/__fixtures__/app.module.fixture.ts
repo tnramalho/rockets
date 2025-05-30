@@ -1,10 +1,13 @@
-import { APP_FILTER } from '@nestjs/core';
 import { Module } from '@nestjs/common';
+import { APP_FILTER } from '@nestjs/core';
+
 import { ExceptionsFilter } from '@concepta/nestjs-common';
 import { TypeOrmExtModule } from '@concepta/nestjs-typeorm-ext';
+
 import { CacheModule } from '../cache.module';
-import { UserEntityFixture } from './entities/user-entity.fixture';
+
 import { UserCacheEntityFixture } from './entities/user-cache-entity.fixture';
+import { UserEntityFixture } from './entities/user-entity.fixture';
 
 @Module({
   imports: [

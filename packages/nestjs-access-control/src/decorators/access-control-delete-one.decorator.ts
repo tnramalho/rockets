@@ -1,6 +1,8 @@
-import { AccessControlGrant } from './access-control-grant.decorator';
 import { applyDecorators } from '@nestjs/common';
+
 import { ActionEnum } from '../enums/action.enum';
+
+import { AccessControlGrant } from './access-control-grant.decorator';
 
 /**
  * Delete one resource grant shortcut.

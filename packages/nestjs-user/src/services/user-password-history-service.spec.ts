@@ -1,14 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserPasswordHistoryService } from './user-password-history.service';
-import { UserPasswordHistoryModelService } from './user-password-history-model.service';
-import { UserException } from '../exceptions/user-exception';
+
 import {
   ReferenceId,
   PasswordStorageInterface,
   UserPasswordHistoryEntityInterface,
 } from '@concepta/nestjs-common';
-import { USER_MODULE_SETTINGS_TOKEN } from '../user.constants';
+
+import { UserException } from '../exceptions/user-exception';
 import { UserSettingsInterface } from '../interfaces/user-settings.interface';
+import { USER_MODULE_SETTINGS_TOKEN } from '../user.constants';
+
+import { UserPasswordHistoryModelService } from './user-password-history-model.service';
+import { UserPasswordHistoryService } from './user-password-history.service';
 
 describe(UserPasswordHistoryService.name, () => {
   let service: UserPasswordHistoryService;

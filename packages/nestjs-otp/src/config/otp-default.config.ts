@@ -1,6 +1,7 @@
 import { registerAs } from '@nestjs/config';
-import { OTP_MODULE_DEFAULT_SETTINGS_TOKEN } from '../otp.constants';
+
 import { OtpSettingsInterface } from '../interfaces/otp-settings.interface';
+import { OTP_MODULE_DEFAULT_SETTINGS_TOKEN } from '../otp.constants';
 import { uuidGeneratorUtil } from '../utils/uuid-generator.util';
 import { uuidValidatorUtil } from '../utils/uuid-validator.util';
 

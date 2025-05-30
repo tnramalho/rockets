@@ -1,21 +1,24 @@
 import { Inject, Injectable } from '@nestjs/common';
+
 import {
   NotAnErrorException,
   ReferenceIdInterface,
   ModelMutateException,
+  FederatedEntityInterface,
 } from '@concepta/nestjs-common';
-import { FEDERATED_MODULE_USER_MODEL_SERVICE_TOKEN } from '../federated.constants';
-import { FederatedEntityInterface } from '@concepta/nestjs-common';
-import { FederatedUserModelServiceInterface } from '../interfaces/federated-user-model-service.interface';
-import { FederatedService } from './federated.service';
-import { FederatedCredentialsInterface } from '../interfaces/federated-credentials.interface';
-import { FederatedOAuthServiceInterface } from '../interfaces/federated-oauth-service.interface';
-import { FederatedCreateException } from '../exceptions/federated-create.exception';
+
 import { FederatedCreateUserException } from '../exceptions/federated-create-user.exception';
+import { FederatedCreateException } from '../exceptions/federated-create.exception';
 import { FederatedFindUserException } from '../exceptions/federated-find-user.exception';
-import { FederatedModelService } from './federated-model.service';
 import { FederatedUserRelationshipException } from '../exceptions/federated-user-relationship.exception';
+import { FEDERATED_MODULE_USER_MODEL_SERVICE_TOKEN } from '../federated.constants';
+import { FederatedCredentialsInterface } from '../interfaces/federated-credentials.interface';
 import { FederatedModelServiceInterface } from '../interfaces/federated-model-service.interface';
+import { FederatedOAuthServiceInterface } from '../interfaces/federated-oauth-service.interface';
+import { FederatedUserModelServiceInterface } from '../interfaces/federated-user-model-service.interface';
+
+import { FederatedModelService } from './federated-model.service';
+import { FederatedService } from './federated.service';
 
 @Injectable()
 export class FederatedOAuthService implements FederatedOAuthServiceInterface {

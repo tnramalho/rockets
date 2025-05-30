@@ -1,8 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getDataSourceToken } from '@nestjs/typeorm';
+
 import { SeedingSource } from '@concepta/typeorm-seeding';
-import { RoleModule } from './role.module';
+
 import { RoleFactory } from './role.factory';
+import { RoleModule } from './role.module';
 
 import { AppModuleFixture } from './__fixtures__/app.module.fixture';
 import { RoleEntityFixture } from './__fixtures__/entities/role-entity.fixture';

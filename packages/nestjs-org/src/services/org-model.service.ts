@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+
 import {
   ModelService,
   OrgCreatableInterface,
@@ -6,11 +7,12 @@ import {
   OrgUpdatableInterface,
   RepositoryInterface,
   InjectDynamicRepository,
+  OrgEntityInterface,
 } from '@concepta/nestjs-common';
-import { OrgEntityInterface } from '@concepta/nestjs-common';
-import { OrgModelServiceInterface } from '../interfaces/org-model-service.interface';
+
 import { OrgCreateDto } from '../dto/org-create.dto';
 import { OrgUpdateDto } from '../dto/org-update.dto';
+import { OrgModelServiceInterface } from '../interfaces/org-model-service.interface';
 import { ORG_MODULE_ORG_ENTITY_KEY } from '../org.constants';
 
 /**

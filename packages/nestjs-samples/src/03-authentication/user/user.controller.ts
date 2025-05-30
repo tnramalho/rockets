@@ -1,7 +1,8 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+
 import { JwtAuthGuard } from '@concepta/nestjs-auth-jwt';
 import { ReferenceUsername } from '@concepta/nestjs-common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 export class UserDto {
   constructor(username: ReferenceUsername) {

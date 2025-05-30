@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+
 import {
   ModelService,
   ReferenceId,
@@ -8,8 +9,8 @@ import {
   UserPasswordHistoryCreatableInterface,
 } from '@concepta/nestjs-common';
 
-import { USER_MODULE_USER_PASSWORD_HISTORY_ENTITY_KEY } from '../user.constants';
 import { UserPasswordHistoryCreateDto } from '../dto/user-password-history-create.dto';
+import { USER_MODULE_USER_PASSWORD_HISTORY_ENTITY_KEY } from '../user.constants';
 
 @Injectable()
 export class UserPasswordHistoryModelService extends ModelService<

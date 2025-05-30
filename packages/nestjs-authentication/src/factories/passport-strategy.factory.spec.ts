@@ -1,5 +1,7 @@
 import { Strategy } from 'passport-strategy';
+
 import { PassportStrategy } from '@nestjs/passport';
+
 import { PassportStrategyFactory } from './passport-strategy.factory';
 
 jest.mock('@nestjs/passport', () => ({

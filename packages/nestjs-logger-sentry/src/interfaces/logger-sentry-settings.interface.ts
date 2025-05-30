@@ -1,9 +1,11 @@
 import { SeverityLevel } from '@sentry/types';
-import { LoggerSentryConfigInterface } from './logger-sentry-config.interface';
+
 import {
   LoggerSettingsInterface,
   LoggerTransportSettingsInterface,
 } from '@concepta/nestjs-logger';
+
+import { LoggerSentryConfigInterface } from './logger-sentry-config.interface';
 
 /**
  * LoggerSentry options interface.

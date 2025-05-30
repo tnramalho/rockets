@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
+
 import { ReferenceSubject, ReferenceUsername } from '@concepta/nestjs-common';
+
 import { AuthLocalCredentialsInterface } from '../../interfaces/auth-local-credentials.interface';
 import { AuthLocalUserModelServiceInterface } from '../../interfaces/auth-local-user-model-service.interface';
+
 import { LOGIN_SUCCESS, USER_SUCCESS } from './constants';
 
 @Injectable()

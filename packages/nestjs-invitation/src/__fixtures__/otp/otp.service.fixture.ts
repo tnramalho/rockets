@@ -1,13 +1,14 @@
 import { randomUUID } from 'crypto';
+
 import { Injectable } from '@nestjs/common';
+
 import {
   AssigneeRelationInterface,
   OtpCreateParamsInterface,
+  OtpInterface,
 } from '@concepta/nestjs-common';
-import { OtpInterface } from '@concepta/nestjs-common';
 
 import { InvitationOtpServiceInterface } from '../../interfaces/services/invitation-otp-service.interface';
-
 import { UserFixture } from '../user/user.fixture';
 
 @Injectable()

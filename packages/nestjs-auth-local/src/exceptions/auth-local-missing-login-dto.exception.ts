@@ -1,5 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
+
 import { RuntimeExceptionOptions } from '@concepta/nestjs-common';
+
 import { AuthLocalException } from './auth-local.exception';
 
 export class AuthLocalMissingLoginDtoException extends AuthLocalException {

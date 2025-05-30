@@ -1,25 +1,28 @@
-import { Logger, Module } from '@nestjs/common';
-import { TypeOrmExtModule } from '@concepta/nestjs-typeorm-ext';
-import { CrudModule } from '@concepta/nestjs-crud';
-import { OtpModule, OtpService } from '@concepta/nestjs-otp';
-import { EmailModule, EmailService } from '@concepta/nestjs-email';
-import { UserModelService, UserModule } from '@concepta/nestjs-user';
-import { EmailSendOptionsInterface } from '@concepta/nestjs-common';
-import { EventModule } from '@concepta/nestjs-event';
-import { PasswordModule } from '@concepta/nestjs-password';
 import { MailerModule, MailerService } from '@nestjs-modules/mailer';
 
-import { InvitationModule } from '../invitation.module';
-import { InvitationEntityFixture } from './invitation/entities/invitation.entity.fixture';
+import { Logger, Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { EmailSendOptionsInterface } from '@concepta/nestjs-common';
+import { CrudModule } from '@concepta/nestjs-crud';
+import { EmailModule, EmailService } from '@concepta/nestjs-email';
+import { EventModule } from '@concepta/nestjs-event';
+import { OtpModule, OtpService } from '@concepta/nestjs-otp';
+import { PasswordModule } from '@concepta/nestjs-password';
+import { TypeOrmExtModule } from '@concepta/nestjs-typeorm-ext';
+import { UserModelService, UserModule } from '@concepta/nestjs-user';
+
 import { InvitationAcceptedEventAsync } from '../events/invitation-accepted.event';
-import { UserOtpEntityFixture } from './user/entities/user-otp.entity.fixture';
-import { UserEntityFixture } from './user/entities/user.entity.fixture';
-import { default as ormConfig } from './ormconfig.fixture';
-import { InvitationController } from './controllers/invitation.controller';
+import { InvitationModule } from '../invitation.module';
+
 import { InvitationAcceptanceController } from './controllers/invitation-acceptance.controller';
 import { InvitationReattemptController } from './controllers/invitation-reattempt.controller';
+import { InvitationController } from './controllers/invitation.controller';
+import { InvitationEntityFixture } from './invitation/entities/invitation.entity.fixture';
 import { InvitationCrudService } from './invitation-crud.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { default as ormConfig } from './ormconfig.fixture';
+import { UserOtpEntityFixture } from './user/entities/user-otp.entity.fixture';
+import { UserEntityFixture } from './user/entities/user.entity.fixture';
 
 @Module({
   imports: [

@@ -1,4 +1,5 @@
 import * as bcrypt from 'bcrypt';
+
 import { PasswordException } from '../exceptions/password.exception';
 
 /**

@@ -1,14 +1,21 @@
-import { FileCreatableInterface } from '@concepta/nestjs-common';
-import { RepositoryInterface } from '@concepta/nestjs-common';
 import { randomUUID } from 'crypto';
+
 import { mock } from 'jest-mock-extended';
-import { FileEntityFixture } from '../__fixtures__/file/file-entity.fixture';
+
+import {
+  FileCreatableInterface,
+  RepositoryInterface,
+  FileEntityInterface,
+} from '@concepta/nestjs-common';
+
 import { FileCreateDto } from '../dto/file-create.dto';
 import { FileQueryException } from '../exceptions/file-query.exception';
-import { FileEntityInterface } from '@concepta/nestjs-common';
+
 import { FileModelService } from './file-model.service';
 import { FileStrategyService } from './file-strategy.service';
 import { FileService } from './file.service';
+
+import { FileEntityFixture } from '../__fixtures__/file/file-entity.fixture';
 
 describe(FileService.name, () => {
   let fileService: FileService;

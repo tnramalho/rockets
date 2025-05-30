@@ -7,18 +7,17 @@ import { ConfigModule } from '@nestjs/config';
 
 import { createSettingsProvider } from '@concepta/nestjs-common';
 
+import { federatedDefaultConfig } from './config/federated-default.config';
 import {
   FEDERATED_MODULE_SETTINGS_TOKEN,
   FEDERATED_MODULE_USER_MODEL_SERVICE_TOKEN,
 } from './federated.constants';
-
-import { FederatedOptionsInterface } from './interfaces/federated-options.interface';
 import { FederatedOptionsExtrasInterface } from './interfaces/federated-options-extras.interface';
+import { FederatedOptionsInterface } from './interfaces/federated-options.interface';
 import { FederatedSettingsInterface } from './interfaces/federated-settings.interface';
-import { FederatedService } from './services/federated.service';
-import { FederatedOAuthService } from './services/federated-oauth.service';
 import { FederatedModelService } from './services/federated-model.service';
-import { federatedDefaultConfig } from './config/federated-default.config';
+import { FederatedOAuthService } from './services/federated-oauth.service';
+import { FederatedService } from './services/federated.service';
 
 const RAW_OPTIONS_TOKEN = Symbol('__FEDERATED_MODULE_RAW_OPTIONS_TOKEN__');
 

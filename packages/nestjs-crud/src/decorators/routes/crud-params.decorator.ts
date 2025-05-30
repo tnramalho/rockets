@@ -1,5 +1,7 @@
-import { SetMetadata } from '@nestjs/common';
 import { ParamsOptions } from '@nestjsx/crud-request';
+
+import { SetMetadata } from '@nestjs/common';
+
 import { CRUD_MODULE_ROUTE_PARAMS_METADATA } from '../../crud.constants';
 
 /**

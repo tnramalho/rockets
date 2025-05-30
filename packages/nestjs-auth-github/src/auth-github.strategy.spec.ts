@@ -1,17 +1,21 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { UnauthorizedException } from '@nestjs/common';
-import { AuthGithubStrategy } from './auth-github.strategy';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import {
+  FederatedOAuthService,
+  FederatedCredentialsInterface,
+} from '@concepta/nestjs-federated';
+
 import {
   AUTH_GITHUB_MODULE_SETTINGS_TOKEN,
   AUTH_GITHUB_STRATEGY_NAME,
 } from './auth-github.constants';
-import { AuthGithubSettingsInterface } from './interfaces/auth-github-settings.interface';
-import { AuthGithubProfileInterface } from './interfaces/auth-github-profile.interface';
+import { AuthGithubStrategy } from './auth-github.strategy';
 import { AuthGithubMissingEmailException } from './exceptions/auth-github-missing-email.exception';
 import { AuthGithubMissingIdException } from './exceptions/auth-github-missing-id.exception';
+import { AuthGithubProfileInterface } from './interfaces/auth-github-profile.interface';
+import { AuthGithubSettingsInterface } from './interfaces/auth-github-settings.interface';
 import { mapProfile } from './utils/auth-github-map-profile';
-import { FederatedOAuthService } from '@concepta/nestjs-federated';
-import { FederatedCredentialsInterface } from '@concepta/nestjs-federated';
 
 // Mock the PassportStrategy class
 jest.mock('@nestjs/passport', () => {

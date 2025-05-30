@@ -1,5 +1,5 @@
-import { mapHttpStatus } from '../utils/map-http-status.util';
 import { ERROR_CODE_HTTP_UNKNOWN } from '../constants/error-codes.constants';
+import { mapHttpStatus } from '../utils/map-http-status.util';
 
 describe(mapHttpStatus.name, () => {
   it('should return the error code for a given status code', () => {

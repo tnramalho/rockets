@@ -1,7 +1,9 @@
 import { Exclude, Expose, Type } from 'class-transformer';
 import { Allow, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { CacheInterface, CommonEntityDto } from '@concepta/nestjs-common';
+
 import { ApiProperty } from '@nestjs/swagger';
+
+import { CacheInterface, CommonEntityDto } from '@concepta/nestjs-common';
 
 /**
  * Cache Create DTO

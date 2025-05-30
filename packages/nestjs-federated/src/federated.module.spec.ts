@@ -1,27 +1,27 @@
 import { DynamicModule, ModuleMetadata } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+
 import {
   RepositoryInterface,
   getDynamicRepositoryToken,
+  FederatedEntityInterface,
 } from '@concepta/nestjs-common';
 import {
   TypeOrmExtModule,
   TypeOrmRepositoryAdapter,
 } from '@concepta/nestjs-typeorm-ext';
 
-import { FederatedModule } from './federated.module';
-import { FederatedService } from './services/federated.service';
-import { FederatedOAuthService } from './services/federated-oauth.service';
 import { FEDERATED_MODULE_FEDERATED_ENTITY_KEY } from './federated.constants';
-
-import { FederatedEntityInterface } from '@concepta/nestjs-common';
+import { FederatedModule } from './federated.module';
 import { FederatedUserModelServiceInterface } from './interfaces/federated-user-model-service.interface';
 import { FederatedModelService } from './services/federated-model.service';
+import { FederatedOAuthService } from './services/federated-oauth.service';
+import { FederatedService } from './services/federated.service';
 
-import { UserModuleFixture } from './__fixtures__/user/user.module.fixture';
+import { FederatedEntityFixture } from './__fixtures__/federated/federated-entity.fixture';
 import { UserEntityFixture } from './__fixtures__/user/entities/user.entity.fixture';
 import { UserModelServiceFixture } from './__fixtures__/user/services/user-model.service.fixture';
-import { FederatedEntityFixture } from './__fixtures__/federated/federated-entity.fixture';
+import { UserModuleFixture } from './__fixtures__/user/user.module.fixture';
 
 describe(FederatedModule, () => {
   let testModule: TestingModule;

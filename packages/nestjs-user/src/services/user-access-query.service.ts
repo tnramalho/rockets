@@ -1,12 +1,15 @@
 import { plainToInstance } from 'class-transformer';
+
 import { Injectable } from '@nestjs/common';
+
 import {
   CanAccess,
   AccessControlContext,
   ActionEnum,
 } from '@concepta/nestjs-access-control';
-import { UserDto } from '../dto/user.dto';
+
 import { UserPasswordDto } from '../dto/user-password.dto';
+import { UserDto } from '../dto/user.dto';
 import { UserResource } from '../user.types';
 
 @Injectable()

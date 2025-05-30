@@ -1,8 +1,11 @@
 import { fail } from 'assert';
+
 import { PasswordStorageInterface } from '@concepta/nestjs-common';
+
+import { PasswordRequiredException } from '../exceptions/password-required.exception';
+
 import { PasswordStorageService } from './password-storage.service';
 import { PasswordValidationService } from './password-validation.service';
-import { PasswordRequiredException } from '../exceptions/password-required.exception';
 
 describe(PasswordStorageService, () => {
   let storageService: PasswordStorageService;

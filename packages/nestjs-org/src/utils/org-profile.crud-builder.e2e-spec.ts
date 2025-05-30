@@ -1,7 +1,9 @@
 import supertest from 'supertest';
-import { Test, TestingModule } from '@nestjs/testing';
+
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 import { getDataSourceToken, TypeOrmModule } from '@nestjs/typeorm';
+
 import {
   ConfigurableCrudOptions,
   ConfigurableCrudOptionsTransformer,
@@ -9,20 +11,22 @@ import {
 } from '@concepta/nestjs-crud';
 import { SeedingSource } from '@concepta/typeorm-seeding';
 
-import { OrgFactory } from '../seeding/org.factory';
-import { OrgEntityFixture } from '../__fixtures__/org-entity.fixture';
-import { OwnerEntityFixture } from '../__fixtures__/owner-entity.fixture';
-import { OwnerFactoryFixture } from '../__fixtures__/owner-factory.fixture';
-import { OrgMemberEntityFixture } from '../__fixtures__/org-member.entity.fixture';
-import { UserEntityFixture } from '../__fixtures__/user-entity.fixture';
-import { InvitationEntityFixture } from '../__fixtures__/invitation.entity.fixture';
-import { OrgProfileEntityFixture } from '../__fixtures__/org-profile.entity.fixture';
 import { OrgProfileFactory } from '../seeding/org-profile.factory';
 import { OrgProfileSeeder } from '../seeding/org-profile.seeder';
+import { OrgFactory } from '../seeding/org.factory';
+
 import { OrgProfileCrudBuilder } from './org-profile.crud-builder';
-import { OrgProfileDtoFixture } from '../__fixtures__/dto/org-profile.dto.fixture';
+
 import { OrgProfileCreateDtoFixture } from '../__fixtures__/dto/org-profile-create.dto.fixture';
 import { OrgProfileUpdateDtoFixture } from '../__fixtures__/dto/org-profile-update.dto.fixture';
+import { OrgProfileDtoFixture } from '../__fixtures__/dto/org-profile.dto.fixture';
+import { InvitationEntityFixture } from '../__fixtures__/invitation.entity.fixture';
+import { OrgEntityFixture } from '../__fixtures__/org-entity.fixture';
+import { OrgMemberEntityFixture } from '../__fixtures__/org-member.entity.fixture';
+import { OrgProfileEntityFixture } from '../__fixtures__/org-profile.entity.fixture';
+import { OwnerEntityFixture } from '../__fixtures__/owner-entity.fixture';
+import { OwnerFactoryFixture } from '../__fixtures__/owner-factory.fixture';
+import { UserEntityFixture } from '../__fixtures__/user-entity.fixture';
 
 type OrgProfileExtras = {
   model: {

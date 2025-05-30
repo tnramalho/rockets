@@ -1,4 +1,5 @@
 import { Entity } from 'typeorm';
+
 import { UserPostgresEntity } from '@concepta/nestjs-typeorm-ext';
 
 @Entity()

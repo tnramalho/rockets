@@ -1,6 +1,8 @@
-import { IsString } from 'class-validator';
 import { Exclude, Expose } from 'class-transformer';
+import { IsString } from 'class-validator';
+
 import { ApiProperty } from '@nestjs/swagger';
+
 import { AuthenticationLoginInterface } from '@concepta/nestjs-common';
 
 @Exclude()

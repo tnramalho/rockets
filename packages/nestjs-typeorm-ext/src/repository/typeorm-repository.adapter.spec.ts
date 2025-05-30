@@ -1,14 +1,16 @@
-import { getDataSourceToken } from '@nestjs/typeorm';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { getDataSourceToken } from '@nestjs/typeorm';
+
 import { ModelQueryException } from '@concepta/nestjs-common';
 import { SeedingSource } from '@concepta/typeorm-seeding';
 
 import { TypeOrmRepositoryAdapter } from './typeorm-repository.adapter';
+
 import { AppModuleFixture } from '../__fixtures__/repository/app.module.fixture';
-import { TestModuleFixture } from '../__fixtures__/repository/test.module.fixture';
-import { TestEntityFixture } from '../__fixtures__/repository/test.entity.fixture';
 import { TypeOrmRepositoryAdapterFixture } from '../__fixtures__/repository/services/typeorm-repository.adapter.fixture';
+import { TestEntityFixture } from '../__fixtures__/repository/test.entity.fixture';
+import { TestModuleFixture } from '../__fixtures__/repository/test.module.fixture';
 
 describe(TypeOrmRepositoryAdapter, () => {
   let app: INestApplication;

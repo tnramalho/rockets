@@ -1,4 +1,5 @@
 import { FactoryProvider, ModuleMetadata } from '@nestjs/common';
+
 import { CoralogixOptionsInterface } from './logger-coralogix-options.interface';
 
 /**

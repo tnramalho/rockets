@@ -1,15 +1,17 @@
 import { Controller, Inject, Get, UseGuards } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import {
-  AuthenticatedUserInterface,
-  AuthenticationResponseInterface,
-} from '@concepta/nestjs-common';
+
 import {
   AuthUser,
   IssueTokenServiceInterface,
   AuthenticationJwtResponseDto,
   AuthPublic,
 } from '@concepta/nestjs-authentication';
+import {
+  AuthenticatedUserInterface,
+  AuthenticationResponseInterface,
+} from '@concepta/nestjs-common';
+
 import { AUTH_GOOGLE_ISSUE_TOKEN_SERVICE_TOKEN } from '../auth-google.constants';
 import { AuthGoogleGuard } from '../auth-google.guard';
 

@@ -4,6 +4,7 @@ import {
   UserPasswordHistoryEntityInterface,
   UserProfileEntityInterface,
 } from '@concepta/nestjs-common';
+
 import {
   USER_MODULE_USER_ENTITY_KEY,
   USER_MODULE_USER_PROFILE_ENTITY_KEY,

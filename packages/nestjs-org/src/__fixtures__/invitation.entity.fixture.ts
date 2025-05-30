@@ -1,4 +1,5 @@
 import { Entity } from 'typeorm';
+
 import { InvitationSqliteEntity } from '@concepta/nestjs-typeorm-ext';
 
 @Entity()

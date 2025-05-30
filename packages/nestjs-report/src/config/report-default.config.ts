@@ -1,6 +1,7 @@
 import { registerAs } from '@nestjs/config';
-import { REPORT_MODULE_DEFAULT_SETTINGS_TOKEN } from '../report.constants';
+
 import { ReportSettingsInterface } from '../interfaces/report-settings.interface';
+import { REPORT_MODULE_DEFAULT_SETTINGS_TOKEN } from '../report.constants';
 
 /**
  * Default configuration for report module.

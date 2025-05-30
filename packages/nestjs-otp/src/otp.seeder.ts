@@ -1,4 +1,5 @@
 import { Seeder } from '@concepta/typeorm-seeding';
+
 import { OtpFactory } from './otp.factory';
 
 /**

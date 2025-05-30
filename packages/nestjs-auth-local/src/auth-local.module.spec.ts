@@ -1,15 +1,16 @@
 import { DynamicModule, ModuleMetadata } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import {
-  JwtIssueTokenService,
-  JwtModule,
-  JwtService,
-} from '@concepta/nestjs-jwt';
+
 import {
   AuthenticationModule,
   IssueTokenService,
   IssueTokenServiceInterface,
 } from '@concepta/nestjs-authentication';
+import {
+  JwtIssueTokenService,
+  JwtModule,
+  JwtService,
+} from '@concepta/nestjs-jwt';
 import {
   PasswordValidationService,
   PasswordValidationServiceInterface,
@@ -18,10 +19,10 @@ import {
 import { AuthLocalModule } from './auth-local.module';
 import { AuthLocalUserModelServiceInterface } from './interfaces/auth-local-user-model-service.interface';
 import { AuthLocalValidateUserServiceInterface } from './interfaces/auth-local-validate-user-service.interface';
+import { AuthLocalValidateUserService } from './services/auth-local-validate-user.service';
 
 import { UserModelServiceFixture } from './__fixtures__/user/user-model.service.fixture';
 import { UserModuleFixture } from './__fixtures__/user/user.module.fixture';
-import { AuthLocalValidateUserService } from './services/auth-local-validate-user.service';
 
 describe(AuthLocalModule, () => {
   const jwtService = new JwtService();

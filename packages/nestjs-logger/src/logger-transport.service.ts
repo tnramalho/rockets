@@ -1,4 +1,5 @@
 import { Inject, Injectable, LogLevel } from '@nestjs/common';
+
 import { LOGGER_MODULE_SETTINGS_TOKEN } from './config/logger.config';
 import { LoggerSettingsInterface } from './interfaces/logger-settings.interface';
 import { LoggerTransportInterface } from './interfaces/logger-transport.interface';

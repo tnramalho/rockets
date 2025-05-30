@@ -1,13 +1,16 @@
 import { Inject } from '@nestjs/common';
+
 import { ReportInterface, ReportStatusEnum } from '@concepta/nestjs-common';
 import { FileService } from '@concepta/nestjs-file';
+
 import { ReportGeneratorResultInterface } from '../interfaces/report-generator-result.interface';
 import { ReportGeneratorServiceInterface } from '../interfaces/report-generator-service.interface';
+import { delay } from '../utils/delay.util';
+
 import {
   AWS_KEY_FIXTURE,
   REPORT_SHORT_DELAY_KEY_FIXTURE,
 } from './constants.fixture';
-import { delay } from '../utils/delay.util';
 
 export class MyReportGeneratorShortDelayService
   implements ReportGeneratorServiceInterface

@@ -1,17 +1,19 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ReferenceIdInterface } from '@concepta/nestjs-common';
+
 import { ValidateUserService } from '@concepta/nestjs-authentication';
+import { ReferenceIdInterface } from '@concepta/nestjs-common';
 import { PasswordValidationServiceInterface } from '@concepta/nestjs-password';
+
 import {
   AuthLocalPasswordValidationService,
   AuthLocalUserModelService,
 } from '../auth-local.constants';
-import { AuthLocalValidateUserInterface } from '../interfaces/auth-local-validate-user.interface';
-import { AuthLocalValidateUserServiceInterface } from '../interfaces/auth-local-validate-user-service.interface';
-import { AuthLocalUserModelServiceInterface } from '../interfaces/auth-local-user-model-service.interface';
-import { AuthLocalUsernameNotFoundException } from '../exceptions/auth-local-username-not-found.exception';
-import { AuthLocalUserInactiveException } from '../exceptions/auth-local-user-inactive.exception';
 import { AuthLocalInvalidPasswordException } from '../exceptions/auth-local-invalid-password.exception';
+import { AuthLocalUserInactiveException } from '../exceptions/auth-local-user-inactive.exception';
+import { AuthLocalUsernameNotFoundException } from '../exceptions/auth-local-username-not-found.exception';
+import { AuthLocalUserModelServiceInterface } from '../interfaces/auth-local-user-model-service.interface';
+import { AuthLocalValidateUserServiceInterface } from '../interfaces/auth-local-validate-user-service.interface';
+import { AuthLocalValidateUserInterface } from '../interfaces/auth-local-validate-user.interface';
 
 @Injectable()
 export class AuthLocalValidateUserService

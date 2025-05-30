@@ -1,9 +1,9 @@
+import { Module } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { Module } from '@nestjs/common';
+import { CRUD_MODULE_SETTINGS_TOKEN } from './crud.constants';
 import { CrudModule } from './crud.module';
 import { CrudSettingsInterface } from './interfaces/crud-settings.interface';
-import { CRUD_MODULE_SETTINGS_TOKEN } from './crud.constants';
 
 describe(CrudModule, () => {
   let crudModule: CrudModule;

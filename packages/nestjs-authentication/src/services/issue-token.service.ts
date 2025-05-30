@@ -1,14 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ReferenceId } from '@concepta/nestjs-common';
+
+import {
+  ReferenceId,
+  AuthenticationResponseInterface,
+} from '@concepta/nestjs-common';
 import {
   JwtIssueTokenService,
   JwtIssueTokenServiceInterface,
   JwtSignOptions,
   JwtSignStringOptions,
 } from '@concepta/nestjs-jwt';
-import { AuthenticationResponseInterface } from '@concepta/nestjs-common';
-import { IssueTokenServiceInterface } from '../interfaces/issue-token-service.interface';
+
 import { AuthenticationJwtResponseDto } from '../dto/authentication-jwt-response.dto';
+import { IssueTokenServiceInterface } from '../interfaces/issue-token-service.interface';
 
 @Injectable()
 export class IssueTokenService implements IssueTokenServiceInterface {

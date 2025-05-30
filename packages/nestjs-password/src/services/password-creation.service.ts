@@ -1,18 +1,20 @@
 import { Inject, Injectable } from '@nestjs/common';
+
 import { PasswordStorageInterface } from '@concepta/nestjs-common';
 
-import { PASSWORD_MODULE_SETTINGS_TOKEN } from '../password.constants';
-import { PasswordSettingsInterface } from '../interfaces/password-settings.interface';
-import { PasswordCreationServiceInterface } from '../interfaces/password-creation-service.interface';
-import { PasswordStrengthService } from './password-strength.service';
-import { PasswordStorageService } from './password-storage.service';
-import { PasswordValidationService } from './password-validation.service';
-import { PasswordCurrentPasswordInterface } from '../interfaces/password-current-password.interface';
-import { PasswordHistoryPasswordInterface } from '../interfaces/password-history-password.interface';
-import { PasswordHashOptionsInterface } from '../interfaces/password-hash-options.interface';
-import { PasswordNotStrongException } from '../exceptions/password-not-strong.exception';
 import { PasswordCurrentRequiredException } from '../exceptions/password-current-required.exception';
+import { PasswordNotStrongException } from '../exceptions/password-not-strong.exception';
 import { PasswordUsedRecentlyException } from '../exceptions/password-used-recently.exception';
+import { PasswordCreationServiceInterface } from '../interfaces/password-creation-service.interface';
+import { PasswordCurrentPasswordInterface } from '../interfaces/password-current-password.interface';
+import { PasswordHashOptionsInterface } from '../interfaces/password-hash-options.interface';
+import { PasswordHistoryPasswordInterface } from '../interfaces/password-history-password.interface';
+import { PasswordSettingsInterface } from '../interfaces/password-settings.interface';
+import { PASSWORD_MODULE_SETTINGS_TOKEN } from '../password.constants';
+
+import { PasswordStorageService } from './password-storage.service';
+import { PasswordStrengthService } from './password-strength.service';
+import { PasswordValidationService } from './password-validation.service';
 
 /**
  * Service with functions related to password creation

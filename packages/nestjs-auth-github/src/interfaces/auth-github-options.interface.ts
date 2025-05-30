@@ -1,5 +1,6 @@
 import { IssueTokenServiceInterface } from '@concepta/nestjs-authentication';
 import { ModuleOptionsSettingsInterface } from '@concepta/nestjs-common';
+
 import { AuthGithubSettingsInterface } from './auth-github-settings.interface';
 
 export interface AuthGithubOptionsInterface

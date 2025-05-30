@@ -1,9 +1,11 @@
+import { UnauthorizedException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
 import {
   FederatedCredentialsInterface,
   FederatedOAuthService,
 } from '@concepta/nestjs-federated';
-import { UnauthorizedException } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
+
 import {
   AUTH_APPLE_MODULE_SETTINGS_TOKEN,
   AUTH_APPLE_SERVICE_TOKEN,
@@ -13,9 +15,9 @@ import { AuthAppleMissingEmailException } from './exceptions/auth-apple-missing-
 import { AuthAppleMissingIdException } from './exceptions/auth-apple-missing-id.exception';
 import { AuthAppleCredentialsInterface } from './interfaces/auth-apple-credentials.interface';
 import { AuthAppleProfileInterface } from './interfaces/auth-apple-profile.interface';
+import { AuthAppleServiceInterface } from './interfaces/auth-apple-service.interface';
 import { AuthAppleSettingsInterface } from './interfaces/auth-apple-settings.interface';
 import { mapProfile } from './utils/auth-apple-map-profile';
-import { AuthAppleServiceInterface } from './interfaces/auth-apple-service.interface';
 
 // Mock the PassportStrategy class
 jest.mock('@nestjs/passport', () => {

@@ -1,5 +1,6 @@
-import { EventBase } from './event-base';
 import { EVENT_MODULE_EVENT_KEY_PREFIX } from '../event-constants';
+
+import { EventBase } from './event-base';
 
 describe(EventBase, () => {
   describe(EventBase.key, () => {

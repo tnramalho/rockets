@@ -1,5 +1,4 @@
-import { EmailModule } from './index';
-import { EmailService } from './index';
+import { EmailModule, EmailService } from './index';
 
 describe('Index', () => {
   it('EmailModule should be imported', () => {

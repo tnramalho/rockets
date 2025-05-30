@@ -1,10 +1,12 @@
+import { mock } from 'jest-mock-extended';
+
 import { FactoryProvider } from '@nestjs/common';
+
+import { AuthJwtGuard } from './auth-jwt.guard';
 import {
   AuthJwtOptions,
   createAuthJwtAppGuardProvider,
 } from './auth-jwt.module-definition';
-import { AuthJwtGuard } from './auth-jwt.guard';
-import { mock } from 'jest-mock-extended';
 
 describe(createAuthJwtAppGuardProvider.name, () => {
   const guard = mock<AuthJwtGuard>();

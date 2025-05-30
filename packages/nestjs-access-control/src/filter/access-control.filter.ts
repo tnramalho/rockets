@@ -1,3 +1,6 @@
+import { IQueryInfo } from 'accesscontrol';
+import { map } from 'rxjs/operators';
+
 import {
   CallHandler,
   ExecutionContext,
@@ -6,8 +9,7 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { IQueryInfo } from 'accesscontrol';
-import { map } from 'rxjs/operators';
+
 import {
   ACCESS_CONTROL_MODULE_GRANT_METADATA,
   ACCESS_CONTROL_MODULE_SETTINGS_TOKEN,

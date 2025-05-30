@@ -1,12 +1,12 @@
 import EventEmitter2 from 'eventemitter2';
+
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { EVENT_MODULE_EMITTER_SERVICE_TOKEN } from './event-constants';
-
+import { EventManager } from './event-manager';
 import { EventModule } from './event.module';
 import { EventDispatchService } from './services/event-dispatch.service';
 import { EventListenService } from './services/event-listen.service';
-import { EventManager } from './event-manager';
 
 describe(EventModule, () => {
   let testModule: TestingModule;

@@ -1,8 +1,10 @@
-import { ExecutionContext } from '@nestjs/common';
 import { mock } from 'jest-mock-extended';
-import { AuthUser } from './auth-user.decorator';
+
+import { ExecutionContext } from '@nestjs/common';
 import { ROUTE_ARGS_METADATA } from '@nestjs/common/constants';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
+
+import { AuthUser } from './auth-user.decorator';
 
 interface UserInterface {
   user: { username: string };

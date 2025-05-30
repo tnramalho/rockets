@@ -1,6 +1,7 @@
 import { InvitationInterface } from '@concepta/nestjs-common';
-import { InvitationAcceptOptionsInterface } from '../options/invitation-accept-options.interface';
+
 import { InvitationCreateInviteInterface } from '../domain/invitation-create-invite.interface';
+import { InvitationAcceptOptionsInterface } from '../options/invitation-accept-options.interface';
 import { InvitationRevokeOptionsInterface } from '../options/invitation-revoke-options.interface';
 
 export interface InvitationServiceInterface {

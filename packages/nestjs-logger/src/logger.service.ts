@@ -1,10 +1,10 @@
 import { ConsoleLogger, HttpException, Injectable } from '@nestjs/common';
 import { LogLevel } from '@nestjs/common/services/logger.service';
 
-import { LoggerTransportService } from './logger-transport.service';
+import { LoggerException } from './exceptions/logger.exceptions';
 import { LoggerServiceInterface } from './interfaces/logger-service.interface';
 import { LoggerTransportInterface } from './interfaces/logger-transport.interface';
-import { LoggerException } from './exceptions/logger.exceptions';
+import { LoggerTransportService } from './logger-transport.service';
 
 /**
  * A service that extends the Logger class and implements {@link LoggerServiceInterface}.

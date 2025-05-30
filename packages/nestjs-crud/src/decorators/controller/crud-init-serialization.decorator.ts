@@ -1,4 +1,5 @@
 import { UseInterceptors } from '@nestjs/common';
+
 import { CrudSerializeInterceptor } from '../../interceptors/crud-serialize.interceptor';
 
 /**

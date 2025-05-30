@@ -1,3 +1,11 @@
+import {
+  CreateOneRouteOptions,
+  DeleteOneRouteOptions,
+  RecoverOneRouteOptions,
+  ReplaceOneRouteOptions,
+  UpdateOneRouteOptions,
+} from '@nestjsx/crud';
+
 import { Type } from '@nestjs/common';
 import {
   ApiBodyOptions,
@@ -6,14 +14,9 @@ import {
   ApiQueryOptions,
   ApiResponseOptions,
 } from '@nestjs/swagger';
-import {
-  CreateOneRouteOptions,
-  DeleteOneRouteOptions,
-  RecoverOneRouteOptions,
-  ReplaceOneRouteOptions,
-  UpdateOneRouteOptions,
-} from '@nestjsx/crud';
+
 import { CrudValidationOptions } from '../crud.types';
+
 import { CrudSerializationOptionsInterface } from './crud-serialization-options.interface';
 
 export interface CrudRouteOptionsInterface {

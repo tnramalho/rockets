@@ -1,4 +1,5 @@
 import { registerAs } from '@nestjs/config';
+
 import { EmailSettingsInterface } from '../interfaces/email-settings.interface';
 
 /**

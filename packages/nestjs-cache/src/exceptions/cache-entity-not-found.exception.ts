@@ -1,4 +1,5 @@
 import { RuntimeException } from '@concepta/nestjs-common';
+
 import { CacheException } from './cache.exception';
 
 export class CacheEntityNotFoundException extends CacheException {

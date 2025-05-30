@@ -1,4 +1,3 @@
-import { AuthPublic } from '@concepta/nestjs-authentication';
 import { Body, Controller, Patch, Post } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -7,6 +6,9 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+
+import { AuthPublic } from '@concepta/nestjs-authentication';
+
 import { AuthVerifyUpdateDto } from '../dto/auth-verify-update.dto';
 import { AuthVerifyDto } from '../dto/auth-verify.dto';
 import { AuthVerifyService } from '../services/auth-verify.service';

@@ -1,5 +1,6 @@
 import { InjectionToken } from '@nestjs/common';
 import { EntityClassOrSchema } from '@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type';
+
 import { CrudControllerOptionsInterface } from '../../interfaces/crud-controller-options.interface';
 import { CrudExtraDecoratorsInterface } from '../../interfaces/crud-extra-decorators.interface';
 import {

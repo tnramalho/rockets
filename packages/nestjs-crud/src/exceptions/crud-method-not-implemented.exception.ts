@@ -1,5 +1,7 @@
 import { Type } from '@nestjs/common';
+
 import { RuntimeExceptionOptions } from '@concepta/nestjs-common';
+
 import { CrudException } from './crud.exception';
 
 /**

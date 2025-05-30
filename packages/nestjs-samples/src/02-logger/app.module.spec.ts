@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AppModule } from './app.module';
+
 import { LoggerService } from '@concepta/nestjs-logger';
+
+import { AppModule } from './app.module';
 import { OrderController } from './order/order.controller';
 
 describe('AppModule', () => {

@@ -1,23 +1,27 @@
 import { randomUUID } from 'crypto';
-import { Test, TestingModule } from '@nestjs/testing';
+
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 import { getDataSourceToken } from '@nestjs/typeorm';
-import { RepositoryInterface } from '@concepta/nestjs-common';
+
 import {
+  RepositoryInterface,
   INVITATION_MODULE_CATEGORY_USER_KEY,
   getDynamicRepositoryToken,
+  UserEntityInterface,
 } from '@concepta/nestjs-common';
-import { UserEntityInterface } from '@concepta/nestjs-common';
 import { EmailService } from '@concepta/nestjs-email';
-import { SeedingSource } from '@concepta/typeorm-seeding';
 import { UserFactory } from '@concepta/nestjs-user/src/seeding';
+import { SeedingSource } from '@concepta/typeorm-seeding';
 
-import { INVITATION_MODULE_SETTINGS_TOKEN } from '../invitation.constants';
-import { InvitationSendService } from './invitation-send.service';
 import { InvitationSettingsInterface } from '../interfaces/options/invitation-settings.interface';
+import { INVITATION_MODULE_SETTINGS_TOKEN } from '../invitation.constants';
+
+import { InvitationSendService } from './invitation-send.service';
+
 import { AppModuleFixture } from '../__fixtures__/app.module.fixture';
-import { UserEntityFixture } from '../__fixtures__/user/entities/user.entity.fixture';
 import { UserOtpEntityFixture } from '../__fixtures__/user/entities/user-otp.entity.fixture';
+import { UserEntityFixture } from '../__fixtures__/user/entities/user.entity.fixture';
 
 describe(InvitationSendService, () => {
   let spyEmailService: jest.SpyInstance;

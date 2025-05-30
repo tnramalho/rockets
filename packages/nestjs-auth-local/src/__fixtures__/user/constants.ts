@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto';
+
 import { AuthLocalCredentialsInterface } from '../../interfaces/auth-local-credentials.interface';
 
 export const LOGIN_SUCCESS = {

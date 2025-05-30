@@ -8,17 +8,15 @@ import { ConfigModule } from '@nestjs/config';
 
 import { createSettingsProvider } from '@concepta/nestjs-common';
 
+import { emailSettingsConfig } from './config/email-settings.config';
 import {
   EMAIL_MODULE_SETTINGS_TOKEN,
   EMAIL_MODULE_MAILER_SERVICE_TOKEN,
 } from './email.constants';
-
-import { EmailOptionsInterface } from './interfaces/email-options.interface';
-import { EmailOptionsExtrasInterface } from './interfaces/email-options-extras.interface';
-import { EmailSettingsInterface } from './interfaces/email-settings.interface';
-
 import { EmailService } from './email.service';
-import { emailSettingsConfig } from './config/email-settings.config';
+import { EmailOptionsExtrasInterface } from './interfaces/email-options-extras.interface';
+import { EmailOptionsInterface } from './interfaces/email-options.interface';
+import { EmailSettingsInterface } from './interfaces/email-settings.interface';
 
 const RAW_OPTIONS_TOKEN = Symbol('__EMAIL_MODULE_RAW_OPTIONS_TOKEN__');
 

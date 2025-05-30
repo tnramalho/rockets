@@ -1,4 +1,5 @@
 import { Seeder } from '@concepta/typeorm-seeding';
+
 import { UserProfileFactory } from './user-profile.factory';
 
 /**

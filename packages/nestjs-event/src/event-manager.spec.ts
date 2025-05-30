@@ -1,9 +1,11 @@
 import EventEmitter2 from 'eventemitter2';
+
+import { Logger } from '@nestjs/common';
+
 import { EventManager } from './event-manager';
+import { EventException } from './exceptions/event.exception';
 import { EventDispatchService } from './services/event-dispatch.service';
 import { EventListenService } from './services/event-listen.service';
-import { EventException } from './exceptions/event.exception';
-import { Logger } from '@nestjs/common';
 
 describe(EventManager, () => {
   let emitterInstance: EventEmitter2;

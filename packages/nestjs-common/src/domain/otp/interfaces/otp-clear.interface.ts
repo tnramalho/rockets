@@ -1,4 +1,5 @@
 import { ReferenceAssignment } from '../../../reference/interfaces/reference.types';
+
 import { OtpInterface } from './otp.interface';
 
 export interface OtpClearInterface {

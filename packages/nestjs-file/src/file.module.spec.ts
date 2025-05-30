@@ -1,31 +1,30 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { DynamicModule, ModuleMetadata } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
 import {
   RepositoryInterface,
   getDynamicRepositoryToken,
+  FileEntityInterface,
 } from '@concepta/nestjs-common';
 import {
   TypeOrmExtModule,
   TypeOrmRepositoryAdapter,
 } from '@concepta/nestjs-typeorm-ext';
 
+import { FILE_MODULE_FILE_ENTITY_KEY } from './file.constants';
+import { FileModule } from './file.module';
 import { FileService } from './services/file.service';
 
-import { FILE_MODULE_FILE_ENTITY_KEY } from './file.constants';
-
-import { FileEntityInterface } from '@concepta/nestjs-common';
-
 import { AwsStorageService } from './__fixtures__/aws-storage.service';
-import { FileStorageModuleFixture } from './__fixtures__/file-storage.module.fixture';
-import { FileEntityFixture } from './__fixtures__/file/file-entity.fixture';
-import { UserEntityFixture } from './__fixtures__/user/entities/user.entity.fixture';
-import { FileModule } from './file.module';
 import {
   AWS_KEY_FIXTURE,
   DOWNLOAD_URL_FIXTURE,
   FILE_NAME_FIXTURE,
   UPLOAD_URL_FIXTURE,
 } from './__fixtures__/constants.fixture';
+import { FileEntityFixture } from './__fixtures__/file/file-entity.fixture';
+import { FileStorageModuleFixture } from './__fixtures__/file-storage.module.fixture';
+import { UserEntityFixture } from './__fixtures__/user/entities/user.entity.fixture';
 
 describe(FileModule, () => {
   let testModule: TestingModule;

@@ -1,6 +1,9 @@
 import { Exclude } from 'class-transformer';
+
 import { PickType } from '@nestjs/swagger';
+
 import { UserProfileCreatableInterface } from '@concepta/nestjs-common';
+
 import { UserProfileDto } from './user-profile.dto';
 
 /**

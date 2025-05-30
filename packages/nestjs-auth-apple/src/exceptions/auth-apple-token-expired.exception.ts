@@ -1,4 +1,5 @@
 import { RuntimeExceptionOptions } from '@concepta/nestjs-common';
+
 import { AuthAppleException } from './auth-apple-exception';
 
 export class AuthAppleTokenExpiredException extends AuthAppleException {

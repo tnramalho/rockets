@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn } from 'typeorm';
+
 import { ReferenceIdInterface } from '@concepta/nestjs-common';
 
 /**

@@ -4,6 +4,7 @@ import {
   Provider,
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+
 import {
   RepositoryInterface,
   createSettingsProvider,
@@ -16,24 +17,22 @@ import {
   PasswordStorageService,
 } from '@concepta/nestjs-password';
 
+import { userDefaultConfig } from './config/user-default.config';
+import { UserModelServiceInterface } from './interfaces/user-model-service.interface';
+import { UserOptionsExtrasInterface } from './interfaces/user-options-extras.interface';
+import { UserOptionsInterface } from './interfaces/user-options.interface';
+import { UserSettingsInterface } from './interfaces/user-settings.interface';
+import { InvitationAcceptedListener } from './listeners/invitation-accepted-listener';
+import { UserAccessQueryService } from './services/user-access-query.service';
+import { UserModelService } from './services/user-model.service';
+import { UserPasswordHistoryModelService } from './services/user-password-history-model.service';
+import { UserPasswordHistoryService } from './services/user-password-history.service';
+import { UserPasswordService } from './services/user-password.service';
 import {
   USER_MODULE_SETTINGS_TOKEN,
   USER_MODULE_USER_ENTITY_KEY,
   USER_MODULE_USER_PASSWORD_HISTORY_ENTITY_KEY,
 } from './user.constants';
-
-import { UserOptionsInterface } from './interfaces/user-options.interface';
-import { UserOptionsExtrasInterface } from './interfaces/user-options-extras.interface';
-import { UserSettingsInterface } from './interfaces/user-settings.interface';
-
-import { UserModelService } from './services/user-model.service';
-import { UserPasswordService } from './services/user-password.service';
-import { UserPasswordHistoryService } from './services/user-password-history.service';
-import { UserPasswordHistoryModelService } from './services/user-password-history-model.service';
-import { UserAccessQueryService } from './services/user-access-query.service';
-import { InvitationAcceptedListener } from './listeners/invitation-accepted-listener';
-import { userDefaultConfig } from './config/user-default.config';
-import { UserModelServiceInterface } from './interfaces/user-model-service.interface';
 
 const RAW_OPTIONS_TOKEN = Symbol('__USER_MODULE_RAW_OPTIONS_TOKEN__');
 

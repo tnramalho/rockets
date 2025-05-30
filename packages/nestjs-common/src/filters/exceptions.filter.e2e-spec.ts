@@ -1,7 +1,9 @@
 import supertest from 'supertest';
+
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
-import { HttpStatus, INestApplication } from '@nestjs/common';
+
 import { ExceptionsFilter } from './exceptions.filter';
 
 import { AppModuleFixture } from '../__fixtures__/exceptions/app.module.fixture';

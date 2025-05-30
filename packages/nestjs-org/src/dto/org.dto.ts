@@ -6,13 +6,17 @@ import {
   IsUUID,
   ValidateNested,
 } from 'class-validator';
+
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
 import {
   OrgProfileInterface,
   ReferenceIdInterface,
+  OrgInterface,
+  CommonEntityDto,
+  ReferenceIdDto,
 } from '@concepta/nestjs-common';
-import { OrgInterface } from '@concepta/nestjs-common';
-import { CommonEntityDto, ReferenceIdDto } from '@concepta/nestjs-common';
+
 import { OrgProfileDto } from './profile/org-profile.dto';
 
 /**

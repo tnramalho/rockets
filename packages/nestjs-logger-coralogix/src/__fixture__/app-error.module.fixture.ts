@@ -1,10 +1,14 @@
-import { LogLevel, Module } from '@nestjs/common';
-import { AppControllerFixture } from './app.controller.fixture';
-import { LoggerCoralogixModule } from '../logger-coralogix.module';
 import { Severity } from 'coralogix-logger';
+
+import { LogLevel, Module } from '@nestjs/common';
+
 import { LoggerModule } from '@concepta/nestjs-logger';
+
+import { LoggerCoralogixModule } from '../logger-coralogix.module';
 import { LoggerCoralogixTransport } from '../transports/logger-coralogix.transport';
 import { formatMessage } from '../utils';
+
+import { AppControllerFixture } from './app.controller.fixture';
 @Module({
   controllers: [AppControllerFixture],
   imports: [

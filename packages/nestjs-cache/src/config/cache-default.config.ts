@@ -1,4 +1,5 @@
 import { registerAs } from '@nestjs/config';
+
 import { CACHE_MODULE_DEFAULT_SETTINGS_TOKEN } from '../cache.constants';
 import { CacheSettingsInterface } from '../interfaces/cache-settings.interface';
 

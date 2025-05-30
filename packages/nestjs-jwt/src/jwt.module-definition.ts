@@ -4,23 +4,23 @@ import {
   Provider,
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { createSettingsProvider } from '@concepta/nestjs-common';
-import { NestJwtModule } from './jwt.externals';
 
+import { createSettingsProvider } from '@concepta/nestjs-common';
+
+import { jwtDefaultConfig } from './config/jwt-default.config';
+import { JwtOptionsExtrasInterface } from './interfaces/jwt-options-extras.interface';
+import { JwtOptionsInterface } from './interfaces/jwt-options.interface';
+import { JwtServiceInterface } from './interfaces/jwt-service.interface';
+import { JwtSettingsInterface } from './interfaces/jwt-settings.interface';
 import {
   JWT_MODULE_SETTINGS_TOKEN,
   JwtAccessService,
   JwtRefreshService,
 } from './jwt.constants';
-
-import { JwtOptionsExtrasInterface } from './interfaces/jwt-options-extras.interface';
-import { jwtDefaultConfig } from './config/jwt-default.config';
-import { JwtSettingsInterface } from './interfaces/jwt-settings.interface';
-import { JwtOptionsInterface } from './interfaces/jwt-options.interface';
-import { JwtServiceInterface } from './interfaces/jwt-service.interface';
-import { JwtService } from './services/jwt.service';
+import { NestJwtModule } from './jwt.externals';
 import { JwtIssueTokenService } from './services/jwt-issue-token.service';
 import { JwtVerifyTokenService } from './services/jwt-verify-token.service';
+import { JwtService } from './services/jwt.service';
 
 const RAW_OPTIONS_TOKEN = Symbol('__JWT_MODULE_RAW_OPTIONS_TOKEN__');
 

@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { Order } from './entities/order.entity';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { Inject } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
+
 import { LoggerService } from '@concepta/nestjs-logger';
+
+import { CreateOrderDto } from './dto/create-order.dto';
+import { Order } from './entities/order.entity';
 
 @Injectable()
 export class OrderService {

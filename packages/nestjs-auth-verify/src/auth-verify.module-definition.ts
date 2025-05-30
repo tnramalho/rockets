@@ -13,14 +13,13 @@ import {
   AuthVerifyOtpService,
   AuthVerifyUserModelService,
 } from './auth-verify.constants';
-
-import { AuthVerifyOptionsInterface } from './interfaces/auth-verify-options.interface';
-import { AuthVerifyOptionsExtrasInterface } from './interfaces/auth-verify-options-extras.interface';
-import { AuthVerifySettingsInterface } from './interfaces/auth-verify-settings.interface';
 import { authVerifyDefaultConfig } from './config/auth-verify-default.config';
-import { AuthVerifyService } from './services/auth-verify.service';
-import { AuthVerifyNotificationService } from './services/auth-verify-notification.service';
 import { AuthVerifyEmailServiceInterface } from './interfaces/auth-verify-email.service.interface';
+import { AuthVerifyOptionsExtrasInterface } from './interfaces/auth-verify-options-extras.interface';
+import { AuthVerifyOptionsInterface } from './interfaces/auth-verify-options.interface';
+import { AuthVerifySettingsInterface } from './interfaces/auth-verify-settings.interface';
+import { AuthVerifyNotificationService } from './services/auth-verify-notification.service';
+import { AuthVerifyService } from './services/auth-verify.service';
 
 const RAW_OPTIONS_TOKEN = Symbol('__AUTH_VERIFY_MODULE_RAW_OPTIONS_TOKEN__');
 

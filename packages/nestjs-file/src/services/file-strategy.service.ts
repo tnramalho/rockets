@@ -1,8 +1,9 @@
 import { FileCreatableInterface } from '@concepta/nestjs-common';
-import { FileStrategyServiceInterface } from '../interfaces/file-strategy-service.interface';
-import { FileStorageServiceInterface } from '../interfaces/file-storage-service.interface';
-import { FileStorageServiceNotFoundException } from '../exceptions/file-storage-service-not-found.exception';
+
 import { FileDownloadUrlMissingException } from '../exceptions/file-download-url-missing.exception';
+import { FileStorageServiceNotFoundException } from '../exceptions/file-storage-service-not-found.exception';
+import { FileStorageServiceInterface } from '../interfaces/file-storage-service.interface';
+import { FileStrategyServiceInterface } from '../interfaces/file-strategy-service.interface';
 
 export class FileStrategyService implements FileStrategyServiceInterface {
   private readonly storageServices: FileStorageServiceInterface[] = [];

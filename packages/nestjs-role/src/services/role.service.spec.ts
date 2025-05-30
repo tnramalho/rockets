@@ -1,16 +1,20 @@
-import { CrudModule } from '@concepta/nestjs-crud';
-import {
-  TypeOrmExtModule,
-  TypeOrmRepositoryAdapter,
-} from '@concepta/nestjs-typeorm-ext';
+import { Test, TestingModule } from '@nestjs/testing';
+import { getDataSourceToken } from '@nestjs/typeorm';
+
 import {
   ReferenceIdInterface,
   RepositoryInterface,
   getDynamicRepositoryToken,
 } from '@concepta/nestjs-common';
+import { CrudModule } from '@concepta/nestjs-crud';
+import {
+  TypeOrmExtModule,
+  TypeOrmRepositoryAdapter,
+} from '@concepta/nestjs-typeorm-ext';
 import { SeedingSource } from '@concepta/typeorm-seeding';
-import { Test, TestingModule } from '@nestjs/testing';
-import { getDataSourceToken } from '@nestjs/typeorm';
+
+import { RoleAssignmentConflictException } from '../exceptions/role-assignment-conflict.exception';
+import { RoleFactory } from '../role.factory';
 import { RoleModule } from '../role.module';
 import { RoleService } from '../services/role.service';
 
@@ -21,8 +25,6 @@ import { UserEntityFixture } from '../__fixtures__/entities/user-entity.fixture'
 import { UserRoleEntityFixture } from '../__fixtures__/entities/user-role-entity.fixture';
 import { UserRoleFactoryFixture } from '../__fixtures__/factories/user-role.factory.fixture';
 import { UserFactoryFixture } from '../__fixtures__/factories/user.factory.fixture';
-import { RoleAssignmentConflictException } from '../exceptions/role-assignment-conflict.exception';
-import { RoleFactory } from '../role.factory';
 
 describe('RoleModule', () => {
   let testModule: TestingModule;

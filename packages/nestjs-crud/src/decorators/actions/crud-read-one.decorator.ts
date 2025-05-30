@@ -1,4 +1,5 @@
 import { applyDecorators, Get } from '@nestjs/common';
+
 import { CRUD_MODULE_ROUTE_ID_DEFAULT_PATH } from '../../crud.constants';
 import { CrudActions } from '../../crud.enums';
 import { CrudReadOneOptionsInterface } from '../../interfaces/crud-route-options.interface';

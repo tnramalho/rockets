@@ -7,19 +7,17 @@ import { ConfigModule } from '@nestjs/config';
 
 import { createSettingsProvider } from '@concepta/nestjs-common';
 
+import { reportDefaultConfig } from './config/report-default.config';
+import { ReportOptionsExtrasInterface } from './interfaces/report-options-extras.interface';
+import { ReportOptionsInterface } from './interfaces/report-options.interface';
+import { ReportSettingsInterface } from './interfaces/report-settings.interface';
 import {
   REPORT_MODULE_SETTINGS_TOKEN,
   REPORT_STRATEGY_SERVICE_KEY,
 } from './report.constants';
-
-import { ReportOptionsInterface } from './interfaces/report-options.interface';
-import { ReportOptionsExtrasInterface } from './interfaces/report-options-extras.interface';
-import { ReportSettingsInterface } from './interfaces/report-settings.interface';
-import { ReportService } from './services/report.service';
-import { ReportStrategyService } from './services/report-strategy.service';
-
-import { reportDefaultConfig } from './config/report-default.config';
 import { ReportModelService } from './services/report-model.service';
+import { ReportStrategyService } from './services/report-strategy.service';
+import { ReportService } from './services/report.service';
 
 const RAW_OPTIONS_TOKEN = Symbol('__REPORT_MODULE_RAW_OPTIONS_TOKEN__');
 

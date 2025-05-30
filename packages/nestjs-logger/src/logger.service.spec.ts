@@ -1,15 +1,16 @@
+import supertest from 'supertest';
+
 import {
   ConsoleLogger,
   INestApplication,
   NotFoundException,
 } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { LoggerTransportInterface } from './interfaces/logger-transport.interface';
 
+import { AppModuleFixture } from './__fixture__/app.module.fixture';
+import { LoggerTransportInterface } from './interfaces/logger-transport.interface';
 import { LoggerTransportService } from './logger-transport.service';
 import { LoggerService } from './logger.service';
-import { AppModuleFixture } from './__fixture__/app.module.fixture';
-import supertest from 'supertest';
 
 describe('LoggerService', () => {
   let loggerService: LoggerService;

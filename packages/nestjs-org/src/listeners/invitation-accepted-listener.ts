@@ -1,13 +1,14 @@
-import { EventAsyncInterface, EventListenerOn } from '@concepta/nestjs-event';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+
 import {
   INVITATION_MODULE_CATEGORY_ORG_KEY,
   InvitationAcceptedEventPayloadInterface,
 } from '@concepta/nestjs-common';
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { EventAsyncInterface, EventListenerOn } from '@concepta/nestjs-event';
 
-import { ORG_MODULE_SETTINGS_TOKEN } from '../org.constants';
-import { OrgSettingsInterface } from '../interfaces/org-settings.interface';
 import { OrgMemberException } from '../exceptions/org-member.exception';
+import { OrgSettingsInterface } from '../interfaces/org-settings.interface';
+import { ORG_MODULE_SETTINGS_TOKEN } from '../org.constants';
 import { OrgMemberService } from '../services/org-member.service';
 
 @Injectable()

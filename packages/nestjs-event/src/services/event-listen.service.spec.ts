@@ -1,15 +1,18 @@
 import { EventEmitter2 } from 'eventemitter2';
+
 import { Test } from '@nestjs/testing';
+
 import {
   EVENT_MODULE_EMITTER_SERVICE_TOKEN,
   EVENT_MODULE_SETTINGS_TOKEN,
 } from '../event-constants';
 import { Event } from '../events/event';
-import { EventListenerOn } from '../listeners/event-listener-on';
-import { EventListenService } from './event-listen.service';
 import { EventAsync } from '../events/event-async';
 import { EventListenException } from '../exceptions/event-listen.exception';
 import { EventSettingsInterface } from '../interfaces/event-settings.interface';
+import { EventListenerOn } from '../listeners/event-listener-on';
+
+import { EventListenService } from './event-listen.service';
 
 describe(EventListenService, () => {
   const settings: EventSettingsInterface = {};

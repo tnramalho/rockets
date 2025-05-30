@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { JwtModule } from './jwt.module';
-import { JwtService } from './services/jwt.service';
-import { JwtVerifyTokenService } from './services/jwt-verify-token.service';
-import { JwtIssueTokenService } from './services/jwt-issue-token.service';
 import { JwtSettingsInterface } from './interfaces/jwt-settings.interface';
 import {
   JWT_MODULE_SETTINGS_TOKEN,
   JwtAccessService,
   JwtRefreshService,
 } from './jwt.constants';
+import { JwtModule } from './jwt.module';
+import { JwtIssueTokenService } from './services/jwt-issue-token.service';
+import { JwtVerifyTokenService } from './services/jwt-verify-token.service';
+import { JwtService } from './services/jwt.service';
 
 describe(JwtModule, () => {
   let jwtModule: JwtModule;

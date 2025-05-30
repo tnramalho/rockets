@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+
 import {
   ReferenceAssignment,
   ReferenceIdInterface,
@@ -6,18 +7,19 @@ import {
   ModelQueryException,
   RoleAssignmentEntityInterface,
 } from '@concepta/nestjs-common';
-import { RoleEntityNotFoundException } from '../exceptions/role-entity-not-found.exception';
-import { RoleAssignmentNotFoundException } from '../exceptions/role-assignment-not-found.exception';
+
 import { RoleAssignmentConflictException } from '../exceptions/role-assignment-conflict.exception';
+import { RoleAssignmentNotFoundException } from '../exceptions/role-assignment-not-found.exception';
+import { RoleEntityNotFoundException } from '../exceptions/role-entity-not-found.exception';
+import { RoleAssignmentContext } from '../interfaces/role-assignment-context';
+import { RoleAssignmentOptionsInterface } from '../interfaces/role-assignment-options.interface';
+import { RoleServiceInterface } from '../interfaces/role-service.interface';
+import { RoleSettingsInterface } from '../interfaces/role-settings.interface';
+import { RolesAssignmentOptionsInterface } from '../interfaces/roles-assignment-options.interface';
 import {
   ROLE_MODULE_REPOSITORIES_TOKEN,
   ROLE_MODULE_SETTINGS_TOKEN,
 } from '../role.constants';
-import { RoleSettingsInterface } from '../interfaces/role-settings.interface';
-import { RoleServiceInterface } from '../interfaces/role-service.interface';
-import { RoleAssignmentOptionsInterface } from '../interfaces/role-assignment-options.interface';
-import { RolesAssignmentOptionsInterface } from '../interfaces/roles-assignment-options.interface';
-import { RoleAssignmentContext } from '../interfaces/role-assignment-context';
 
 @Injectable()
 export class RoleService implements RoleServiceInterface {
