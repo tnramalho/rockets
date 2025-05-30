@@ -10,36 +10,6 @@
 
 export namespace RepositoryInternals {
   /**
-   * A single property handler for FindOptionsSelect.
-   */
-  export type FindOptionsSelectProperty<Property> = Property extends Promise<
-    infer I
-  >
-    ? FindOptionsSelectProperty<I> | boolean
-    : Property extends Array<infer I>
-    ? FindOptionsSelectProperty<I> | boolean
-    : Property extends string
-    ? boolean
-    : Property extends number
-    ? boolean
-    : Property extends boolean
-    ? boolean
-    : Property extends Function
-    ? never
-    : Property extends Date
-    ? boolean
-    : Property extends object
-    ? FindOptionsSelect<Property>
-    : boolean;
-  /**
-   * Select find options.
-   */
-  export type FindOptionsSelect<Entity> = {
-    [P in keyof Entity]?: P extends 'toString'
-      ? unknown
-      : FindOptionsSelectProperty<NonNullable<Entity[P]>>;
-  };
-  /**
    * A single property handler for FindOptionsOrder.
    */
   export type FindOptionsOrderProperty<Property> = Property extends Promise<
@@ -145,17 +115,6 @@ export namespace RepositoryInternals {
      * This data can be used in subscribers then.
      */
     data?: any;
-  }
-
-  /**
-   * Result object returned by DeleteQueryBuilder execution.
-   */
-  export declare class DeleteResult {
-    /**
-     * Number of affected rows/documents
-     * Not all drivers support this
-     */
-    affected?: number | null;
   }
 
   /**
