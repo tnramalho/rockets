@@ -1,4 +1,4 @@
-import { CrudSoftDelete } from '../../decorators/routes/crud-soft-delete.decorator';
+import { CrudSoftDelete } from '../../crud/decorators/routes/crud-soft-delete.decorator';
 import { ConfigurableCrudBuilder } from '../../util/configurable-crud.builder';
 import { PhotoCreateManyDtoFixture } from '../photo/dto/photo-create-many.dto.fixture';
 import { PhotoCreateDtoFixture } from '../photo/dto/photo-create.dto.fixture';

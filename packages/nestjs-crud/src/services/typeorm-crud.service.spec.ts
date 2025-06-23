@@ -1,17 +1,18 @@
-import { CreateManyDto, CrudRequest } from '@nestjsx/crud';
-import { TypeOrmCrudService as JsxTypeOrmCrudService } from '@nestjsx/crud-typeorm/lib/typeorm-crud.service';
 import { mock } from 'jest-mock-extended';
 import { Repository } from 'typeorm';
 
 import { Type } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 
-import { CrudQueryOptionsInterface } from '../interfaces/crud-query-options.interface';
-import { CrudQueryHelper } from '../util/crud-query.helper';
+import { CrudCreateManyInterface } from '../crud/interfaces/crud-create-many.interface';
+import { CrudRequestInterface } from '../crud/interfaces/crud-request.interface';
+import { CrudServiceQueryOptionsInterface } from '../crud/interfaces/crud-service-query-options.interface';
 
+import { CrudQueryHelper } from './helpers/crud-query.helper';
 import { TypeOrmCrudService } from './typeorm-crud.service';
+import { xTypeOrmCrudService } from './x-typeorm-crud.service';
 
-jest.mock('@nestjsx/crud-typeorm/lib/typeorm-crud.service');
+jest.mock('./x-typeorm-crud.service');
 
 describe('TypeOrmService', () => {
   // fake entity/repo
@@ -22,8 +23,8 @@ describe('TypeOrmService', () => {
   class TestOrmService extends TypeOrmCrudService<Thing> {}
 
   let ormService: TestOrmService;
-  let mockRequest: CrudRequest;
-  let mockOverrides: CrudQueryOptionsInterface;
+  let mockRequest: CrudRequestInterface;
+  let mockOverrides: CrudServiceQueryOptionsInterface;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -39,7 +40,7 @@ describe('TypeOrmService', () => {
     mockRequest = {
       options: { query: { alwaysPaginate: true } },
       parsed: { search: { name: 'apple' } },
-    } as unknown as CrudRequest;
+    } as unknown as CrudRequestInterface;
 
     mockOverrides = {
       filter: { name: 'pear' },
@@ -62,7 +63,7 @@ describe('TypeOrmService', () => {
     it.each(crudMethods)(
       '%s should use custom options',
       async (crudMethod: SingleArg) => {
-        const spy = jest.spyOn(JsxTypeOrmCrudService.prototype, crudMethod);
+        const spy = jest.spyOn(xTypeOrmCrudService.prototype, crudMethod);
 
         await ormService[crudMethod](mockRequest, mockOverrides);
 
@@ -94,9 +95,9 @@ describe('TypeOrmService', () => {
     it.each(crudMethods)(
       '%s should use custom options',
       async (crudMethod: DoubleArg) => {
-        const spy = jest.spyOn(JsxTypeOrmCrudService.prototype, crudMethod);
+        const spy = jest.spyOn(xTypeOrmCrudService.prototype, crudMethod);
 
-        let dto: Type<Thing> | CreateManyDto<Type<Thing>>;
+        let dto: Type<Thing> | CrudCreateManyInterface<Type<Thing>>;
 
         if (crudMethod === 'createMany') {
           dto = { bulk: [class extends Thing {}] };

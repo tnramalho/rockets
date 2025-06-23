@@ -1,6 +1,6 @@
-import { CrudSoftDelete } from '../../decorators/routes/crud-soft-delete.decorator';
-import { CrudCreateManyInterface } from '../../interfaces/crud-create-many.interface';
-import { CrudRequestInterface } from '../../interfaces/crud-request.interface';
+import { CrudSoftDelete } from '../../crud/decorators/routes/crud-soft-delete.decorator';
+import { CrudCreateManyInterface } from '../../crud/interfaces/crud-create-many.interface';
+import { CrudRequestInterface } from '../../crud/interfaces/crud-request.interface';
 import { ConfigurableCrudBuilder } from '../../util/configurable-crud.builder';
 import { PhotoCreateManyDtoFixture } from '../photo/dto/photo-create-many.dto.fixture';
 import { PhotoCreateDtoFixture } from '../photo/dto/photo-create.dto.fixture';

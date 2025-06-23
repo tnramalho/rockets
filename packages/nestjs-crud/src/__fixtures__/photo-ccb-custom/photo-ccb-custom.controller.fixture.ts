@@ -1,10 +1,10 @@
 import { Inject } from '@nestjs/common';
 
-import { CrudBaseController } from '../../controllers/crud-base.controller';
-import { CrudBody } from '../../decorators/params/crud-body.decorator';
-import { CrudRequest } from '../../decorators/params/crud-request.decorator';
-import { CrudSoftDelete } from '../../decorators/routes/crud-soft-delete.decorator';
-import { CrudRequestInterface } from '../../interfaces/crud-request.interface';
+import { CrudBaseController } from '../../crud/controllers/crud-base.controller';
+import { CrudBody } from '../../crud/decorators/params/crud-body.decorator';
+import { CrudRequest } from '../../crud/decorators/params/crud-request.decorator';
+import { CrudSoftDelete } from '../../crud/decorators/routes/crud-soft-delete.decorator';
+import { CrudRequestInterface } from '../../crud/interfaces/crud-request.interface';
 import { TypeOrmCrudService } from '../../services/typeorm-crud.service';
 import { ConfigurableCrudBuilder } from '../../util/configurable-crud.builder';
 import { PhotoCreateManyDtoFixture } from '../photo/dto/photo-create-many.dto.fixture';

@@ -12,21 +12,21 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { DeepPartial, InjectDynamicRepository } from '@concepta/nestjs-common';
 
-import { CrudBaseController } from '../controllers/crud-base.controller';
+import { CrudBaseController } from '../crud/controllers/crud-base.controller';
+import { CrudCreateMany } from '../crud/decorators/actions/crud-create-many.decorator';
+import { CrudCreateOne } from '../crud/decorators/actions/crud-create-one.decorator';
+import { CrudDeleteOne } from '../crud/decorators/actions/crud-delete-one.decorator';
+import { CrudGetMany } from '../crud/decorators/actions/crud-get-many.decorator';
+import { CrudGetOne } from '../crud/decorators/actions/crud-get-one.decorator';
+import { CrudRecoverOne } from '../crud/decorators/actions/crud-recover-one.decorator';
+import { CrudReplaceOne } from '../crud/decorators/actions/crud-replace-one.decorator';
+import { CrudUpdateOne } from '../crud/decorators/actions/crud-update-one.decorator';
+import { CrudController } from '../crud/decorators/controller/crud-controller.decorator';
+import { CrudBody } from '../crud/decorators/params/crud-body.decorator';
+import { CrudRequest } from '../crud/decorators/params/crud-request.decorator';
+import { CrudCreateManyInterface } from '../crud/interfaces/crud-create-many.interface';
+import { CrudRequestInterface } from '../crud/interfaces/crud-request.interface';
 import { ConfigurableCrudOptionsTransformer } from '../crud.types';
-import { CrudCreateMany } from '../decorators/actions/crud-create-many.decorator';
-import { CrudCreateOne } from '../decorators/actions/crud-create-one.decorator';
-import { CrudDeleteOne } from '../decorators/actions/crud-delete-one.decorator';
-import { CrudGetMany } from '../decorators/actions/crud-get-many.decorator';
-import { CrudGetOne } from '../decorators/actions/crud-get-one.decorator';
-import { CrudRecoverOne } from '../decorators/actions/crud-recover-one.decorator';
-import { CrudReplaceOne } from '../decorators/actions/crud-replace-one.decorator';
-import { CrudUpdateOne } from '../decorators/actions/crud-update-one.decorator';
-import { CrudController } from '../decorators/controller/crud-controller.decorator';
-import { CrudBody } from '../decorators/params/crud-body.decorator';
-import { CrudRequest } from '../decorators/params/crud-request.decorator';
-import { CrudCreateManyInterface } from '../interfaces/crud-create-many.interface';
-import { CrudRequestInterface } from '../interfaces/crud-request.interface';
 import { TypeOrmCrudService } from '../services/typeorm-crud.service';
 
 import { ConfigurableCrudDecorators } from './interfaces/configurable-crud-decorators.interface';
@@ -241,7 +241,11 @@ export class ConfigurableCrudBuilder<
         crudRequest: CrudRequestInterface,
         createManyDto: CrudCreateManyInterface<Creatable>,
       ) {
-        return this.crudService.createMany(crudRequest, createManyDto);
+        return this.crudService.createMany(crudRequest, {
+          ...createManyDto,
+          // TODO: this cast is a temporary workaround
+          bulk: createManyDto.bulk as (Entity | Partial<Entity>)[],
+        });
       };
 
       CrudCreateMany(
@@ -262,7 +266,11 @@ export class ConfigurableCrudBuilder<
         crudRequest: CrudRequestInterface,
         createDto: Creatable,
       ) {
-        return this.crudService.createOne(crudRequest, createDto);
+        return this.crudService.createOne(
+          crudRequest,
+          // TODO: this cast is a temporary workaround
+          createDto as Entity | Partial<Entity>,
+        );
       };
 
       CrudCreateOne(
@@ -283,7 +291,11 @@ export class ConfigurableCrudBuilder<
         crudRequest: CrudRequestInterface,
         updateDto: Updatable,
       ) {
-        return this.crudService.updateOne(crudRequest, updateDto);
+        return this.crudService.updateOne(
+          crudRequest,
+          // TODO: this cast is a temporary workaround
+          updateDto as Entity | Partial<Entity>,
+        );
       };
 
       CrudUpdateOne(
@@ -304,7 +316,11 @@ export class ConfigurableCrudBuilder<
         crudRequest: CrudRequestInterface,
         replaceDto: Replaceable,
       ) {
-        return this.crudService.replaceOne(crudRequest, replaceDto);
+        return this.crudService.replaceOne(
+          crudRequest,
+          // TODO: this cast is a temporary workaround
+          replaceDto as Entity | Partial<Entity>,
+        );
       };
 
       CrudReplaceOne(

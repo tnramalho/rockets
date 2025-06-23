@@ -1,14 +1,14 @@
-import { CrudRequest, JoinOptions, QueryOptions } from '@nestjsx/crud';
-import { ParsedRequestParams, QueryJoin } from '@nestjsx/crud-request';
-import { TypeOrmCrudService as xTypeOrmCrudService } from '@nestjsx/crud-typeorm';
-import { ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm';
+import { ObjectLiteral, Repository } from 'typeorm';
 
 import { Injectable } from '@nestjs/common';
 
+import { CrudRequestInterface } from '../crud/interfaces/crud-request.interface';
+import { CrudResponsePaginatedInterface } from '../crud/interfaces/crud-response-paginated.interface';
+import { CrudServiceQueryOptionsInterface } from '../crud/interfaces/crud-service-query-options.interface';
 import { CrudQueryException } from '../exceptions/crud-query.exception';
-import { CrudQueryOptionsInterface } from '../interfaces/crud-query-options.interface';
-import { CrudResponsePaginatedInterface } from '../interfaces/crud-response-paginated.interface';
-import { CrudQueryHelper } from '../util/crud-query.helper';
+
+import { CrudQueryHelper } from './helpers/crud-query.helper';
+import { xTypeOrmCrudService } from './x-typeorm-crud.service';
 
 // TODO: TYPEORM - review what to do
 @Injectable()
@@ -22,8 +22,8 @@ export class TypeOrmCrudService<
   protected readonly crudQueryHelper: CrudQueryHelper = new CrudQueryHelper();
 
   async getMany(
-    req: CrudRequest,
-    queryOptions?: CrudQueryOptionsInterface,
+    req: CrudRequestInterface,
+    queryOptions?: CrudServiceQueryOptionsInterface,
   ): Promise<T[] | CrudResponsePaginatedInterface<T>> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
@@ -51,8 +51,8 @@ export class TypeOrmCrudService<
   }
 
   async getOne(
-    req: CrudRequest,
-    queryOptions?: CrudQueryOptionsInterface,
+    req: CrudRequestInterface,
+    queryOptions?: CrudServiceQueryOptionsInterface,
   ): ReturnType<xTypeOrmCrudService<T>['getOne']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
@@ -67,9 +67,9 @@ export class TypeOrmCrudService<
   }
 
   async createMany(
-    req: CrudRequest,
+    req: CrudRequestInterface,
     dto: Parameters<xTypeOrmCrudService<T>['createMany']>[1],
-    queryOptions?: CrudQueryOptionsInterface,
+    queryOptions?: CrudServiceQueryOptionsInterface,
   ): ReturnType<xTypeOrmCrudService<T>['createMany']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
@@ -84,9 +84,9 @@ export class TypeOrmCrudService<
   }
 
   async createOne(
-    req: CrudRequest,
+    req: CrudRequestInterface,
     dto: Parameters<xTypeOrmCrudService<T>['createOne']>[1],
-    queryOptions?: CrudQueryOptionsInterface,
+    queryOptions?: CrudServiceQueryOptionsInterface,
   ): ReturnType<xTypeOrmCrudService<T>['createOne']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
@@ -101,9 +101,9 @@ export class TypeOrmCrudService<
   }
 
   async updateOne(
-    req: CrudRequest,
+    req: CrudRequestInterface,
     dto: Parameters<xTypeOrmCrudService<T>['updateOne']>[1],
-    queryOptions?: CrudQueryOptionsInterface,
+    queryOptions?: CrudServiceQueryOptionsInterface,
   ): ReturnType<xTypeOrmCrudService<T>['updateOne']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
@@ -118,9 +118,9 @@ export class TypeOrmCrudService<
   }
 
   async replaceOne(
-    req: CrudRequest,
+    req: CrudRequestInterface,
     dto: Parameters<xTypeOrmCrudService<T>['replaceOne']>[1],
-    queryOptions?: CrudQueryOptionsInterface,
+    queryOptions?: CrudServiceQueryOptionsInterface,
   ): ReturnType<xTypeOrmCrudService<T>['replaceOne']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
@@ -135,8 +135,8 @@ export class TypeOrmCrudService<
   }
 
   async deleteOne(
-    req: CrudRequest,
-    queryOptions?: CrudQueryOptionsInterface,
+    req: CrudRequestInterface,
+    queryOptions?: CrudServiceQueryOptionsInterface,
   ): ReturnType<xTypeOrmCrudService<T>['deleteOne']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
@@ -151,8 +151,8 @@ export class TypeOrmCrudService<
   }
 
   async recoverOne(
-    req: CrudRequest,
-    queryOptions?: CrudQueryOptionsInterface,
+    req: CrudRequestInterface,
+    queryOptions?: CrudServiceQueryOptionsInterface,
   ): ReturnType<xTypeOrmCrudService<T>['recoverOne']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
@@ -164,75 +164,5 @@ export class TypeOrmCrudService<
         originalError: e,
       });
     }
-  }
-
-  protected setJoin(
-    cond: QueryJoin,
-    joinOptions: JoinOptions,
-    builder: SelectQueryBuilder<T>,
-  ): ReturnType<xTypeOrmCrudService<T>['setJoin']> {
-    const options = joinOptions[cond.field];
-
-    if (!options) {
-      return true;
-    }
-
-    const allowedRelation = this.getRelationMetadata(cond.field, options);
-
-    if (!allowedRelation) {
-      return true;
-    }
-
-    const relationType = options.required ? 'innerJoin' : 'leftJoin';
-    const alias = options.alias ? options.alias : allowedRelation.name;
-
-    builder[relationType](allowedRelation.path, alias);
-
-    if (options.select !== false) {
-      const columns =
-        Array.isArray(cond.select) && cond.select?.length
-          ? cond.select.filter((column) =>
-              allowedRelation.allowedColumns.some(
-                (allowed) => allowed === column,
-              ),
-            )
-          : allowedRelation.allowedColumns;
-
-      const select = new Set(
-        [
-          ...allowedRelation.primaryColumns,
-          ...(Array.isArray(options.persist) && options.persist?.length
-            ? options.persist
-            : []),
-          ...columns,
-        ].map((col) => `${alias}.${col}`),
-      );
-
-      builder.addSelect(Array.from(select));
-    }
-
-    return true;
-  }
-
-  protected getSelect(
-    query: ParsedRequestParams,
-    options: QueryOptions,
-  ): string[] {
-    const allowed = this.getAllowedColumns(this.entityColumns, options);
-
-    const columns =
-      query.fields && query.fields.length
-        ? query.fields.filter((field) => allowed.some((col) => field === col))
-        : allowed;
-
-    const select = new Set(
-      [
-        ...(options.persist && options.persist.length ? options.persist : []),
-        ...columns,
-        ...this.entityPrimaryColumns,
-      ].map((col) => `${this.alias}.${col}`),
-    );
-
-    return Array.from(select);
   }
 }
