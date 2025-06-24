@@ -1,4 +1,4 @@
-import { Controller, Inject, Get, UseGuards } from '@nestjs/common';
+import { Controller, Inject, Get, UseGuards, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 import {
@@ -35,6 +35,17 @@ export class OAuthControllerFixture {
   })
   @Get('callback')
   async callback(@AuthUser() user: AuthenticatedUserInterface) {
+    return {
+      ok: 'success',
+    };
+  }
+
+  @ApiOkResponse({
+    type: AuthenticationJwtResponseDto,
+    description: 'DTO containing an access token and a refresh token.',
+  })
+  @Post('callback')
+  async postCallback(@AuthUser() user: AuthenticatedUserInterface) {
     return {
       ok: 'success',
     };

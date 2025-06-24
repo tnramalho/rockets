@@ -17,6 +17,7 @@ import {
   OAUTH_MODULE_GUARDS_TOKEN,
 } from './oauth.constants';
 import { OAuthGuardsRecord } from './oauth.types';
+import { AuthGuardInterface } from '@concepta/nestjs-authentication';
 
 const RAW_OPTIONS_TOKEN = Symbol('__AUTH_OAUTH_MODULE_RAW_OPTIONS_TOKEN__');
 
@@ -69,7 +70,7 @@ export function createOAuthExports(extras?: OAuthOptionsExtrasInterface) {
   return [
     AUTH_OAUTH_MODULE_SETTINGS_TOKEN,
     OAUTH_MODULE_GUARDS_TOKEN,
-    ...(extras?.oAuthGuards?.map((config) => config.guard) ?? []),
+    //...(extras?.oAuthGuards?.map((config) => config.guard) ?? []),
   ];
 }
 
@@ -80,12 +81,12 @@ export function createOAuthProviders(options: {
 }): Provider[] {
   return [
     ...(options.providers ?? []),
-    createOAuthOptionsProvider(options.overrides),
+    createOAuthSettingsProvider(options.overrides),
     ...createOAuthGuardsProvider(options.extras),
   ];
 }
 
-export function createOAuthOptionsProvider(
+export function createOAuthSettingsProvider(
   optionsOverrides?: OAuthOptions,
 ): Provider {
   return createSettingsProvider<OAuthSettingsInterface, OAuthOptionsInterface>({
@@ -119,7 +120,7 @@ export function createOAuthGuardsProvider(
     {
       provide: OAUTH_MODULE_GUARDS_TOKEN,
       inject: guardsToInject,
-      useFactory: (...args: CanActivate[]): OAuthGuardsRecord => {
+      useFactory: (...args: AuthGuardInterface[]): OAuthGuardsRecord => {
         const guardInstances: OAuthGuardsRecord = {};
 
         for (const guardConfig of oAuthGuards) {

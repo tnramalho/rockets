@@ -1,3 +1,3 @@
-import { CanActivate } from '@nestjs/common';
+import { AuthGuardInterface } from '@concepta/nestjs-authentication';
 
-export type OAuthGuardsRecord = Record<string, CanActivate>;
+export type OAuthGuardsRecord = Record<string, AuthGuardInterface>;

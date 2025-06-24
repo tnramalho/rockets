@@ -27,6 +27,7 @@ export { AuthAppleEmailNotVerifiedException } from './exceptions/auth-apple-emai
 export { AuthAppleTokenExpiredException } from './exceptions/auth-apple-token-expired.exception';
 export { AuthAppleMissingIdException } from './exceptions/auth-apple-missing-id.exception';
 export { AuthAppleInvalidIssuerException } from './exceptions/auth-apple-invalid-issuer.exception';
+export { AuthAppleOptionsInterface } from './interfaces/auth-apple-options.interface';
 
 export {
   AuthAppleGuard,

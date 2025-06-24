@@ -15,6 +15,7 @@ export { VerifyTokenServiceInterface } from './interfaces/verify-token-service.i
 export { ValidateTokenServiceInterface } from './interfaces/validate-token-service.interface';
 export { IssueTokenServiceInterface } from './interfaces/issue-token-service.interface';
 export { ValidateUserServiceInterface } from './interfaces/validate-user-service.interface';
+export { AuthGuardInterface } from './interfaces/auth-guard.interface';
 
 export { AuthenticationJwtResponseDto } from './dto/authentication-jwt-response.dto';
 

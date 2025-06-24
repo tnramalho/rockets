@@ -1,18 +1,17 @@
-import { Observable } from 'rxjs';
-
+import { AuthGuardInterface } from '@concepta/nestjs-authentication';
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 
 @Injectable()
-export class OAuthFixtureGuard implements CanActivate {
+export class OAuthFixtureGuard implements AuthGuardInterface, CanActivate {
   canActivate(
     context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  ): boolean {
     const request = context.switchToHttp().getRequest();
 
     // Attach a mock user to the request for testing
     request.user = {
       id: 'fixture-user-allow',
-      username: 'fixture-allow',
+      username: 'fixture-allow', 
       email: 'fixture-allow@test.com',
       provider: 'google',
       roles: ['user'],

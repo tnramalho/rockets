@@ -779,7 +779,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@concepta/nestjs-auth-apple@npm:7.0.0-alpha.4, @concepta/nestjs-auth-apple@workspace:packages/nestjs-auth-apple":
+"@concepta/nestjs-auth-apple@workspace:packages/nestjs-auth-apple":
   version: 0.0.0-use.local
   resolution: "@concepta/nestjs-auth-apple@workspace:packages/nestjs-auth-apple"
   dependencies:
@@ -809,7 +809,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@concepta/nestjs-auth-github@npm:7.0.0-alpha.4, @concepta/nestjs-auth-github@workspace:packages/nestjs-auth-github":
+"@concepta/nestjs-auth-github@workspace:packages/nestjs-auth-github":
   version: 0.0.0-use.local
   resolution: "@concepta/nestjs-auth-github@workspace:packages/nestjs-auth-github"
   dependencies:
@@ -838,7 +838,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@concepta/nestjs-auth-google@npm:7.0.0-alpha.4, @concepta/nestjs-auth-google@workspace:packages/nestjs-auth-google":
+"@concepta/nestjs-auth-google@workspace:packages/nestjs-auth-google":
   version: 0.0.0-use.local
   resolution: "@concepta/nestjs-auth-google@workspace:packages/nestjs-auth-google"
   dependencies:
@@ -1267,17 +1267,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@concepta/nestjs-oauth@workspace:packages/nestjs-oauth"
   dependencies:
-    "@concepta/nestjs-auth-apple": "npm:7.0.0-alpha.4"
-    "@concepta/nestjs-auth-github": "npm:7.0.0-alpha.4"
-    "@concepta/nestjs-auth-google": "npm:7.0.0-alpha.4"
-    "@concepta/nestjs-auth-jwt": "npm:^7.0.0-alpha.4"
     "@concepta/nestjs-authentication": "npm:^7.0.0-alpha.4"
     "@concepta/nestjs-common": "npm:^7.0.0-alpha.4"
-    "@concepta/nestjs-crud": "npm:^7.0.0-alpha.4"
-    "@concepta/nestjs-jwt": "npm:^7.0.0-alpha.4"
-    "@concepta/nestjs-password": "npm:^7.0.0-alpha.4"
-    "@concepta/nestjs-typeorm-ext": "npm:^7.0.0-alpha.4"
-    "@concepta/nestjs-user": "npm:^7.0.0-alpha.4"
     "@nestjs/common": "npm:^10.4.1"
     "@nestjs/config": "npm:^3.2.3"
     "@nestjs/core": "npm:^10.4.1"

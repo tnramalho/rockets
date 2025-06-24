@@ -12,6 +12,7 @@
     "dist/**/!(*.spec|*.e2e-spec|*.fixture).{js,d.ts}"
   ],
   "dependencies": {
+    "@concepta/nestjs-authentication": "^7.0.0-alpha.4",
     "@concepta/nestjs-common": "^7.0.0-alpha.4",
     "@nestjs/common": "^10.4.1",
     "@nestjs/config": "^3.2.3",
@@ -20,16 +21,7 @@
     "rxjs": "^7.1.0"
   },
   "devDependencies": {
-    "@concepta/nestjs-auth-apple": "7.0.0-alpha.4",
-    "@concepta/nestjs-auth-github": "7.0.0-alpha.4",
-    "@concepta/nestjs-auth-google": "7.0.0-alpha.4",
-    "@concepta/nestjs-auth-jwt": "^7.0.0-alpha.4",
     "@concepta/nestjs-authentication": "^7.0.0-alpha.4",
-    "@concepta/nestjs-crud": "^7.0.0-alpha.4",
-    "@concepta/nestjs-jwt": "^7.0.0-alpha.4",
-    "@concepta/nestjs-password": "^7.0.0-alpha.4",
-    "@concepta/nestjs-typeorm-ext": "^7.0.0-alpha.4",
-    "@concepta/nestjs-user": "^7.0.0-alpha.4",
     "@nestjs/testing": "^10.4.1",
     "@types/express": "^4.17.21",
     "supertest": "^6.3.4"

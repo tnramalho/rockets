@@ -1,30 +1,50 @@
+import { Injectable } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { OAuthModule } from './oauth.module';
-
+import { AuthGuard } from '@concepta/nestjs-authentication';
 import { OAuthFixtureGuard } from './__fixtures__/oauth-fixture.guards';
+import { OAuthModule } from './oauth.module';
+import { AuthGuardInterface } from '@concepta/nestjs-authentication/src';
+
+jest.mock('@concepta/nestjs-authentication', () => ({
+  AuthGuard: jest.fn().mockImplementation(() => jest.fn()),
+}));
+@Injectable()
+export class AuthGoogleGuardTest extends AuthGuard('google', {
+  canDisable: false,
+}) implements AuthGuardInterface { }
 
 describe(OAuthModule, () => {
-  let oAuthModule: OAuthModule;
+  let oauthModule: OAuthModule;
 
   describe(OAuthModule.forRoot, () => {
-    it('module should be loaded', async () => {
+    it('module should be loaded with google guard', async () => {
+      
       const module: TestingModule = await Test.createTestingModule({
         imports: [
           OAuthModule.forRoot({
             oAuthGuards: [
               {
-                name: 'testGuard',
+                name: 'google',
                 guard: OAuthFixtureGuard,
+              },
+              {
+                name: 'google-passport', 
+                guard: AuthGoogleGuardTest,
               },
             ],
           }),
         ],
-      }).compile();
+      })
+      .compile();
 
-      oAuthModule = module.get(OAuthModule);
+      oauthModule = module.get(OAuthModule);
+      expect(oauthModule).toBeInstanceOf(OAuthModule);
 
-      expect(oAuthModule).toBeInstanceOf(OAuthModule);
+      const guardsToken = module.get('OAUTH_MODULE_GUARDS_TOKEN');
+      expect(guardsToken.google).toBeInstanceOf(OAuthFixtureGuard);
+      expect(guardsToken['google-passport']).toBeInstanceOf(AuthGoogleGuardTest);;
     });
   });
 });

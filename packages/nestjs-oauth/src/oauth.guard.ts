@@ -18,6 +18,7 @@ import {
 } from './exceptions';
 import { OAUTH_MODULE_GUARDS_TOKEN } from './oauth.constants';
 import { OAuthGuardsRecord } from './oauth.types';
+import { AuthGuardInterface } from '@concepta/nestjs-authentication';
 
 /**
  * OAuth Guard
@@ -83,7 +84,7 @@ export class OAuthGuard implements CanActivate {
    * @internal
    * @param provider - The OAuth provider name
    */
-  protected getProviderGuard(provider: string): CanActivate {
+  protected getProviderGuard(provider: string): AuthGuardInterface {
     // Get the guard instance from the injected guards record
     const guardInstance = this.allOAuthGuards[provider];
 
