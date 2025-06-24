@@ -29,6 +29,7 @@
   },
   "peerDependencies": {
     "class-transformer": "*",
+    "rxjs": "^7.1.0",
     "class-validator": "*"
   }
 }

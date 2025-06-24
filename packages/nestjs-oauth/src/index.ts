@@ -13,4 +13,3 @@ export { OAuthOptionsInterface } from './interfaces/oauth-options.interface';
 export { OAuthSettingsInterface } from './interfaces/oauth-settings.interface';
 export { OAuthOptionsExtrasInterface } from './interfaces/oauth-options-extras.interface';
 export { OAuthGuardConfigInterface } from './interfaces/oauth-guard-config.interface';
-

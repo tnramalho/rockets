@@ -49,7 +49,7 @@ describe('OAuthController (e2e)', () => {
       const googleGuard = guardsRecord.google;
       const guardSpy = jest.spyOn(googleGuard, 'canActivate');
 
-      const response = await supertest(app.getHttpServer())
+      await supertest(app.getHttpServer())
         .get('/oauth/login?provider=google')
         .expect(200);
 

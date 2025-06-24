@@ -219,12 +219,16 @@ import {
 ```ts
 interface OAuthOptions {
   oAuthGuards: OAuthGuardConfigInterface[];
-  global?: boolean;
+  settings?: OAuthSettingsInterface;
 }
 
 interface OAuthGuardConfigInterface {
   name: string;           // Provider name (e.g., 'google', 'facebook')
-  guard: Type<CanActivate>; // Guard class that implements CanActivate
+  guard: Type<AuthGuardInterface>; // Guard class that implements AuthGuardInterface
+}
+
+interface OAuthOptionsExtrasInterface {
+  global?: boolean;       // Whether the module should be global
 }
 ```
 

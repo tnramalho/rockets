@@ -1,10 +1,10 @@
-import { Controller, Inject, Get, UseGuards, Post } from '@nestjs/common';
+import { Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 import {
-  AuthUser,
   AuthenticationJwtResponseDto,
   AuthPublic,
+  AuthUser,
 } from '@concepta/nestjs-authentication';
 import { AuthenticatedUserInterface } from '@concepta/nestjs-common';
 
@@ -34,7 +34,7 @@ export class OAuthControllerFixture {
     description: 'DTO containing an access token and a refresh token.',
   })
   @Get('callback')
-  async callback(@AuthUser() user: AuthenticatedUserInterface) {
+  async callback(@AuthUser() _user: AuthenticatedUserInterface) {
     return {
       ok: 'success',
     };
@@ -45,7 +45,7 @@ export class OAuthControllerFixture {
     description: 'DTO containing an access token and a refresh token.',
   })
   @Post('callback')
-  async postCallback(@AuthUser() user: AuthenticatedUserInterface) {
+  async postCallback(@AuthUser() _user: AuthenticatedUserInterface) {
     return {
       ok: 'success',
     };

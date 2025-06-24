@@ -1,6 +1,5 @@
 import {
   IssueTokenServiceInterface,
-  VerifyTokenService,
   VerifyTokenServiceInterface,
 } from '@concepta/nestjs-authentication';
 

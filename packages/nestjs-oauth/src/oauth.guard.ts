@@ -4,9 +4,10 @@ import {
   Injectable,
   CanActivate,
   ExecutionContext,
-  Logger,
   Inject,
 } from '@nestjs/common';
+
+import { AuthGuardInterface } from '@concepta/nestjs-authentication';
 
 import {
   OAuthProviderMissingException,
@@ -18,7 +19,6 @@ import {
 } from './exceptions';
 import { OAUTH_MODULE_GUARDS_TOKEN } from './oauth.constants';
 import { OAuthGuardsRecord } from './oauth.types';
-import { AuthGuardInterface } from '@concepta/nestjs-authentication';
 
 /**
  * OAuth Guard
@@ -35,7 +35,7 @@ export class OAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const provider = request.query?.provider as string;
+    const provider = request.query?.provider;
 
     if (!provider) {
       throw new OAuthProviderMissingException();

@@ -1,11 +1,11 @@
 import {
-  CanActivate,
   ConfigurableModuleBuilder,
   DynamicModule,
   Provider,
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
+import { AuthGuardInterface } from '@concepta/nestjs-authentication';
 import { createSettingsProvider } from '@concepta/nestjs-common';
 
 import { oAuthDefaultConfig } from './config/oauth-default.config';
@@ -17,7 +17,6 @@ import {
   OAUTH_MODULE_GUARDS_TOKEN,
 } from './oauth.constants';
 import { OAuthGuardsRecord } from './oauth.types';
-import { AuthGuardInterface } from '@concepta/nestjs-authentication';
 
 const RAW_OPTIONS_TOKEN = Symbol('__AUTH_OAUTH_MODULE_RAW_OPTIONS_TOKEN__');
 
@@ -70,7 +69,7 @@ export function createOAuthExports(extras?: OAuthOptionsExtrasInterface) {
   return [
     AUTH_OAUTH_MODULE_SETTINGS_TOKEN,
     OAUTH_MODULE_GUARDS_TOKEN,
-    //...(extras?.oAuthGuards?.map((config) => config.guard) ?? []),
+    ...(extras?.oAuthGuards?.map((config) => config.guard) ?? []),
   ];
 }
 
