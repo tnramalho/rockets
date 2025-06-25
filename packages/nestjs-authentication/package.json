@@ -29,7 +29,7 @@
   },
   "peerDependencies": {
     "class-transformer": "*",
-    "rxjs": "^7.1.0",
-    "class-validator": "*"
+    "class-validator": "*",
+    "rxjs": "^7.1.0"
   }
 }

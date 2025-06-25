@@ -1,6 +1,7 @@
 # Rockets NestJS OAuth Guard Router
 
-Route OAuth authentication requests to provider-specific guards based on query parameters.
+Route OAuth authentication requests to provider-specific guards based on query
+parameters.
 
 ## Project
 
@@ -32,9 +33,15 @@ Route OAuth authentication requests to provider-specific guards based on query p
 
 ### Introduction
 
-The `@concepta/nestjs-oauth` module provides a guard router that delegates OAuth authentication to provider-specific guards based on the `provider` query parameter. This allows you to support multiple OAuth providers (Google, Facebook, GitHub, etc.) through a single unified interface.
+The `@concepta/nestjs-oauth` module provides a guard router that delegates OAuth
+authentication to provider-specific guards based on the `provider` query
+parameter. This allows you to support multiple OAuth providers (Google,
+Facebook, GitHub, etc.) through a single unified interface.
 
-**Important:** This module is a guard router only. It does not provide OAuth strategies or authentication logic itself. You need to implement or use provider-specific guards (like `@concepta/nestjs-auth-google`) that handle the actual OAuth authentication.
+**Important:** This module is a guard router only. It does not provide OAuth
+strategies or authentication logic itself. You need to implement or use
+provider-specific guards (like `@concepta/nestjs-auth-google`) that handle the
+actual OAuth authentication.
 
 ### Getting Started with OAuth Guard Router
 
@@ -48,7 +55,8 @@ yarn add @concepta/nestjs-oauth
 
 #### Step 2: Configure Multiple OAuth Guards
 
-Configure the OAuth module with your provider-specific guards. You need to import the actual OAuth provider modules that provide the guards:
+Configure the OAuth module with your provider-specific guards. You need to
+import the actual OAuth provider modules that provide the guards:
 
 ```ts
 import { Module } from '@nestjs/common';
@@ -112,7 +120,8 @@ export class AuthController {
 
 ### Configuring Provider-Specific Guards
 
-You typically use existing OAuth provider modules rather than creating guards from scratch. For example, use `@concepta/nestjs-auth-google` for Google OAuth:
+You typically use existing OAuth provider modules rather than creating guards
+from scratch. For example, use `@concepta/nestjs-auth-google` for Google OAuth:
 
 ```ts
 import { Module } from '@nestjs/common';
@@ -136,7 +145,8 @@ import { AuthGoogleModule, AuthGoogleGuard } from '@concepta/nestjs-auth-google'
 export class AppModule {}
 ```
 
-If you need to create a custom OAuth guard, it must implement the `CanActivate` interface:
+If you need to create a custom OAuth guard, it must implement the `CanActivate`
+interface:
 
 ```ts
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
@@ -209,8 +219,10 @@ import {
 
 ### Exported Types and Classes
 
-- **`OAuthModule`**: Main module class with `forRoot()` and `forRootAsync()` methods
-- **`OAuthGuard`**: Main guard that routes requests to provider-specific guards
+- **`OAuthModule`**: Main module class with `forRoot()` and `forRootAsync()`
+  methods
+- **`OAuthGuard`**: Main guard that routes requests to provider-specific
+  guards
 - **`OAuthGuardsRecord`**: Type for mapping provider names to guard instances
 - **`OAuthException`**: Base exception class for OAuth-related errors
 
@@ -235,6 +247,7 @@ interface OAuthOptionsExtrasInterface {
 ### Usage Patterns
 
 **URL Patterns:**
+
 - `/auth/login?provider=google` → Routes to Google guard
 - `/auth/login?provider=facebook` → Routes to Facebook guard
 - `/auth/login?provider=github` → Routes to GitHub guard
@@ -243,7 +256,8 @@ interface OAuthOptionsExtrasInterface {
 
 ### Overview of the Guard Router
 
-The OAuth module provides a routing mechanism for OAuth authentication rather than implementing OAuth strategies directly. It acts as a dispatcher that:
+The OAuth module provides a routing mechanism for OAuth authentication rather
+than implementing OAuth strategies directly. It acts as a dispatcher that:
 
 1. Extracts the `provider` query parameter from incoming requests
 2. Validates the provider and configuration
@@ -254,14 +268,16 @@ The OAuth module provides a routing mechanism for OAuth authentication rather th
 
 The routing system works as follows:
 
-1. **Request Processing**: When a request hits an endpoint protected by `OAuthGuard`, the guard extracts the `provider` query parameter.
+1. **Request Processing**: When a request hits an endpoint protected by
+   `OAuthGuard`, the guard extracts the `provider` query parameter.
 
 2. **Provider Validation**: The guard validates that:
    - The provider parameter is present and not empty
    - The provider is configured in the `oAuthGuards` array
    - The corresponding guard instance is valid
 
-3. **Guard Delegation**: The request is forwarded to the provider-specific guard's `canActivate` method.
+3. **Guard Delegation**: The request is forwarded to the provider-specific
+   guard's `canActivate` method.
 
 4. **Response Handling**: The guard handles different return types:
    - `boolean`: Direct return
@@ -272,10 +288,16 @@ The routing system works as follows:
 
 The module includes comprehensive error handling:
 
-- **`OAuthProviderMissingException`**: Thrown when no `provider` query parameter is provided
-- **`OAuthProviderNotSupportedException`**: Thrown when the provider is not configured
-- **`OAuthConfigNotAvailableException`**: Thrown when the guards configuration is invalid
-- **`OAuthGuardInvalidException`**: Thrown when a guard instance doesn't implement `canActivate`
-- **`OAuthAuthenticationFailedException`**: Thrown when the provider guard throws an unexpected error
+- **`OAuthProviderMissingException`**: Thrown when no `provider` query
+  parameter is provided
+- **`OAuthProviderNotSupportedException`**: Thrown when the provider is not
+  configured
+- **`OAuthConfigNotAvailableException`**: Thrown when the guards
+  configuration is invalid
+- **`OAuthGuardInvalidException`**: Thrown when a guard instance doesn't
+  implement `canActivate`
+- **`OAuthAuthenticationFailedException`**: Thrown when the provider guard
+  throws an unexpected error
 
-This approach ensures that authentication errors are properly categorized and can be handled appropriately by your application's error handling middleware.
+This approach ensures that authentication errors are properly categorized and
+can be handled appropriately by your application's error handling middleware.
