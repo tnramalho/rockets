@@ -1,6 +1,6 @@
 import { mock } from 'jest-mock-extended';
 
-import { FactoryProvider } from '@nestjs/common';
+import { FactoryProvider, CanActivate } from '@nestjs/common';
 
 import { AuthJwtGuard } from './auth-jwt.guard';
 import {
@@ -9,7 +9,7 @@ import {
 } from './auth-jwt.module-definition';
 
 describe(createAuthJwtAppGuardProvider.name, () => {
-  const guard = mock<AuthJwtGuard>();
+  const guard = mock<AuthJwtGuard>() as CanActivate;
 
   it('should return null if appGuard is explicitly false', async () => {
     const options: Pick<AuthJwtOptions, 'appGuard'> = { appGuard: false };
