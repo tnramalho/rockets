@@ -35,8 +35,34 @@ export class OAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const provider = request.query?.provider;
-
+    const provider = request.query?.provider as string;
+    const code = request.query?.code as string;
+    const state = request.query?.state as string;
+    
+    // Handle callback case (when code is present)
+    if (code) {
+      let callbackProvider = provider;
+      
+      // If no provider in query, try to extract from state parameter
+      if (!callbackProvider && state) {
+        try {
+          // The state parameter might be a JSON string containing provider info
+          const stateData = JSON.parse(state);
+          callbackProvider = stateData.provider;
+        } catch (error) {
+          
+        }
+      }
+      
+      if (!callbackProvider) {
+        throw new OAuthProviderMissingException();
+      }
+      
+      // Now proceed with the provider-specific guard
+      return this.executeProviderGuard(callbackProvider?.trim(), context);
+    }
+    
+    // Handle initial authorization request
     if (!provider) {
       throw new OAuthProviderMissingException();
     }
@@ -46,12 +72,16 @@ export class OAuthGuard implements CanActivate {
       throw new OAuthProviderMissingException();
     }
 
-    if (!this.allOAuthGuards || typeof this.allOAuthGuards !== 'object') {
-      throw new OAuthConfigNotAvailableException();
-    }
+    return this.executeProviderGuard(trimmedProvider, context);
+  }
 
+  private async executeProviderGuard(provider: string, context: ExecutionContext): Promise<boolean> {
     try {
-      const guardInstance = this.getProviderGuard(trimmedProvider);
+      if (!this.allOAuthGuards || typeof this.allOAuthGuards !== 'object') {
+        throw new OAuthConfigNotAvailableException();
+      }
+
+      const guardInstance = this.getProviderGuard(provider);
       const result = guardInstance.canActivate(context);
 
       // Handle Observable, Promise, or boolean return types
@@ -71,7 +101,7 @@ export class OAuthGuard implements CanActivate {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
       throw new OAuthAuthenticationFailedException(
-        trimmedProvider,
+        provider,
         errorMessage,
       );
     }
