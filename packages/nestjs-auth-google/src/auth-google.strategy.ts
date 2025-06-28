@@ -4,6 +4,10 @@ import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 
 import {
+  processOAuthParams,
+  OAuthRequestInterface,
+} from '@concepta/nestjs-authentication';
+import {
   FederatedOAuthService,
   FederatedCredentialsInterface,
 } from '@concepta/nestjs-federated';
@@ -34,6 +38,27 @@ export class AuthGoogleStrategy extends PassportStrategy(
       callbackURL: settings?.callbackURL,
       scope: settings?.scope,
     });
+  }
+  /**
+   * Handles OAuth authentication by overriding authentication options.
+   * This allows dynamic configuration of:
+   * - scope: Override the default scopes
+   * - state: Pass state parameters for tracking auth flow
+   * - callbackURL: Override the default callback URL
+   *
+   * @param req - OAuth request containing query parameters
+   * @param options - Authentication options to override defaults
+   */
+  authenticate(
+    req: OAuthRequestInterface,
+    options: Record<string, unknown>,
+  ): void {
+    const authOptions = {
+      ...options,
+      ...processOAuthParams(req.query),
+    };
+
+    super.authenticate(req, authOptions);
   }
 
   async validate(

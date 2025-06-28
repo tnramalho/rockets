@@ -16,6 +16,9 @@ export { ValidateTokenServiceInterface } from './interfaces/validate-token-servi
 export { IssueTokenServiceInterface } from './interfaces/issue-token-service.interface';
 export { ValidateUserServiceInterface } from './interfaces/validate-user-service.interface';
 export { AuthGuardInterface } from './interfaces/auth-guard.interface';
+export { OAuthAuthenticateOptionsInterface } from './interfaces/oauth-authenticate-options.interface';
+export { OAuthParamsInterface } from './interfaces/oauth-params.interface';
+export { OAuthRequestInterface } from './interfaces/oauth-request.interface';
 
 export { AuthenticationJwtResponseDto } from './dto/authentication-jwt-response.dto';
 
@@ -28,3 +31,5 @@ export { AuthGuardOptions, AuthGuardCtr } from './authentication.types';
 export { AuthenticationException } from './exceptions/authentication.exception';
 export { AuthenticationAccessTokenException } from './exceptions/authentication-access-token.exception';
 export { AuthenticationRefreshTokenException } from './exceptions/authentication-refresh-token.exception';
+
+export { processOAuthParams } from './utils/oauth-auth-params.util';
