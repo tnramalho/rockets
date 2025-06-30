@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { OAUTH_MODULE_GUARDS_TOKEN } from './oauth.constants';
+import { OAuthModuleGuards } from './oauth.constants';
 import { OAuthModule } from './oauth.module';
 
 import { OAuthFixtureGuard } from './__fixtures__/oauth-fixture.guards';
@@ -37,7 +37,7 @@ describe('OAuthController (e2e)', () => {
     await app.init();
 
     // Get the guards record from the module
-    guardsRecord = moduleFixture.get(OAUTH_MODULE_GUARDS_TOKEN);
+    guardsRecord = moduleFixture.get(OAuthModuleGuards);
   });
 
   afterAll(async () => {

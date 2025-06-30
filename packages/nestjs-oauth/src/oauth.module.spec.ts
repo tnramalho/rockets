@@ -4,6 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthGuard } from '@concepta/nestjs-authentication';
 import { AuthGuardInterface } from '@concepta/nestjs-authentication/src';
 
+import { OAuthModuleGuards } from './oauth.constants';
 import { OAuthModule } from './oauth.module';
 
 import { OAuthFixtureGuard } from './__fixtures__/oauth-fixture.guards';
@@ -43,7 +44,7 @@ describe(OAuthModule, () => {
       oauthModule = module.get(OAuthModule);
       expect(oauthModule).toBeInstanceOf(OAuthModule);
 
-      const guardsToken = module.get('OAUTH_MODULE_GUARDS_TOKEN');
+      const guardsToken = module.get(OAuthModuleGuards);
       expect(guardsToken.google).toBeInstanceOf(OAuthFixtureGuard);
       expect(guardsToken['google-passport']).toBeInstanceOf(
         AuthGoogleGuardTest,

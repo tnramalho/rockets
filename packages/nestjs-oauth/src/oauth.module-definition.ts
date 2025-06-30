@@ -14,7 +14,7 @@ import { OAuthOptionsInterface } from './interfaces/oauth-options.interface';
 import { OAuthSettingsInterface } from './interfaces/oauth-settings.interface';
 import {
   AUTH_OAUTH_MODULE_SETTINGS_TOKEN,
-  OAUTH_MODULE_GUARDS_TOKEN,
+  OAuthModuleGuards,
 } from './oauth.constants';
 import { OAuthGuardsRecord } from './oauth.types';
 
@@ -68,7 +68,7 @@ export function createOAuthImports(options: {
 export function createOAuthExports(extras?: OAuthOptionsExtrasInterface) {
   return [
     AUTH_OAUTH_MODULE_SETTINGS_TOKEN,
-    OAUTH_MODULE_GUARDS_TOKEN,
+    OAuthModuleGuards,
     ...(extras?.oAuthGuards?.map((config) => config.guard) ?? []),
   ];
 }
@@ -117,7 +117,7 @@ export function createOAuthGuardsProvider(
     ...oAuthGuards.map((config) => config.guard),
     // Create the guards record provider
     {
-      provide: OAUTH_MODULE_GUARDS_TOKEN,
+      provide: OAuthModuleGuards,
       inject: guardsToInject,
       useFactory: (...args: AuthGuardInterface[]): OAuthGuardsRecord => {
         const guardInstances: OAuthGuardsRecord = {};

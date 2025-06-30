@@ -9,6 +9,6 @@ export const AUTH_OAUTH_MODULE_DEFAULT_SETTINGS_TOKEN =
 
 export const OAUTH_CONFIG_TOKEN = 'OAUTH_CONFIG_TOKEN';
 
-export const OAUTH_MODULE_GUARDS_TOKEN = 'OAUTH_MODULE_GUARDS_TOKEN';
+export const OAuthModuleGuards = Symbol('OAUTH_MODULE_GUARDS_TOKEN');
 
 export const AUTH_OAUTH_STRATEGY_NAME = 'oauth';
