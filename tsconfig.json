@@ -111,7 +111,7 @@
       "path": "packages/nestjs-samples"
     },
     {
-      "path": "packages/nestjs-oauth"
+      "path": "packages/nestjs-auth-guard-router"
     }
   ]
 }
