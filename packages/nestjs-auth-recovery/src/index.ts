@@ -16,6 +16,7 @@ export { AuthRecoveryUserModelServiceInterface } from './interfaces/auth-recover
 export { AuthRecoveryEmailServiceInterface } from './interfaces/auth-recovery-email.service.interface';
 export { AuthRecoveryOtpServiceInterface } from './interfaces/auth-recovery-otp.service.interface';
 export { AuthRecoveryServiceInterface } from './interfaces/auth-recovery.service.interface';
+export { AuthRecoveryNotificationServiceInterface } from './interfaces/auth-recovery-notification.service.interface';
 
 export { AuthRecoveryRecoverLoginDto } from './dto/auth-recovery-recover-login.dto';
 export { AuthRecoveryRecoverPasswordDto } from './dto/auth-recovery-recover-password.dto';

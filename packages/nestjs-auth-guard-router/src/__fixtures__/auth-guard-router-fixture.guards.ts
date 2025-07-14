@@ -1,11 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { ExecutionContext, Injectable } from '@nestjs/common';
 
 import { AuthGuardInterface } from '@concepta/nestjs-authentication';
 
 @Injectable()
-export class AuthGuardRouterFixtureGuard
-  implements AuthGuardInterface, CanActivate
-{
+export class AuthGuardRouterFixtureGuard implements AuthGuardInterface {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
 

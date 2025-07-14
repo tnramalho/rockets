@@ -1,11 +1,6 @@
 import { firstValueFrom, isObservable } from 'rxjs';
 
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  Inject,
-} from '@nestjs/common';
+import { Injectable, ExecutionContext, Inject } from '@nestjs/common';
 
 import { AuthGuardInterface } from '@concepta/nestjs-authentication';
 
@@ -27,7 +22,7 @@ import {
  * to provider-specific guards based on the 'provider' query parameter.
  */
 @Injectable()
-export class AuthGuardRouterGuard implements CanActivate {
+export class AuthGuardRouterGuard implements AuthGuardInterface {
   constructor(
     @Inject(AuthGuardRouterModuleGuards)
     private readonly allAuthGuardRouterGuards: AuthGuardRouterGuardsRecord,

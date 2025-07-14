@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext } from '@nestjs/common';
+import { ExecutionContext } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { AuthGuardInterface } from '@concepta/nestjs-authentication';
@@ -14,31 +14,31 @@ import {
 } from './exceptions';
 
 // Mock guard classes for testing
-class MockSuccessGuard implements AuthGuardInterface, CanActivate {
+class MockSuccessGuard implements AuthGuardInterface {
   canActivate(_context: ExecutionContext): boolean {
     return true;
   }
 }
 
-class MockFailureGuard implements AuthGuardInterface, CanActivate {
+class MockFailureGuard implements AuthGuardInterface {
   canActivate(_context: ExecutionContext): boolean {
     return false;
   }
 }
 
-class MockAsyncSuccessGuard implements AuthGuardInterface, CanActivate {
+class MockAsyncSuccessGuard implements AuthGuardInterface {
   canActivate(_context: ExecutionContext): Promise<boolean> {
     return Promise.resolve(true);
   }
 }
 
-class MockErrorGuard implements AuthGuardInterface, CanActivate {
+class MockErrorGuard implements AuthGuardInterface {
   canActivate(_context: ExecutionContext): boolean {
     throw new Error('Mock guard error');
   }
 }
 
-class MockAsyncErrorGuard implements AuthGuardInterface, CanActivate {
+class MockAsyncErrorGuard implements AuthGuardInterface {
   canActivate(_context: ExecutionContext): Promise<boolean> {
     return Promise.reject(new Error('Mock async guard error'));
   }

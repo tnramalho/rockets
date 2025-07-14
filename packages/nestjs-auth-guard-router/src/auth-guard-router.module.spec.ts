@@ -1,23 +1,29 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ExecutionContext } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { AuthGuard } from '@concepta/nestjs-authentication';
-import { AuthGuardInterface } from '@concepta/nestjs-authentication/src';
+import { AuthGuard, AuthGuardInterface } from '@concepta/nestjs-authentication';
 
 import { AuthGuardRouterModuleGuards } from './auth-guard-router.constants';
 import { AuthGuardRouterModule } from './auth-guard-router.module';
 
 import { AuthGuardRouterFixtureGuard } from './__fixtures__/auth-guard-router-fixture.guards';
 
-jest.mock('@concepta/nestjs-authentication', () => ({
-  AuthGuard: jest.fn().mockImplementation(() => jest.fn()),
-}));
+// Mock class that implements AuthGuardInterface
 @Injectable()
-export class AuthGoogleGuardTest
-  extends AuthGuard('google', {
-    canDisable: false,
-  })
-  implements AuthGuardInterface {}
+class MockAuthGuard implements AuthGuardInterface {
+  canActivate(_context: ExecutionContext): boolean | Promise<boolean> {
+    return true;
+  }
+}
+
+jest.mock('@concepta/nestjs-authentication', () => ({
+  AuthGuard: jest.fn().mockImplementation(() => MockAuthGuard),
+}));
+
+@Injectable()
+export class AuthGoogleGuardTest extends AuthGuard('google', {
+  canDisable: false,
+}) {}
 
 describe(AuthGuardRouterModule, () => {
   let authGuardRouterModule: AuthGuardRouterModule;
