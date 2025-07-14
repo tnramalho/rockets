@@ -1,6 +1,7 @@
 import { Injectable, ExecutionContext } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { AuthGoogleGuard } from '@concepta/nestjs-auth-google';
 import { AuthGuard, AuthGuardInterface } from '@concepta/nestjs-authentication';
 
 import { AuthGuardRouterModuleGuards } from './auth-guard-router.constants';
@@ -34,6 +35,10 @@ describe(AuthGuardRouterModule, () => {
         imports: [
           AuthGuardRouterModule.forRoot({
             guards: [
+              {
+                name: 'auth-google',
+                guard: AuthGoogleGuard,
+              },
               {
                 name: 'google',
                 guard: AuthGuardRouterFixtureGuard,

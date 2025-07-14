@@ -838,7 +838,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@concepta/nestjs-auth-google@workspace:packages/nestjs-auth-google":
+"@concepta/nestjs-auth-google@npm:^7.0.0-alpha.4, @concepta/nestjs-auth-google@workspace:packages/nestjs-auth-google":
   version: 0.0.0-use.local
   resolution: "@concepta/nestjs-auth-google@workspace:packages/nestjs-auth-google"
   dependencies:
@@ -871,6 +871,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@concepta/nestjs-auth-guard-router@workspace:packages/nestjs-auth-guard-router"
   dependencies:
+    "@concepta/nestjs-auth-google": "npm:^7.0.0-alpha.4"
     "@concepta/nestjs-authentication": "npm:^7.0.0-alpha.4"
     "@concepta/nestjs-common": "npm:^7.0.0-alpha.4"
     "@nestjs/common": "npm:^10.4.1"
