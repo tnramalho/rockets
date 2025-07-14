@@ -8,6 +8,6 @@ import {
 export class AuthGuardRouterException extends RuntimeException {
   constructor(options?: RuntimeExceptionOptions) {
     super(options);
-    this.errorCode = 'AUTH_AUTH_GUARD_ROUTER_ERROR';
+    this.errorCode = 'AUTH_GUARD_ROUTER_ERROR';
   }
 }

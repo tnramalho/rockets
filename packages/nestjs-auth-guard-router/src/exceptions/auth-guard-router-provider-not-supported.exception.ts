@@ -9,6 +9,6 @@ export class AuthGuardRouterProviderNotSupportedException extends AuthGuardRoute
       ...options,
     });
 
-    this.errorCode = 'AUTH_AUTH_GUARD_ROUTER_PROVIDER_NOT_SUPPORTED_ERROR';
+    this.errorCode = 'AUTH_GUARD_ROUTER_PROVIDER_NOT_SUPPORTED_ERROR';
   }
 }

@@ -10,6 +10,6 @@ export class AuthGuardRouterConfigNotAvailableException extends AuthGuardRouterE
       ...options,
     });
 
-    this.errorCode = 'AUTH_AUTH_GUARD_ROUTER_CONFIG_NOT_AVAILABLE_ERROR';
+    this.errorCode = 'AUTH_GUARD_ROUTER_CONFIG_NOT_AVAILABLE_ERROR';
   }
 }

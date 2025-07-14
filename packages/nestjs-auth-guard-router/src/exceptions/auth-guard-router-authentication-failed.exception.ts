@@ -13,6 +13,6 @@ export class AuthGuardRouterAuthenticationFailedException extends AuthGuardRoute
       ...options,
     });
 
-    this.errorCode = 'AUTH_AUTH_GUARD_ROUTER_AUTHENTICATION_FAILED_ERROR';
+    this.errorCode = 'AUTH_GUARD_ROUTER_AUTHENTICATION_FAILED_ERROR';
   }
 }

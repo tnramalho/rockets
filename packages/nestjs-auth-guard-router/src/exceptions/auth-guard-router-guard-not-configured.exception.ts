@@ -9,6 +9,6 @@ export class AuthGuardRouterGuardNotConfiguredException extends AuthGuardRouterE
       ...options,
     });
 
-    this.errorCode = 'AUTH_AUTH_GUARD_ROUTER_GUARD_NOT_CONFIGURED_ERROR';
+    this.errorCode = 'AUTH_GUARD_ROUTER_GUARD_NOT_CONFIGURED_ERROR';
   }
 }

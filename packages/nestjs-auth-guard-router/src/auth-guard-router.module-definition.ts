@@ -9,7 +9,7 @@ import { AuthGuardInterface } from '@concepta/nestjs-authentication';
 import { createSettingsProvider } from '@concepta/nestjs-common';
 
 import {
-  AUTH_AUTH_GUARD_ROUTER_MODULE_SETTINGS_TOKEN,
+  AUTH_GUARD_ROUTER_MODULE_SETTINGS_TOKEN,
   AuthGuardRouterModuleGuards,
 } from './auth-guard-router.constants';
 import { AuthGuardRouterGuardsRecord } from './auth-guard-router.types';
@@ -19,13 +19,13 @@ import { AuthGuardRouterOptionsInterface } from './interfaces/auth-guard-router-
 import { AuthGuardRouterSettingsInterface } from './interfaces/auth-guard-router-settings.interface';
 
 const RAW_OPTIONS_TOKEN = Symbol(
-  '__AUTH_AUTH_GUARD_ROUTER_MODULE_RAW_OPTIONS_TOKEN__',
+  '__AUTH_GUARD_ROUTER_MODULE_RAW_OPTIONS_TOKEN__',
 );
 
 export const {
   ConfigurableModuleClass: AuthGuardRouterModuleClass,
-  OPTIONS_TYPE: AUTH_AUTH_GUARD_ROUTER_OPTIONS_TYPE,
-  ASYNC_OPTIONS_TYPE: AUTH_AUTH_GUARD_ROUTER_ASYNC_OPTIONS_TYPE,
+  OPTIONS_TYPE: AUTH_GUARD_ROUTER_OPTIONS_TYPE,
+  ASYNC_OPTIONS_TYPE: AUTH_GUARD_ROUTER_ASYNC_OPTIONS_TYPE,
 } = new ConfigurableModuleBuilder<AuthGuardRouterOptionsInterface>({
   moduleName: 'AuthGuardRouter',
   optionsInjectionToken: RAW_OPTIONS_TOKEN,
@@ -37,11 +37,11 @@ export const {
   .build();
 
 export type AuthGuardRouterOptions = Omit<
-  typeof AUTH_AUTH_GUARD_ROUTER_OPTIONS_TYPE,
+  typeof AUTH_GUARD_ROUTER_OPTIONS_TYPE,
   'global'
 >;
 export type AuthGuardRouterAsyncOptions = Omit<
-  typeof AUTH_AUTH_GUARD_ROUTER_ASYNC_OPTIONS_TYPE,
+  typeof AUTH_GUARD_ROUTER_ASYNC_OPTIONS_TYPE,
   'global'
 >;
 
@@ -73,7 +73,7 @@ export function createAuthGuardRouterExports(
   extras?: AuthGuardRouterOptionsExtrasInterface,
 ) {
   return [
-    AUTH_AUTH_GUARD_ROUTER_MODULE_SETTINGS_TOKEN,
+    AUTH_GUARD_ROUTER_MODULE_SETTINGS_TOKEN,
     AuthGuardRouterModuleGuards,
     ...(extras?.guards?.map((config) => config.guard) ?? []),
   ];
@@ -98,7 +98,7 @@ export function createAuthGuardRouterSettingsProvider(
     AuthGuardRouterSettingsInterface,
     AuthGuardRouterOptionsInterface
   >({
-    settingsToken: AUTH_AUTH_GUARD_ROUTER_MODULE_SETTINGS_TOKEN,
+    settingsToken: AUTH_GUARD_ROUTER_MODULE_SETTINGS_TOKEN,
     optionsToken: RAW_OPTIONS_TOKEN,
     settingsKey: authGuardRouterDefaultConfig.KEY,
     optionsOverrides,

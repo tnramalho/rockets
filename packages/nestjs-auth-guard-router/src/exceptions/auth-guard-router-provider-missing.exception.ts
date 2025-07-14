@@ -10,6 +10,6 @@ export class AuthGuardRouterProviderMissingException extends AuthGuardRouterExce
       ...options,
     });
 
-    this.errorCode = 'AUTH_AUTH_GUARD_ROUTER_PROVIDER_MISSING_ERROR';
+    this.errorCode = 'AUTH_GUARD_ROUTER_PROVIDER_MISSING_ERROR';
   }
 }

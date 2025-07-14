@@ -9,6 +9,6 @@ export class AuthGuardRouterGuardInvalidException extends AuthGuardRouterExcepti
       ...options,
     });
 
-    this.errorCode = 'AUTH_AUTH_GUARD_ROUTER_GUARD_INVALID_ERROR';
+    this.errorCode = 'AUTH_GUARD_ROUTER_GUARD_INVALID_ERROR';
   }
 }
