@@ -1,28 +1,32 @@
 import { firstValueFrom, isObservable } from 'rxjs';
 
-import { CanActivate, Injectable, ExecutionContext, Inject } from '@nestjs/common';
+import {
+  CanActivate,
+  Injectable,
+  ExecutionContext,
+  Inject,
+} from '@nestjs/common';
 
-import { AuthGuardRouterModuleGuards } from './auth-guard-router.constants';
-import { AuthGuardRouterGuardsRecord } from './auth-guard-router.types';
-import { AuthGuardRouterProviderMissingException } from './exceptions/auth-guard-router-provider-missing.exception';
-import { AuthGuardRouterProviderNotSupportedException } from './exceptions/auth-guard-router-provider-not-supported.exception';
-import { AuthGuardRouterConfigNotAvailableException } from './exceptions/auth-guard-router-config-not-available.exception';
-import { AuthGuardRouterGuardInvalidException } from './exceptions/auth-guard-router-guard-invalid.exception';
-import { AuthGuardRouterAuthenticationFailedException } from './exceptions/auth-guard-router-authentication-failed.exception';
-import { AuthGuardRouterException } from './exceptions/auth-guard-router.exception';
+import { AuthRouterModuleGuards } from './auth-router.constants';
+import { AuthRouterGuardsRecord } from './auth-router.types';
+import { AuthRouterAuthenticationFailedException } from './exceptions/auth-router-authentication-failed.exception';
+import { AuthRouterConfigNotAvailableException } from './exceptions/auth-router-config-not-available.exception';
+import { AuthRouterGuardInvalidException } from './exceptions/auth-router-guard-invalid.exception';
+import { AuthRouterProviderMissingException } from './exceptions/auth-router-provider-missing.exception';
+import { AuthRouterProviderNotSupportedException } from './exceptions/auth-router-provider-not-supported.exception';
+import { AuthRouterException } from './exceptions/auth-router.exception';
 
 /**
- * Auth Guard Router
+ * Auth Router
  *
- * This guard is responsible for handling Auth Guard Router authentication by delegating
+ * This guard is responsible for handling Auth Router authentication by delegating
  * to provider-specific guards based on the 'provider' query parameter.
  */
 @Injectable()
-export class AuthGuardRouter implements CanActivate {
-  
+export class AuthRouterGuard implements CanActivate {
   constructor(
-    @Inject(AuthGuardRouterModuleGuards)
-    private readonly allAuthGuardRouterGuards: AuthGuardRouterGuardsRecord,
+    @Inject(AuthRouterModuleGuards)
+    private readonly allAuthRouterGuards: AuthRouterGuardsRecord,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -45,7 +49,7 @@ export class AuthGuardRouter implements CanActivate {
       }
 
       if (!callbackProvider) {
-        throw new AuthGuardRouterProviderMissingException();
+        throw new AuthRouterProviderMissingException();
       }
 
       // Now proceed with the provider-specific guard
@@ -54,12 +58,12 @@ export class AuthGuardRouter implements CanActivate {
 
     // Handle initial authorization request
     if (!provider) {
-      throw new AuthGuardRouterProviderMissingException();
+      throw new AuthRouterProviderMissingException();
     }
 
     const trimmedProvider = provider.trim();
     if (!trimmedProvider) {
-      throw new AuthGuardRouterProviderMissingException();
+      throw new AuthRouterProviderMissingException();
     }
 
     return this.executeProviderGuard(trimmedProvider, context);
@@ -71,10 +75,10 @@ export class AuthGuardRouter implements CanActivate {
   ): Promise<boolean> {
     try {
       if (
-        !this.allAuthGuardRouterGuards ||
-        typeof this.allAuthGuardRouterGuards !== 'object'
+        !this.allAuthRouterGuards ||
+        typeof this.allAuthRouterGuards !== 'object'
       ) {
-        throw new AuthGuardRouterConfigNotAvailableException();
+        throw new AuthRouterConfigNotAvailableException();
       }
 
       const guardInstance = this.getProviderGuard(provider);
@@ -91,17 +95,14 @@ export class AuthGuardRouter implements CanActivate {
         return Boolean(result);
       }
     } catch (error) {
-      // Re-throw our custom Auth Guard Router exceptions
-      if (error instanceof AuthGuardRouterException) {
+      // Re-throw our custom Auth Router exceptions
+      if (error instanceof AuthRouterException) {
         throw error;
       }
 
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
-      throw new AuthGuardRouterAuthenticationFailedException(
-        provider,
-        errorMessage,
-      );
+      throw new AuthRouterAuthenticationFailedException(provider, errorMessage);
     }
   }
 
@@ -110,18 +111,18 @@ export class AuthGuardRouter implements CanActivate {
    * Similar to CacheService.getAssignmentRepo()
    *
    * @internal
-   * @param provider - The Auth Guard Router provider name
+   * @param provider - The Auth Router provider name
    */
   protected getProviderGuard(provider: string): CanActivate {
     // Get the guard instance from the injected guards record
-    const guardInstance = this.allAuthGuardRouterGuards[provider];
+    const guardInstance = this.allAuthRouterGuards[provider];
 
     if (!guardInstance) {
-      throw new AuthGuardRouterProviderNotSupportedException(provider);
+      throw new AuthRouterProviderNotSupportedException(provider);
     }
 
     if (typeof guardInstance.canActivate !== 'function') {
-      throw new AuthGuardRouterGuardInvalidException(provider);
+      throw new AuthRouterGuardInvalidException(provider);
     }
 
     return guardInstance;

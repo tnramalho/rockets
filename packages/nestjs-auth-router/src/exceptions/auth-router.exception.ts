@@ -3,11 +3,11 @@ import {
   RuntimeExceptionOptions,
 } from '@concepta/nestjs-common';
 /**
- * Generic auth guard router exception.
+ * Generic auth router exception.
  */
-export class AuthGuardRouterException extends RuntimeException {
+export class AuthRouterException extends RuntimeException {
   constructor(options?: RuntimeExceptionOptions) {
     super(options);
-    this.errorCode = 'AUTH_GUARD_ROUTER_ERROR';
+    this.errorCode = 'AUTH_ROUTER_ERROR';
   }
 }

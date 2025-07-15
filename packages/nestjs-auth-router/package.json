@@ -1,5 +1,5 @@
 {
-  "name": "@concepta/nestjs-auth-guard-router",
+  "name": "@concepta/nestjs-auth-router",
   "version": "7.0.0-alpha.4",
   "description": "Rockets NestJS Auth Guard Router",
   "main": "dist/index.js",

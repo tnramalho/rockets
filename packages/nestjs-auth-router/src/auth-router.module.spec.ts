@@ -1,27 +1,27 @@
-import { Injectable, ExecutionContext } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { AuthGoogleGuard } from '@concepta/nestjs-auth-google';
 import { AuthGuard } from '@concepta/nestjs-authentication';
 
-import { AuthGuardRouterModuleGuards } from './auth-guard-router.constants';
-import { AuthGuardRouterModule } from './auth-guard-router.module';
+import { AuthRouterModuleGuards } from './auth-router.constants';
+import { AuthRouterModule } from './auth-router.module';
 
-import { AuthGuardRouterFixtureGuard } from './__fixtures__/auth-guard-router-fixture.guards';
+import { AuthRouterFixtureGuard } from './__fixtures__/auth-router-fixture.guards';
 
 @Injectable()
 export class AuthGoogleGuardTest extends AuthGuard('google', {
   canDisable: false,
 }) {}
 
-describe(AuthGuardRouterModule, () => {
-  let authGuardRouterModule: AuthGuardRouterModule;
+describe(AuthRouterModule, () => {
+  let authRouterModule: AuthRouterModule;
 
-  describe(AuthGuardRouterModule.forRoot, () => {
+  describe(AuthRouterModule.forRoot, () => {
     it('module should be loaded with google guard', async () => {
       const module: TestingModule = await Test.createTestingModule({
         imports: [
-          AuthGuardRouterModule.forRoot({
+          AuthRouterModule.forRoot({
             guards: [
               {
                 name: 'auth-google',
@@ -29,7 +29,7 @@ describe(AuthGuardRouterModule, () => {
               },
               {
                 name: 'google',
-                guard: AuthGuardRouterFixtureGuard,
+                guard: AuthRouterFixtureGuard,
               },
               {
                 name: 'google-passport',
@@ -40,11 +40,11 @@ describe(AuthGuardRouterModule, () => {
         ],
       }).compile();
 
-      authGuardRouterModule = module.get(AuthGuardRouterModule);
-      expect(authGuardRouterModule).toBeInstanceOf(AuthGuardRouterModule);
+      authRouterModule = module.get(AuthRouterModule);
+      expect(authRouterModule).toBeInstanceOf(AuthRouterModule);
 
-      const guardsToken = module.get(AuthGuardRouterModuleGuards);
-      expect(guardsToken.google).toBeInstanceOf(AuthGuardRouterFixtureGuard);
+      const guardsToken = module.get(AuthRouterModuleGuards);
+      expect(guardsToken.google).toBeInstanceOf(AuthRouterFixtureGuard);
       expect(guardsToken['google-passport']).toBeInstanceOf(
         AuthGoogleGuardTest,
       );

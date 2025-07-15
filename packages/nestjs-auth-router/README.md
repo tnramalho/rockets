@@ -5,8 +5,8 @@ parameters.
 
 ## Project
 
-[![NPM Latest](https://img.shields.io/npm/v/@concepta/nestjs-auth-guard-router)](https://www.npmjs.com/package/@concepta/nestjs-auth-guard-router)
-[![NPM Downloads](https://img.shields.io/npm/dw/@conceptadev/nestjs-auth-guard-router)](https://www.npmjs.com/package/@concepta/nestjs-auth-guard-router)
+[![NPM Latest](https://img.shields.io/npm/v/@concepta/nestjs-auth-router)](https://www.npmjs.com/package/@concepta/nestjs-auth-router)
+[![NPM Downloads](https://img.shields.io/npm/dw/@conceptadev/nestjs-auth-router)](https://www.npmjs.com/package/@concepta/nestjs-auth-router)
 [![GH Last Commit](https://img.shields.io/github/last-commit/conceptadev/rockets?logo=github)](https://google.com/conceptadev/rockets)
 [![GH Contrib](https://img.shields.io/github/contributors/conceptadev/rockets?logo=github)](https://google.com/conceptadev/rockets/graphs/contributors)
 [![NestJS Dep](https://img.shields.io/github/package-json/dependency-version/conceptadev/rockets/@nestjs/common?label=NestJS&logo=nestjs&filename=packages%2Fnestjs-core%2Fpackage.json)](https://www.npmjs.com/package/@nestjs/common)
@@ -18,7 +18,7 @@ parameters.
    - [Getting Started with Auth Guard Router](#getting-started-with-auth-guard-router)
      - [Step 1: Install the Package](#step-1-install-the-package)
      - [Step 2: Configure Multiple Auth Guard Router Guards](#step-2-configure-multiple-auth-guard-router-guards)
-     - [Step 3: Use the Auth Guard Router Guard](#step-3-use-the-auth-guard-router-guard)
+     - [Step 3: Use the Auth Router Guard](#step-3-use-the-auth-router-guard)
 2. [How-To Guides](#how-to-guides)
    - [Configuring Provider-Specific Guards](#configuring-provider-specific-guards)
    - [Creating Custom Controllers](#creating-custom-controllers)
@@ -33,7 +33,7 @@ parameters.
 
 ### Introduction
 
-The `@concepta/nestjs-auth-guard-router` module provides a guard router that
+The `@concepta/nestjs-auth-router` module provides a guard router that
 delegates authentication to provider-specific guards based on the `provider`
 query parameter. This allows you to support multiple authentication providers
 (Google, Facebook, GitHub, etc.) through a single unified interface.
@@ -47,10 +47,10 @@ handle the actual authentication.
 
 #### Step 1: Install the Package
 
-To get started, install the `@concepta/nestjs-auth-guard-router` package:
+To get started, install the `@concepta/nestjs-auth-router` package:
 
 ```bash
-yarn add @concepta/nestjs-auth-guard-router
+yarn add @concepta/nestjs-auth-router
 ```
 
 #### Step 2: Configure Multiple Auth Guard Router Guards
@@ -61,7 +61,7 @@ guards:
 
 ```ts
 import { Module } from '@nestjs/common';
-import { AuthGuardRouterModule } from '@concepta/nestjs-auth-guard-router';
+import { AuthRouterModule } from '@concepta/nestjs-auth-router';
 import { AuthGoogleModule, AuthGoogleGuard } from '@concepta/nestjs-auth-google';
 import { AuthFacebookModule, AuthFacebookGuard } from '@concepta/nestjs-auth-facebook';
 import { AuthGitHubModule, AuthGitHubGuard } from '@concepta/nestjs-auth-github';
@@ -78,8 +78,8 @@ import { AuthGitHubModule, AuthGitHubGuard } from '@concepta/nestjs-auth-github'
     AuthGitHubModule.forRoot({
       // GitHub-specific configuration
     }),
-    // Configure the Auth Guard Router with the guards from those modules
-    AuthGuardRouterModule.forRoot({
+    // Configure the Auth Router with the guards from those modules
+    AuthRouterModule.forRoot({
       guards: [
         { name: 'google', guard: AuthGoogleGuard },
         { name: 'facebook', guard: AuthFacebookGuard },
@@ -91,20 +91,20 @@ import { AuthGitHubModule, AuthGitHubGuard } from '@concepta/nestjs-auth-github'
 export class AppModule {}
 ```
 
-#### Step 3: Use the Auth Guard Router Guard
+#### Step 3: Use the Auth Router Guard
 
-Use the `AuthGuardRouterGuard` in your controllers:
+Use the `AuthRouterGuard` in your controllers:
 
 ```ts
 import { Controller, Get, UseGuards, Query } from '@nestjs/common';
-import { AuthGuardRouterGuard } from '@concepta/nestjs-auth-guard-router';
+import { AuthRouterGuard } from '@concepta/nestjs-auth-router';
 
 @Controller('auth')
-@UseGuards(AuthGuardRouterGuard)
+@UseGuards(AuthRouterGuard)
 export class AuthController {
   @Get('login')
   login(@Query('provider') provider: string): void {
-    // The AuthGuardRouterGuard will route to the appropriate provider guard
+    // The AuthRouterGuard will route to the appropriate provider guard
     // based on the provider query parameter
     return;
   }
@@ -127,7 +127,7 @@ Google authentication:
 
 ```ts
 import { Module } from '@nestjs/common';
-import { AuthGuardRouterModule } from '@concepta/nestjs-auth-guard-router';
+import { AuthRouterModule } from '@concepta/nestjs-auth-router';
 import { AuthGoogleModule, AuthGoogleGuard } from '@concepta/nestjs-auth-google';
 
 @Module({
@@ -136,8 +136,8 @@ import { AuthGoogleModule, AuthGoogleGuard } from '@concepta/nestjs-auth-google'
     AuthGoogleModule.forRoot({
       // Google authentication configuration (client ID, secret, etc.)
     }),
-    // Configure the Auth Guard Router to use the Google guard
-    AuthGuardRouterModule.forRoot({
+    // Configure the Auth Router to use the Google guard
+    AuthRouterModule.forRoot({
       guards: [
         { name: 'google', guard: AuthGoogleGuard },
       ],
@@ -165,7 +165,7 @@ export class CustomAuthGuard implements CanActivate {
 Then register it in the module:
 
 ```ts
-AuthGuardRouterModule.forRoot({
+AuthRouterModule.forRoot({
   guards: [
     { name: 'custom', guard: CustomAuthGuard },
   ],
@@ -178,10 +178,10 @@ You can create custom controllers that use the Auth Guard Router guard:
 
 ```ts
 import { Controller, Get, UseGuards } from '@nestjs/common';
-import { AuthGuardRouterGuard } from '@concepta/nestjs-auth-guard-router';
+import { AuthRouterGuard } from '@concepta/nestjs-auth-router';
 
 @Controller('auth')
-@UseGuards(AuthGuardRouterGuard)
+@UseGuards(AuthRouterGuard)
 export class AuthController {
   @Get('login')
   login(): void {
@@ -203,48 +203,48 @@ scenarios:
 
 ```ts
 import {
-  AuthGuardRouterProviderMissingException,
-  AuthGuardRouterProviderNotSupportedException,
-  AuthGuardRouterConfigNotAvailableException,
-  AuthGuardRouterGuardInvalidException,
-  AuthGuardRouterAuthenticationFailedException,
-} from '@concepta/nestjs-auth-guard-router';
+  AuthRouterProviderMissingException,
+  AuthRouterProviderNotSupportedException,
+  AuthRouterConfigNotAvailableException,
+  AuthRouterGuardInvalidException,
+  AuthRouterAuthenticationFailedException,
+} from '@concepta/nestjs-auth-router';
 
 // These exceptions are thrown automatically by the guard:
-// - AuthGuardRouterProviderMissingException: No provider query parameter
-// - AuthGuardRouterProviderNotSupportedException: Provider not configured
-// - AuthGuardRouterConfigNotAvailableException: Guards not properly configured
-// - AuthGuardRouterGuardInvalidException: Guard instance is invalid
-// - AuthGuardRouterAuthenticationFailedException: Authentication failed
+// - AuthRouterProviderMissingException: No provider query parameter
+// - AuthRouterProviderNotSupportedException: Provider not configured
+// - AuthRouterConfigNotAvailableException: Guards not properly configured
+// - AuthRouterGuardInvalidException: Guard instance is invalid
+// - AuthRouterAuthenticationFailedException: Authentication failed
 ```
 
 ## Reference
 
 ### Exported Types and Classes
 
-- **`AuthGuardRouterModule`**: Main module class with `forRoot()` and
+- **`AuthRouterModule`**: Main module class with `forRoot()` and
   `forRootAsync()` methods
-- **`AuthGuardRouterGuard`**: Main guard that routes requests to
+- **`AuthRouterGuard`**: Main guard that routes requests to
   provider-specific guards
-- **`AuthGuardRouterGuardsRecord`**: Type for mapping provider names to guard
+- **`AuthRouterGuardsRecord`**: Type for mapping provider names to guard
   instances
-- **`AuthGuardRouterException`**: Base exception class for Auth Guard
-  Router-related errors
+- **`AuthRouterException`**: Base exception class for Auth Router
+  related errors
 
 ### Configuration Options
 
 ```ts
-interface AuthGuardRouterOptions {
-  guards: AuthGuardRouterGuardConfigInterface[];
-  settings?: AuthGuardRouterSettingsInterface;
+interface AuthRouterOptions {
+  guards: AuthRouterGuardConfigInterface[];
+  settings?: AuthRouterSettingsInterface;
 }
 
-interface AuthGuardRouterGuardConfigInterface {
+interface AuthRouterGuardConfigInterface {
   name: string;           // Provider name (e.g., 'google', 'facebook')
   guard: Type<CanActivate>; // Guard class that implements CanActivate
 }
 
-interface AuthGuardRouterOptionsExtrasInterface {
+interface AuthRouterOptionsExtrasInterface {
   global?: boolean;       // Whether the module should be global
 }
 ```
@@ -270,7 +270,7 @@ The guard also handles callback scenarios where the `code` parameter is present:
 
 ### Overview of the Guard Router
 
-The Auth Guard Router module provides a routing mechanism for authentication
+The Auth Router module provides a routing mechanism for authentication
 rather than implementing authentication strategies directly. It acts as a
 dispatcher that:
 
@@ -284,7 +284,7 @@ dispatcher that:
 The routing system works as follows:
 
 1. **Request Processing**: When a request hits an endpoint protected by
-   `AuthGuardRouterGuard`, the guard extracts the `provider` query parameter.
+   `AuthRouterGuard`, the guard extracts the `provider` query parameter.
 
 2. **Callback Detection**: If a `code` parameter is present, the guard
    handles callback scenarios:
@@ -308,15 +308,15 @@ The routing system works as follows:
 
 The module includes comprehensive error handling:
 
-- **`AuthGuardRouterProviderMissingException`**: Thrown when no `provider`
+- **`AuthRouterProviderMissingException`**: Thrown when no `provider`
   query parameter is provided
-- **`AuthGuardRouterProviderNotSupportedException`**: Thrown when the provider
+- **`AuthRouterProviderNotSupportedException`**: Thrown when the provider
   is not configured
-- **`AuthGuardRouterConfigNotAvailableException`**: Thrown when the guards
+- **`AuthRouterConfigNotAvailableException`**: Thrown when the guards
   configuration is invalid
-- **`AuthGuardRouterGuardInvalidException`**: Thrown when a guard instance
+- **`AuthRouterGuardInvalidException`**: Thrown when a guard instance
   doesn't implement `canActivate`
-- **`AuthGuardRouterAuthenticationFailedException`**: Thrown when the provider
+- **`AuthRouterAuthenticationFailedException`**: Thrown when the provider
   guard throws an unexpected error
 
 This approach ensures that authentication errors are properly categorized and

@@ -8,21 +8,20 @@ import {
 } from '@concepta/nestjs-authentication';
 import { AuthenticatedUserInterface } from '@concepta/nestjs-common';
 
-import { AuthGuardRouter } from '../auth-guard-router.guard';
+import { AuthRouterGuard } from '../auth-router.guard';
 
-@Controller('auth-guard-router')
-@UseGuards(AuthGuardRouter)
+@Controller('auth-router')
+@UseGuards(AuthRouterGuard)
 @AuthPublic()
 @ApiTags('auth')
-export class AuthGuardRouterControllerFixture {
+export class AuthRouterControllerFixture {
   constructor() {}
 
   /**
    * Login
    */
   @ApiOkResponse({
-    description:
-      'Users are redirected to request their Auth Guard Router identity.',
+    description: 'Users are redirected to request their Auth Router identity.',
   })
   @Get('login')
   login(): void {

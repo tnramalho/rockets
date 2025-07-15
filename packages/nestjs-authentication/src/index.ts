@@ -24,10 +24,10 @@ export { AuthenticationJwtResponseDto } from './dto/authentication-jwt-response.
 export { IssueTokenService } from './services/issue-token.service';
 export { VerifyTokenService } from './services/verify-token.service';
 export { ValidateUserService } from './services/validate-user.service';
-export { 
+export {
   ValidateTokenService,
   AUTHENTICATION_MODULE_SETTINGS_TOKEN,
-  AUTHENTICATION_MODULE_DISABLE_GUARDS_TOKEN 
+  AUTHENTICATION_MODULE_DISABLE_GUARDS_TOKEN,
 } from './authentication.constants';
 
 export { AuthGuardOptions, AuthGuardCtr } from './authentication.types';
