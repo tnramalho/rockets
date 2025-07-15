@@ -1,4 +1,4 @@
-import { ExecutionContext, Inject, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Inject, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard as PassportAuthGuard } from '@nestjs/passport';
 
@@ -7,7 +7,6 @@ import {
   AUTHENTICATION_MODULE_SETTINGS_TOKEN,
 } from '../authentication.constants';
 import { AuthGuardCtr, AuthGuardOptions } from '../authentication.types';
-import { AuthGuardInterface } from '../interfaces/auth-guard.interface';
 import { AuthenticationSettingsInterface } from '../interfaces/authentication-settings.interface';
 
 import { FastifyAuthGuard } from './fastify-auth.guard';
@@ -49,7 +48,7 @@ export const AuthGuard = (
   }
 
   @Injectable()
-  class AuthGuard extends AuthGuardBaseClass implements AuthGuardInterface {
+  class AuthGuard extends AuthGuardBaseClass implements CanActivate {
     readonly options: AuthGuardOptions = {};
 
     constructor(

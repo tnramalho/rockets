@@ -8,10 +8,10 @@ import {
 } from '@concepta/nestjs-authentication';
 import { AuthenticatedUserInterface } from '@concepta/nestjs-common';
 
-import { AuthGuardRouterGuard } from '../auth-guard-router.guard';
+import { AuthGuardRouter } from '../auth-guard-router.guard';
 
 @Controller('auth-guard-router')
-@UseGuards(AuthGuardRouterGuard)
+@UseGuards(AuthGuardRouter)
 @AuthPublic()
 @ApiTags('auth')
 export class AuthGuardRouterControllerFixture {

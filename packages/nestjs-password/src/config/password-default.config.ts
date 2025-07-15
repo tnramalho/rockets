@@ -16,7 +16,7 @@ export const passwordDefaultConfig = registerAs(
     minPasswordStrength: process.env.PASSWORD_MIN_PASSWORD_STRENGTH
       ? Number.parseInt(process.env.PASSWORD_MIN_PASSWORD_STRENGTH)
       : process.env?.NODE_ENV === 'production'
-      ? 8
+      ? 4
       : 0,
 
     requireCurrentToUpdate:

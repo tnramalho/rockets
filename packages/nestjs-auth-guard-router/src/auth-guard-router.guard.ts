@@ -1,19 +1,15 @@
 import { firstValueFrom, isObservable } from 'rxjs';
 
-import { Injectable, ExecutionContext, Inject } from '@nestjs/common';
-
-import { AuthGuardInterface } from '@concepta/nestjs-authentication';
+import { CanActivate, Injectable, ExecutionContext, Inject } from '@nestjs/common';
 
 import { AuthGuardRouterModuleGuards } from './auth-guard-router.constants';
 import { AuthGuardRouterGuardsRecord } from './auth-guard-router.types';
-import {
-  AuthGuardRouterProviderMissingException,
-  AuthGuardRouterProviderNotSupportedException,
-  AuthGuardRouterConfigNotAvailableException,
-  AuthGuardRouterGuardInvalidException,
-  AuthGuardRouterAuthenticationFailedException,
-  AuthGuardRouterException,
-} from './exceptions';
+import { AuthGuardRouterProviderMissingException } from './exceptions/auth-guard-router-provider-missing.exception';
+import { AuthGuardRouterProviderNotSupportedException } from './exceptions/auth-guard-router-provider-not-supported.exception';
+import { AuthGuardRouterConfigNotAvailableException } from './exceptions/auth-guard-router-config-not-available.exception';
+import { AuthGuardRouterGuardInvalidException } from './exceptions/auth-guard-router-guard-invalid.exception';
+import { AuthGuardRouterAuthenticationFailedException } from './exceptions/auth-guard-router-authentication-failed.exception';
+import { AuthGuardRouterException } from './exceptions/auth-guard-router.exception';
 
 /**
  * Auth Guard Router
@@ -22,7 +18,8 @@ import {
  * to provider-specific guards based on the 'provider' query parameter.
  */
 @Injectable()
-export class AuthGuardRouterGuard implements AuthGuardInterface {
+export class AuthGuardRouter implements CanActivate {
+  
   constructor(
     @Inject(AuthGuardRouterModuleGuards)
     private readonly allAuthGuardRouterGuards: AuthGuardRouterGuardsRecord,
@@ -115,7 +112,7 @@ export class AuthGuardRouterGuard implements AuthGuardInterface {
    * @internal
    * @param provider - The Auth Guard Router provider name
    */
-  protected getProviderGuard(provider: string): AuthGuardInterface {
+  protected getProviderGuard(provider: string): CanActivate {
     // Get the guard instance from the injected guards record
     const guardInstance = this.allAuthGuardRouterGuards[provider];
 

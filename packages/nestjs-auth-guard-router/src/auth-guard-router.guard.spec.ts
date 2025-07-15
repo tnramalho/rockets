@@ -1,53 +1,51 @@
 import { ExecutionContext } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { AuthGuardInterface } from '@concepta/nestjs-authentication';
+import { CanActivate } from '@nestjs/common';
 
 import { AuthGuardRouterModuleGuards } from './auth-guard-router.constants';
-import { AuthGuardRouterGuard } from './auth-guard-router.guard';
-import {
-  AuthGuardRouterAuthenticationFailedException,
-  AuthGuardRouterConfigNotAvailableException,
-  AuthGuardRouterGuardInvalidException,
-  AuthGuardRouterProviderMissingException,
-  AuthGuardRouterProviderNotSupportedException,
-} from './exceptions';
+import { AuthGuardRouter } from './auth-guard-router.guard';
+import { AuthGuardRouterAuthenticationFailedException } from './exceptions/auth-guard-router-authentication-failed.exception';
+import { AuthGuardRouterConfigNotAvailableException } from './exceptions/auth-guard-router-config-not-available.exception';
+import { AuthGuardRouterGuardInvalidException } from './exceptions/auth-guard-router-guard-invalid.exception';
+import { AuthGuardRouterProviderMissingException } from './exceptions/auth-guard-router-provider-missing.exception';
+import { AuthGuardRouterProviderNotSupportedException } from './exceptions/auth-guard-router-provider-not-supported.exception';
 
 // Mock guard classes for testing
-class MockSuccessGuard implements AuthGuardInterface {
+class MockSuccessGuard implements CanActivate {
   canActivate(_context: ExecutionContext): boolean {
     return true;
   }
 }
 
-class MockFailureGuard implements AuthGuardInterface {
+class MockFailureGuard implements CanActivate {
   canActivate(_context: ExecutionContext): boolean {
     return false;
   }
 }
 
-class MockAsyncSuccessGuard implements AuthGuardInterface {
+class MockAsyncSuccessGuard implements CanActivate {
   canActivate(_context: ExecutionContext): Promise<boolean> {
     return Promise.resolve(true);
   }
 }
 
-class MockErrorGuard implements AuthGuardInterface {
+class MockErrorGuard implements CanActivate {
   canActivate(_context: ExecutionContext): boolean {
     throw new Error('Mock guard error');
   }
 }
 
-class MockAsyncErrorGuard implements AuthGuardInterface {
+class MockAsyncErrorGuard implements CanActivate {
   canActivate(_context: ExecutionContext): Promise<boolean> {
     return Promise.reject(new Error('Mock async guard error'));
   }
 }
 
-describe(AuthGuardRouterGuard.name, () => {
-  let guard: AuthGuardRouterGuard;
+describe(AuthGuardRouter.name, () => {
+  let guard: AuthGuardRouter;
   let mockExecutionContext: ExecutionContext;
-  let mockAuthGuardRouterGuards: Record<string, AuthGuardInterface>;
+  let mockAuthGuardRouterGuards: Record<string, CanActivate>;
 
   const createMockExecutionContext = (provider?: string): ExecutionContext => {
     const mockRequest = {
@@ -84,7 +82,7 @@ describe(AuthGuardRouterGuard.name, () => {
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        AuthGuardRouterGuard,
+        AuthGuardRouter,
         {
           provide: AuthGuardRouterModuleGuards,
           useValue: mockAuthGuardRouterGuards,
@@ -92,7 +90,7 @@ describe(AuthGuardRouterGuard.name, () => {
       ],
     }).compile();
 
-    guard = module.get<AuthGuardRouterGuard>(AuthGuardRouterGuard);
+    guard = module.get<AuthGuardRouter>(AuthGuardRouter);
   });
 
   describe('Guard Instance', () => {
@@ -101,7 +99,7 @@ describe(AuthGuardRouterGuard.name, () => {
     });
 
     it('should be an instance of AuthGuardRouterGuard', () => {
-      expect(guard).toBeInstanceOf(AuthGuardRouterGuard);
+      expect(guard).toBeInstanceOf(AuthGuardRouter);
     });
   });
 
@@ -153,8 +151,8 @@ describe(AuthGuardRouterGuard.name, () => {
     it('should throw AuthGuardRouterConfigNotAvailableException when guards record is not found', async () => {
       mockExecutionContext = createMockExecutionContext('google');
 
-      const guardWithoutGuards = new AuthGuardRouterGuard(
-        null as unknown as Record<string, AuthGuardInterface>,
+      const guardWithoutGuards = new AuthGuardRouter(
+        null as unknown as Record<string, CanActivate>,
       );
 
       try {
@@ -169,8 +167,8 @@ describe(AuthGuardRouterGuard.name, () => {
     it('should throw AuthGuardRouterConfigNotAvailableException when guards record is undefined', async () => {
       mockExecutionContext = createMockExecutionContext('google');
 
-      const guardWithUndefinedGuards = new AuthGuardRouterGuard(
-        undefined as unknown as Record<string, AuthGuardInterface>,
+      const guardWithUndefinedGuards = new AuthGuardRouter(
+        undefined as unknown as Record<string, CanActivate>,
       );
 
       try {
@@ -185,8 +183,8 @@ describe(AuthGuardRouterGuard.name, () => {
     it('should throw AuthGuardRouterConfigNotAvailableException when guards record is not an object', async () => {
       mockExecutionContext = createMockExecutionContext('google');
 
-      const guardWithInvalidGuards = new AuthGuardRouterGuard(
-        'not an object' as unknown as Record<string, AuthGuardInterface>,
+      const guardWithInvalidGuards = new AuthGuardRouter(
+        'not an object' as unknown as Record<string, CanActivate>,
       );
 
       try {
@@ -206,7 +204,7 @@ describe(AuthGuardRouterGuard.name, () => {
         google: new MockSuccessGuard(),
       };
 
-      const guardWithGuards = new AuthGuardRouterGuard(
+      const guardWithGuards = new AuthGuardRouter(
         mockAuthGuardRouterGuards,
       );
 
@@ -225,7 +223,7 @@ describe(AuthGuardRouterGuard.name, () => {
         google: new MockSuccessGuard(),
       };
 
-      const guardWithGuards = new AuthGuardRouterGuard(
+      const guardWithGuards = new AuthGuardRouter(
         mockAuthGuardRouterGuards,
       );
 
@@ -248,10 +246,10 @@ describe(AuthGuardRouterGuard.name, () => {
       mockAuthGuardRouterGuards = {
         google: {
           canActivate: 'not a function',
-        } as unknown as AuthGuardInterface,
+        } as unknown as CanActivate,
       };
 
-      const guardWithGuards = new AuthGuardRouterGuard(
+      const guardWithGuards = new AuthGuardRouter(
         mockAuthGuardRouterGuards,
       );
 
@@ -270,7 +268,7 @@ describe(AuthGuardRouterGuard.name, () => {
         google: new MockSuccessGuard(),
       };
 
-      const guardWithGuards = new AuthGuardRouterGuard(
+      const guardWithGuards = new AuthGuardRouter(
         mockAuthGuardRouterGuards,
       );
       const result = await guardWithGuards.canActivate(mockExecutionContext);
@@ -284,7 +282,7 @@ describe(AuthGuardRouterGuard.name, () => {
         google: new MockFailureGuard(),
       };
 
-      const guardWithGuards = new AuthGuardRouterGuard(
+      const guardWithGuards = new AuthGuardRouter(
         mockAuthGuardRouterGuards,
       );
       const result = await guardWithGuards.canActivate(mockExecutionContext);
@@ -298,7 +296,7 @@ describe(AuthGuardRouterGuard.name, () => {
         google: new MockAsyncSuccessGuard(),
       };
 
-      const guardWithGuards = new AuthGuardRouterGuard(
+      const guardWithGuards = new AuthGuardRouter(
         mockAuthGuardRouterGuards,
       );
       const result = await guardWithGuards.canActivate(mockExecutionContext);
@@ -314,7 +312,7 @@ describe(AuthGuardRouterGuard.name, () => {
         google: new MockErrorGuard(),
       };
 
-      const guardWithGuards = new AuthGuardRouterGuard(
+      const guardWithGuards = new AuthGuardRouter(
         mockAuthGuardRouterGuards,
       );
 
@@ -333,7 +331,7 @@ describe(AuthGuardRouterGuard.name, () => {
         google: new MockAsyncErrorGuard(),
       };
 
-      const guardWithGuards = new AuthGuardRouterGuard(
+      const guardWithGuards = new AuthGuardRouter(
         mockAuthGuardRouterGuards,
       );
 
@@ -352,7 +350,7 @@ describe(AuthGuardRouterGuard.name, () => {
         github: new MockErrorGuard(),
       };
 
-      const guardWithGuards = new AuthGuardRouterGuard(
+      const guardWithGuards = new AuthGuardRouter(
         mockAuthGuardRouterGuards,
       );
 
@@ -378,10 +376,10 @@ describe(AuthGuardRouterGuard.name, () => {
           canActivate: () => {
             throw 'String error'; // Non-Error object
           },
-        } as unknown as AuthGuardInterface,
+        } as unknown as CanActivate,
       };
 
-      const guardWithGuards = new AuthGuardRouterGuard(
+      const guardWithGuards = new AuthGuardRouter(
         mockAuthGuardRouterGuards,
       );
 
@@ -412,8 +410,8 @@ describe(AuthGuardRouterGuard.name, () => {
     it('should re-throw AuthGuardRouterConfigNotAvailableException without wrapping', async () => {
       mockExecutionContext = createMockExecutionContext('google');
 
-      const guardWithoutGuards = new AuthGuardRouterGuard(
-        null as unknown as Record<string, AuthGuardInterface>,
+      const guardWithoutGuards = new AuthGuardRouter(
+        null as unknown as Record<string, CanActivate>,
       );
 
       try {
@@ -431,7 +429,7 @@ describe(AuthGuardRouterGuard.name, () => {
         google: new MockSuccessGuard(),
       };
 
-      const guardWithGuards = new AuthGuardRouterGuard(
+      const guardWithGuards = new AuthGuardRouter(
         mockAuthGuardRouterGuards,
       );
 
@@ -449,10 +447,10 @@ describe(AuthGuardRouterGuard.name, () => {
       mockAuthGuardRouterGuards = {
         google: {
           canActivate: 'not a function',
-        } as unknown as AuthGuardInterface,
+        } as unknown as CanActivate,
       };
 
-      const guardWithGuards = new AuthGuardRouterGuard(
+      const guardWithGuards = new AuthGuardRouter(
         mockAuthGuardRouterGuards,
       );
 
@@ -473,7 +471,7 @@ describe(AuthGuardRouterGuard.name, () => {
         facebook: new MockSuccessGuard(),
       };
 
-      const guardWithGuards = new AuthGuardRouterGuard(
+      const guardWithGuards = new AuthGuardRouter(
         mockAuthGuardRouterGuards,
       );
       const result = await guardWithGuards.canActivate(mockExecutionContext);
@@ -487,7 +485,7 @@ describe(AuthGuardRouterGuard.name, () => {
         google: new MockSuccessGuard(),
       };
 
-      const guardWithGuards = new AuthGuardRouterGuard(
+      const guardWithGuards = new AuthGuardRouter(
         mockAuthGuardRouterGuards,
       );
 

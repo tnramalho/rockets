@@ -3,7 +3,7 @@ import supertest from 'supertest';
 import { INestApplication, ExecutionContext } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { AuthGuardInterface } from '@concepta/nestjs-authentication';
+import { CanActivate } from '@nestjs/common';
 
 import { AuthGuardRouterModuleGuards } from './auth-guard-router.constants';
 import { AuthGuardRouterModule } from './auth-guard-router.module';
@@ -14,7 +14,7 @@ import { AuthGuardRouterControllerFixture } from './__fixtures__/auth-guard-rout
 describe('AuthGuardRouterController (e2e)', () => {
   let app: INestApplication;
   let moduleFixture: TestingModule;
-  let guardsRecord: { google: AuthGuardInterface };
+  let guardsRecord: { google: CanActivate };
 
   beforeAll(async () => {
     moduleFixture = await Test.createTestingModule({

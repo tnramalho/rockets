@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-import { AuthGuardInterface } from '@concepta/nestjs-authentication';
+import { CanActivate } from '@nestjs/common';
 import { createSettingsProvider } from '@concepta/nestjs-common';
 
 import {
@@ -129,7 +129,7 @@ export function createAuthGuardRouterGuardsProvider(
       provide: AuthGuardRouterModuleGuards,
       inject: guardsToInject,
       useFactory: (
-        ...args: AuthGuardInterface[]
+        ...args: CanActivate[]
       ): AuthGuardRouterGuardsRecord => {
         const guardInstances: AuthGuardRouterGuardsRecord = {};
 

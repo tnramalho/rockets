@@ -1,9 +1,6 @@
 export { AuthGuardRouterModule } from './auth-guard-router.module';
 
-export {
-  AuthGuardRouterGuard,
-  AuthGuardRouterGuard as AuthGuardRouterAuthGuard,
-} from './auth-guard-router.guard';
+export { AuthGuardRouter } from './auth-guard-router.guard';
 
 export { AuthGuardRouterGuardsRecord } from './auth-guard-router.types';
 

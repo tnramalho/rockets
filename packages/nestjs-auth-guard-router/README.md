@@ -148,14 +148,13 @@ export class AppModule {}
 ```
 
 If you need to create a custom authentication guard, it must implement the
-`AuthGuardInterface` interface:
+`CanActivate` interface:
 
 ```ts
-import { AuthGuardInterface } from '@concepta/nestjs-authentication';
-import { Injectable, ExecutionContext } from '@nestjs/common';
+import { CanActivate, Injectable, ExecutionContext } from '@nestjs/common';
 
 @Injectable()
-export class CustomAuthGuard implements AuthGuardInterface {
+export class CustomAuthGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
     // Implement your authentication logic here
     return true;
@@ -242,7 +241,7 @@ interface AuthGuardRouterOptions {
 
 interface AuthGuardRouterGuardConfigInterface {
   name: string;           // Provider name (e.g., 'google', 'facebook')
-  guard: Type<AuthGuardInterface>; // Guard class that implements AuthGuardInterface
+  guard: Type<CanActivate>; // Guard class that implements CanActivate
 }
 
 interface AuthGuardRouterOptionsExtrasInterface {
