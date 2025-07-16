@@ -24,3 +24,4 @@ export {
 export { AuthGoogleException } from './exceptions/auth-google.exception';
 export { AuthGoogleMissingEmailException } from './exceptions/auth-google-missing-email.exception';
 export { AuthGoogleMissingIdException } from './exceptions/auth-google-missing-id.exception';
+export { AuthGoogleOptionsInterface } from './interfaces/auth-google-options.interface';

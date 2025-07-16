@@ -15,15 +15,24 @@ export { VerifyTokenServiceInterface } from './interfaces/verify-token-service.i
 export { ValidateTokenServiceInterface } from './interfaces/validate-token-service.interface';
 export { IssueTokenServiceInterface } from './interfaces/issue-token-service.interface';
 export { ValidateUserServiceInterface } from './interfaces/validate-user-service.interface';
+export { OAuthAuthenticateOptionsInterface } from './interfaces/oauth-authenticate-options.interface';
+export { OAuthParamsInterface } from './interfaces/oauth-params.interface';
+export { OAuthRequestInterface } from './interfaces/oauth-request.interface';
 
 export { AuthenticationJwtResponseDto } from './dto/authentication-jwt-response.dto';
 
 export { IssueTokenService } from './services/issue-token.service';
 export { VerifyTokenService } from './services/verify-token.service';
 export { ValidateUserService } from './services/validate-user.service';
-export { ValidateTokenService } from './authentication.constants';
+export {
+  ValidateTokenService,
+  AUTHENTICATION_MODULE_SETTINGS_TOKEN,
+  AUTHENTICATION_MODULE_DISABLE_GUARDS_TOKEN,
+} from './authentication.constants';
 
 export { AuthGuardOptions, AuthGuardCtr } from './authentication.types';
 export { AuthenticationException } from './exceptions/authentication.exception';
 export { AuthenticationAccessTokenException } from './exceptions/authentication-access-token.exception';
 export { AuthenticationRefreshTokenException } from './exceptions/authentication-refresh-token.exception';
+
+export { processOAuthParams } from './utils/oauth-auth-params.util';

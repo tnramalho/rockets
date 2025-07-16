@@ -110,5 +110,8 @@
     {
       "path": "packages/nestjs-samples"
     },
+    {
+      "path": "packages/nestjs-auth-router"
+    }
   ]
 }
