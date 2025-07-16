@@ -15,6 +15,7 @@ export { AuthGithubStrategy } from './auth-github.strategy';
 // interfaces
 export { AuthGithubProfileInterface } from './interfaces/auth-github-profile.interface';
 export { AuthGithubCredentialsInterface } from './interfaces/auth-github-credentials.interface';
+export { AuthGithubOptionsInterface } from './interfaces/auth-github-options.interface';
 
 export {
   AuthGithubGuard,
