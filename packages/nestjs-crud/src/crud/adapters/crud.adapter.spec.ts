@@ -2,14 +2,14 @@ import { Repository } from 'typeorm';
 
 import { BadRequestException } from '@nestjs/common';
 
-import { TestService } from '../../__fixtures__/crud/services/test.service';
+import { TestCrudAdapter } from '../../__fixtures__/crud/adapters/test-crud.adapter';
 
 describe('#crud', () => {
-  describe('#CrudService', () => {
-    let service: TestService<Repository<{}>>;
+  describe('#CrudAdapter', () => {
+    let service: TestCrudAdapter<Repository<{}>>;
 
     beforeAll(() => {
-      service = new TestService();
+      service = new TestCrudAdapter();
     });
 
     describe('#throwBadRequestException', () => {

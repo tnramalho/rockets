@@ -9,21 +9,25 @@ import { getDataSourceToken, TypeOrmModule } from '@nestjs/typeorm';
 
 import { ExceptionsFilter } from '@concepta/nestjs-common';
 
+import { CompanyCrudService } from '../../__fixtures__/typeorm/company/company-crud.service';
+import { CompanyTypeOrmCrudAdapter } from '../../__fixtures__/typeorm/company/company-typeorm-crud.adapter';
 import { CompanyEntity } from '../../__fixtures__/typeorm/company/company.entity';
-import { CompanyService } from '../../__fixtures__/typeorm/company/company.service';
 import { CompanyDto } from '../../__fixtures__/typeorm/company/dto/company.dto';
 import { NoteDto } from '../../__fixtures__/typeorm/note/dto/note.dto';
+import { NoteCrudService } from '../../__fixtures__/typeorm/note/note-crud.service';
+import { NoteTypeOrmCrudAdapter } from '../../__fixtures__/typeorm/note/note-typeorm-crud.adapter';
 import { NoteEntity } from '../../__fixtures__/typeorm/note/note.entity';
-import { NoteService } from '../../__fixtures__/typeorm/note/note.service';
 import { ormSqliteConfig } from '../../__fixtures__/typeorm/orm.sqlite.config';
 import { ProjectCreateDto } from '../../__fixtures__/typeorm/project/dto/project-create.dto';
 import { ProjectDto } from '../../__fixtures__/typeorm/project/dto/project.dto';
+import { ProjectCrudService } from '../../__fixtures__/typeorm/project/project-crud.service';
+import { ProjectTypeOrmCrudAdapter } from '../../__fixtures__/typeorm/project/project-typeorm-crud.adapter';
 import { ProjectEntity } from '../../__fixtures__/typeorm/project/project.entity';
-import { ProjectService } from '../../__fixtures__/typeorm/project/project.service';
 import { Seeds } from '../../__fixtures__/typeorm/seeds';
 import { UserDto } from '../../__fixtures__/typeorm/users/dto/user.dto';
+import { UserCrudService } from '../../__fixtures__/typeorm/users/user-crud.service';
+import { UserTypeOrmCrudAdapter } from '../../__fixtures__/typeorm/users/user-typeorm-crud.adapter';
 import { UserEntity } from '../../__fixtures__/typeorm/users/user.entity';
-import { UserService } from '../../__fixtures__/typeorm/users/user.service';
 import { CrudGetMany } from '../../crud/decorators/actions/crud-get-many.decorator';
 import { CrudGetOne } from '../../crud/decorators/actions/crud-get-one.decorator';
 import { CrudUpdateOne } from '../../crud/decorators/actions/crud-update-one.decorator';
@@ -56,7 +60,7 @@ describe('#crud-typeorm', () => {
     @CrudAllow(['id', 'name', 'domain', 'description'])
     @CrudMaxLimit(5)
     class CompaniesController {
-      constructor(public service: CompanyService) {}
+      constructor(public service: CompanyCrudService) {}
 
       @CrudGetMany()
       getMany(@CrudRequest() request: CrudRequestInterface) {
@@ -78,7 +82,7 @@ describe('#crud-typeorm', () => {
     @CrudSort([{ field: 'id', order: 'ASC' }])
     @CrudLimit(100)
     class ProjectsController {
-      constructor(public service: ProjectService) {}
+      constructor(public service: ProjectCrudService) {}
 
       @CrudGetMany()
       getMany(@CrudRequest() request: CrudRequestInterface) {
@@ -104,7 +108,7 @@ describe('#crud-typeorm', () => {
       model: { type: ProjectDto },
     })
     class ProjectsController2 {
-      constructor(public service: ProjectService) {}
+      constructor(public service: ProjectCrudService) {}
 
       @CrudGetMany()
       getMany(@CrudRequest() request: CrudRequestInterface) {
@@ -118,7 +122,7 @@ describe('#crud-typeorm', () => {
     })
     @CrudFilter({ isActive: false })
     class ProjectsController3 {
-      constructor(public service: ProjectService) {}
+      constructor(public service: ProjectCrudService) {}
 
       @CrudGetMany()
       getMany(@CrudRequest() request: CrudRequestInterface) {
@@ -132,7 +136,7 @@ describe('#crud-typeorm', () => {
     })
     @CrudFilter({ isActive: true })
     class ProjectsController4 {
-      constructor(public service: ProjectService) {}
+      constructor(public service: ProjectCrudService) {}
 
       @CrudGetMany()
       getMany(@CrudRequest() request: CrudRequestInterface) {
@@ -145,7 +149,7 @@ describe('#crud-typeorm', () => {
       model: { type: UserDto },
     })
     class UsersController {
-      constructor(public service: UserService) {}
+      constructor(public service: UserCrudService) {}
 
       @CrudGetMany()
       getMany(@CrudRequest() request: CrudRequestInterface) {
@@ -158,7 +162,7 @@ describe('#crud-typeorm', () => {
       model: { type: NoteDto },
     })
     class NotesController {
-      constructor(public service: NoteService) {}
+      constructor(public service: NoteCrudService) {}
 
       @CrudGetMany()
       getMany(@CrudRequest() request: CrudRequestInterface) {
@@ -189,10 +193,14 @@ describe('#crud-typeorm', () => {
         ],
         providers: [
           { provide: APP_FILTER, useClass: ExceptionsFilter },
-          CompanyService,
-          UserService,
-          ProjectService,
-          NoteService,
+          CompanyTypeOrmCrudAdapter,
+          CompanyCrudService,
+          UserTypeOrmCrudAdapter,
+          UserCrudService,
+          ProjectTypeOrmCrudAdapter,
+          ProjectCrudService,
+          NoteTypeOrmCrudAdapter,
+          NoteCrudService,
         ],
       }).compile();
 

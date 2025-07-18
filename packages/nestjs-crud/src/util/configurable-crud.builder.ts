@@ -1,17 +1,15 @@
 import { randomUUID } from 'crypto';
 
-import { Repository } from 'typeorm';
-
 import {
   applyDecorators,
   Inject,
   PlainLiteralObject,
   Type,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 
-import { DeepPartial, InjectDynamicRepository } from '@concepta/nestjs-common';
+import { DeepPartial } from '@concepta/nestjs-common';
 
+import { CrudAdapter } from '../crud/adapters/crud.adapter';
 import { CrudBaseController } from '../crud/controllers/crud-base.controller';
 import { CrudCreateMany } from '../crud/decorators/actions/crud-create-many.decorator';
 import { CrudCreateOne } from '../crud/decorators/actions/crud-create-one.decorator';
@@ -27,7 +25,7 @@ import { CrudRequest } from '../crud/decorators/params/crud-request.decorator';
 import { CrudCreateManyInterface } from '../crud/interfaces/crud-create-many.interface';
 import { CrudRequestInterface } from '../crud/interfaces/crud-request.interface';
 import { ConfigurableCrudOptionsTransformer } from '../crud.types';
-import { TypeOrmCrudService } from '../services/typeorm-crud.service';
+import { CrudService } from '../services/crud.service';
 
 import { ConfigurableCrudDecorators } from './interfaces/configurable-crud-decorators.interface';
 import { ConfigurableCrudHost } from './interfaces/configurable-crud-host.interface';
@@ -41,16 +39,19 @@ export class ConfigurableCrudBuilder<
   ExtraOptions extends PlainLiteralObject = PlainLiteralObject,
 > {
   private extras: ExtraOptions;
-  private optionsTransform: ConfigurableCrudOptionsTransformer<ExtraOptions>;
+  private optionsTransform: ConfigurableCrudOptionsTransformer<
+    Entity,
+    ExtraOptions
+  >;
 
-  constructor(private options: ConfigurableCrudOptions) {
+  constructor(private options: ConfigurableCrudOptions<Entity>) {
     this.extras = {} as ExtraOptions;
     this.optionsTransform = (options, _extras) => options;
   }
 
   setExtras(
     extras: ExtraOptions,
-    optionsTransform: ConfigurableCrudOptionsTransformer<ExtraOptions>,
+    optionsTransform: ConfigurableCrudOptionsTransformer<Entity, ExtraOptions>,
   ): ConfigurableCrudBuilder<
     Entity,
     Creatable,
@@ -82,7 +83,7 @@ export class ConfigurableCrudBuilder<
     };
   }
 
-  private generateDecorators<O extends ConfigurableCrudOptions>(
+  private generateDecorators<O extends ConfigurableCrudOptions<Entity>>(
     options: O,
   ): ConfigurableCrudDecorators {
     const {
@@ -173,7 +174,7 @@ export class ConfigurableCrudBuilder<
     };
   }
 
-  private generateClass<O extends ConfigurableCrudOptions>(
+  private generateClass<O extends ConfigurableCrudOptions<Entity>>(
     options: O,
     decorators: ConfigurableCrudDecorators,
   ): typeof CrudBaseController<Entity, Creatable, Updatable, Replaceable> {
@@ -197,7 +198,7 @@ export class ConfigurableCrudBuilder<
     > {
       constructor(
         @Inject(options.service.injectionToken)
-        protected crudService: TypeOrmCrudService<Entity>,
+        protected crudService: CrudService<Entity>,
       ) {
         super(crudService);
       }
@@ -379,36 +380,19 @@ export class ConfigurableCrudBuilder<
   }
 
   private generateService<Entity extends PlainLiteralObject>(
-    options: ConfigurableCrudOptions['service'],
-  ): Type<TypeOrmCrudService<Entity>> {
-    // standard repository injection style
-    if ('entity' in options && options.entity) {
-      const { entity } = options;
+    options: ConfigurableCrudOptions<Entity>['service'],
+  ): Type<CrudService<Entity>> {
+    const { adapter } = options;
 
-      class InternalServiceClass extends TypeOrmCrudService<Entity> {
-        constructor(
-          @InjectRepository(entity)
-          protected readonly repo: Repository<Entity>,
-        ) {
-          super(repo);
-        }
+    class InternalServiceClass extends CrudService<Entity> {
+      constructor(
+        @Inject(adapter)
+        protected readonly crudAdapter: CrudAdapter<Entity>,
+      ) {
+        super(crudAdapter);
       }
-
-      return InternalServiceClass;
-    } else {
-      // EXT repository injection style
-      const { entityKey } = options;
-
-      class InternalServiceClass extends TypeOrmCrudService<Entity> {
-        constructor(
-          @InjectDynamicRepository(entityKey)
-          protected readonly repo: Repository<Entity>,
-        ) {
-          super(repo);
-        }
-      }
-
-      return InternalServiceClass;
     }
+
+    return InternalServiceClass;
   }
 }

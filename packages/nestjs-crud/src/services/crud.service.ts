@@ -1,23 +1,17 @@
-import { ObjectLiteral, Repository } from 'typeorm';
+import { Injectable, PlainLiteralObject } from '@nestjs/common';
 
-import { Injectable } from '@nestjs/common';
-
+import { CrudAdapter } from '../crud/adapters/crud.adapter';
 import { CrudRequestInterface } from '../crud/interfaces/crud-request.interface';
 import { CrudResponsePaginatedInterface } from '../crud/interfaces/crud-response-paginated.interface';
 import { CrudServiceQueryOptionsInterface } from '../crud/interfaces/crud-service-query-options.interface';
 import { CrudQueryException } from '../exceptions/crud-query.exception';
 
 import { CrudQueryHelper } from './helpers/crud-query.helper';
-import { xTypeOrmCrudService } from './x-typeorm-crud.service';
 
 // TODO: TYPEORM - review what to do
 @Injectable()
-export class TypeOrmCrudService<
-  T extends ObjectLiteral,
-> extends xTypeOrmCrudService<T> {
-  constructor(protected repo: Repository<T>) {
-    super(repo);
-  }
+export class CrudService<T extends PlainLiteralObject> {
+  constructor(protected crudAdapter: CrudAdapter<T>) {}
 
   protected readonly crudQueryHelper: CrudQueryHelper = new CrudQueryHelper();
 
@@ -33,9 +27,9 @@ export class TypeOrmCrudService<
 
     // get parent result
     try {
-      result = await super.getMany(req);
+      result = await this.crudAdapter.getMany(req);
     } catch (e) {
-      throw new CrudQueryException(this.repo.metadata.name, {
+      throw new CrudQueryException(this.crudAdapter.entityName(), {
         originalError: e,
       });
     }
@@ -53,14 +47,14 @@ export class TypeOrmCrudService<
   async getOne(
     req: CrudRequestInterface,
     queryOptions?: CrudServiceQueryOptionsInterface,
-  ): ReturnType<xTypeOrmCrudService<T>['getOne']> {
+  ): ReturnType<CrudAdapter<T>['getOne']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
     // return parent result
     try {
-      return super.getOne(req);
+      return this.crudAdapter.getOne(req);
     } catch (e) {
-      throw new CrudQueryException(this.repo.metadata.name, {
+      throw new CrudQueryException(this.crudAdapter.entityName(), {
         originalError: e,
       });
     }
@@ -68,16 +62,16 @@ export class TypeOrmCrudService<
 
   async createMany(
     req: CrudRequestInterface,
-    dto: Parameters<xTypeOrmCrudService<T>['createMany']>[1],
+    dto: Parameters<CrudAdapter<T>['createMany']>[1],
     queryOptions?: CrudServiceQueryOptionsInterface,
-  ): ReturnType<xTypeOrmCrudService<T>['createMany']> {
+  ): ReturnType<CrudAdapter<T>['createMany']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
     // return parent result
     try {
-      return super.createMany(req, dto);
+      return this.crudAdapter.createMany(req, dto);
     } catch (e) {
-      throw new CrudQueryException(this.repo.metadata.name, {
+      throw new CrudQueryException(this.crudAdapter.entityName(), {
         originalError: e,
       });
     }
@@ -85,16 +79,16 @@ export class TypeOrmCrudService<
 
   async createOne(
     req: CrudRequestInterface,
-    dto: Parameters<xTypeOrmCrudService<T>['createOne']>[1],
+    dto: Parameters<CrudAdapter<T>['createOne']>[1],
     queryOptions?: CrudServiceQueryOptionsInterface,
-  ): ReturnType<xTypeOrmCrudService<T>['createOne']> {
+  ): ReturnType<CrudAdapter<T>['createOne']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
     // return parent result
     try {
-      return super.createOne(req, dto);
+      return this.crudAdapter.createOne(req, dto);
     } catch (e) {
-      throw new CrudQueryException(this.repo.metadata.name, {
+      throw new CrudQueryException(this.crudAdapter.entityName(), {
         originalError: e,
       });
     }
@@ -102,16 +96,16 @@ export class TypeOrmCrudService<
 
   async updateOne(
     req: CrudRequestInterface,
-    dto: Parameters<xTypeOrmCrudService<T>['updateOne']>[1],
+    dto: Parameters<CrudAdapter<T>['updateOne']>[1],
     queryOptions?: CrudServiceQueryOptionsInterface,
-  ): ReturnType<xTypeOrmCrudService<T>['updateOne']> {
+  ): ReturnType<CrudAdapter<T>['updateOne']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
     // return parent result
     try {
-      return super.updateOne(req, dto);
+      return this.crudAdapter.updateOne(req, dto);
     } catch (e) {
-      throw new CrudQueryException(this.repo.metadata.name, {
+      throw new CrudQueryException(this.crudAdapter.entityName(), {
         originalError: e,
       });
     }
@@ -119,16 +113,16 @@ export class TypeOrmCrudService<
 
   async replaceOne(
     req: CrudRequestInterface,
-    dto: Parameters<xTypeOrmCrudService<T>['replaceOne']>[1],
+    dto: Parameters<CrudAdapter<T>['replaceOne']>[1],
     queryOptions?: CrudServiceQueryOptionsInterface,
-  ): ReturnType<xTypeOrmCrudService<T>['replaceOne']> {
+  ): ReturnType<CrudAdapter<T>['replaceOne']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
     // return parent result
     try {
-      return super.replaceOne(req, dto);
+      return this.crudAdapter.replaceOne(req, dto);
     } catch (e) {
-      throw new CrudQueryException(this.repo.metadata.name, {
+      throw new CrudQueryException(this.crudAdapter.entityName(), {
         originalError: e,
       });
     }
@@ -137,14 +131,14 @@ export class TypeOrmCrudService<
   async deleteOne(
     req: CrudRequestInterface,
     queryOptions?: CrudServiceQueryOptionsInterface,
-  ): ReturnType<xTypeOrmCrudService<T>['deleteOne']> {
+  ): ReturnType<CrudAdapter<T>['deleteOne']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
     // return parent result
     try {
-      return super.deleteOne(req);
+      return this.crudAdapter.deleteOne(req);
     } catch (e) {
-      throw new CrudQueryException(this.repo.metadata.name, {
+      throw new CrudQueryException(this.crudAdapter.entityName(), {
         originalError: e,
       });
     }
@@ -153,14 +147,14 @@ export class TypeOrmCrudService<
   async recoverOne(
     req: CrudRequestInterface,
     queryOptions?: CrudServiceQueryOptionsInterface,
-  ): ReturnType<xTypeOrmCrudService<T>['recoverOne']> {
+  ): ReturnType<CrudAdapter<T>['recoverOne']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
     // return parent result
     try {
-      return super.recoverOne(req);
+      return this.crudAdapter.recoverOne(req);
     } catch (e) {
-      throw new CrudQueryException(this.repo.metadata.name, {
+      throw new CrudQueryException(this.crudAdapter.entityName(), {
         originalError: e,
       });
     }

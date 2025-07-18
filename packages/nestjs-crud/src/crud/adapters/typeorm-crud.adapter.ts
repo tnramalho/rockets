@@ -24,35 +24,26 @@ import { NotFoundException, PlainLiteralObject } from '@nestjs/common';
 
 import { LiteralObject } from '@concepta/nestjs-common';
 
-import { CrudCreateManyInterface } from '../crud/interfaces/crud-create-many.interface';
-import { CrudQueryOptionsInterface } from '../crud/interfaces/crud-query-options.interface';
-import { CrudRequestOptionsInterface } from '../crud/interfaces/crud-request-options.interface';
-import { CrudRequestInterface } from '../crud/interfaces/crud-request.interface';
-import { CrudResponsePaginatedInterface } from '../crud/interfaces/crud-response-paginated.interface';
-import { CrudService } from '../crud/services/crud-service.abstract';
-import { comparisonOperatorKeys } from '../request/crud-request.utils';
-import { CrudRequestParsedParamsInterface } from '../request/interfaces/crud-request-parsed-params.interface';
+import { comparisonOperatorKeys } from '../../request/crud-request.utils';
+import { CrudRequestParsedParamsInterface } from '../../request/interfaces/crud-request-parsed-params.interface';
 import {
   ComparisonOperator,
   QueryFilter,
   QuerySort,
   SCondition,
   SConditionKey,
-} from '../request/types/crud-request-query.types';
+} from '../../request/types/crud-request-query.types';
+import { CrudCreateManyInterface } from '../interfaces/crud-create-many.interface';
+import { CrudQueryOptionsInterface } from '../interfaces/crud-query-options.interface';
+import { CrudRequestOptionsInterface } from '../interfaces/crud-request-options.interface';
+import { CrudRequestInterface } from '../interfaces/crud-request.interface';
+import { CrudResponsePaginatedInterface } from '../interfaces/crud-response-paginated.interface';
 
-interface IAllowedRelation {
-  alias?: string;
-  nested: boolean;
-  name: string;
-  path: string;
-  columns: string[];
-  primaryColumns: string[];
-  allowedColumns: string[];
-}
+import { CrudAdapter } from './crud.adapter';
 
-export class xTypeOrmCrudService<
+export class TypeOrmCrudAdapter<
   T extends PlainLiteralObject,
-> extends CrudService<T> {
+> extends CrudAdapter<T> {
   protected dbName: DataSourceOptions['type'];
 
   protected entityColumns: string[] = [];
@@ -62,8 +53,6 @@ export class xTypeOrmCrudService<
   protected entityHasDeleteColumn = false;
 
   protected entityColumnsHash: LiteralObject = {};
-
-  protected entityRelationsHash: Map<string, IAllowedRelation> = new Map();
 
   protected sqlInjectionRegEx: RegExp[] = [
     /(%27)|(\')|(--)|(%23)|(#)/gi,
@@ -79,16 +68,8 @@ export class xTypeOrmCrudService<
     this.onInitMapEntityColumns();
   }
 
-  public get findOne(): Repository<T>['findOne'] {
-    return this.repo.findOne.bind(this.repo);
-  }
-
-  public get find(): Repository<T>['find'] {
-    return this.repo.find.bind(this.repo);
-  }
-
-  public get count(): Repository<T>['count'] {
-    return this.repo.count.bind(this.repo);
+  public entityName(): string {
+    return this.repo.metadata.name;
   }
 
   protected get entityType(): ClassType<T> {
@@ -388,7 +369,7 @@ export class xTypeOrmCrudService<
 
   /**
    * depends on paging call `SelectQueryBuilder#getMany` or `SelectQueryBuilder#getManyAndCount`
-   * helpful for overriding `TypeOrmCrudService#getMany`
+   * helpful for overriding `CrudAdapter#getMany`
    *
    * @see getMany
    * @see SelectQueryBuilder#getMany

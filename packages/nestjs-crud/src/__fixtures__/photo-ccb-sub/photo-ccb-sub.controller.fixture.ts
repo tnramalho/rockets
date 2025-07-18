@@ -10,7 +10,7 @@ import { PhotoDtoFixture } from '../photo/dto/photo.dto.fixture';
 import { PhotoCreatableInterfaceFixture } from '../photo/interfaces/photo-creatable.interface.fixture';
 import { PhotoEntityInterfaceFixture } from '../photo/interfaces/photo-entity.interface.fixture';
 import { PhotoUpdatableInterfaceFixture } from '../photo/interfaces/photo-updatable.interface.fixture';
-import { PhotoFixture } from '../photo/photo.entity.fixture';
+import { PhotoTypeOrmCrudAdapterFixture } from '../photo/photo-typeorm-crud.adapter.fixture';
 
 export const PHOTO_CRUD_SERVICE_TOKEN = Symbol('__PHOTO_CRUD_SERVICE_TOKEN__');
 
@@ -20,7 +20,7 @@ const crudBuilder = new ConfigurableCrudBuilder<
   PhotoUpdatableInterfaceFixture
 >({
   service: {
-    entity: PhotoFixture,
+    adapter: PhotoTypeOrmCrudAdapterFixture,
     injectionToken: PHOTO_CRUD_SERVICE_TOKEN,
   },
   controller: {

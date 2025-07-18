@@ -14,7 +14,10 @@ export type ReflectionTargetOrHandler = Function | Type<any>;
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export type AdditionalCrudMethodArgs = any[];
 
-export type ConfigurableCrudOptionsTransformer<T extends PlainLiteralObject> = (
-  options: ConfigurableCrudOptions,
+export type ConfigurableCrudOptionsTransformer<
+  Entity extends PlainLiteralObject,
+  T extends PlainLiteralObject,
+> = (
+  options: ConfigurableCrudOptions<Entity>,
   extras?: T,
-) => ConfigurableCrudOptions;
+) => ConfigurableCrudOptions<Entity>;

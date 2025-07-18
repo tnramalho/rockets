@@ -6,11 +6,11 @@ import { Test } from '@nestjs/testing';
 
 import { ExceptionsFilter } from '@concepta/nestjs-common';
 
+import { TestCrudAdapter } from '../../../__fixtures__/crud/adapters/test-crud.adapter';
 import { TestModelCreateManyDto } from '../../../__fixtures__/crud/dto/test-model-create-many.dto';
 import { TestModelCreateDto } from '../../../__fixtures__/crud/dto/test-model-create.dto';
 import { TestModelUpdateDto } from '../../../__fixtures__/crud/dto/test-model-update.dto';
 import { TestModelDto } from '../../../__fixtures__/crud/models/test.model';
-import { TestService } from '../../../__fixtures__/crud/services/test.service';
 import { CrudModule } from '../../../crud.module';
 import { CrudRequestQueryBuilder } from '../../../request/crud-request-query.builder';
 import { CrudCreateManyInterface } from '../../interfaces/crud-create-many.interface';
@@ -46,7 +46,7 @@ describe('#crud', () => {
       },
     })
     class TestController {
-      constructor(public service: TestService<TestModelDto>) {}
+      constructor(public service: TestCrudAdapter<TestModelDto>) {}
 
       @CrudGetMany()
       async getMany(@CrudRequest() req: CrudRequestInterface) {
@@ -102,7 +102,7 @@ describe('#crud', () => {
         controllers: [TestController],
         providers: [
           { provide: APP_FILTER, useClass: ExceptionsFilter },
-          TestService,
+          TestCrudAdapter,
         ],
       }).compile();
 

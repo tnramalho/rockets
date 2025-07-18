@@ -1,6 +1,6 @@
-import { InjectionToken } from '@nestjs/common';
-import { EntityClassOrSchema } from '@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type';
+import { InjectionToken, PlainLiteralObject, Type } from '@nestjs/common';
 
+import { CrudAdapter } from '../../crud/adapters/crud.adapter';
 import { CrudControllerOptionsInterface } from '../../crud/interfaces/crud-controller-options.interface';
 import { CrudExtraDecoratorsInterface } from '../../crud/interfaces/crud-extra-decorators.interface';
 import {
@@ -14,11 +14,11 @@ import {
   CrudUpdateOneOptionsInterface,
 } from '../../crud/interfaces/crud-route-options.interface';
 
-export interface ConfigurableCrudOptions {
-  service: { injectionToken: InjectionToken } & (
-    | { entity: EntityClassOrSchema; entityKey?: never }
-    | { entityKey: string; entity?: never }
-  );
+export interface ConfigurableCrudOptions<Entity extends PlainLiteralObject> {
+  service: {
+    injectionToken: InjectionToken;
+    adapter: Type<CrudAdapter<Entity>>;
+  };
   controller: CrudControllerOptionsInterface & CrudExtraDecoratorsInterface;
   getMany?: CrudReadAllOptionsInterface & CrudExtraDecoratorsInterface;
   getOne?: CrudReadOneOptionsInterface & CrudExtraDecoratorsInterface;

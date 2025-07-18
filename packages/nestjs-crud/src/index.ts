@@ -7,6 +7,9 @@ export { CrudRequestInterface } from './crud/interfaces/crud-request.interface';
 export { CrudResponsePaginatedInterface } from './crud/interfaces/crud-response-paginated.interface';
 export { CrudCreateManyInterface } from './crud/interfaces/crud-create-many.interface';
 
+export { CrudAdapter } from './crud/adapters/crud.adapter';
+export { TypeOrmCrudAdapter } from './crud/adapters/typeorm-crud.adapter';
+
 // controller decorators
 export { CrudController } from './crud/decorators/controller/crud-controller.decorator';
 
@@ -53,7 +56,7 @@ export { CrudApiResponse } from './crud/decorators/openapi/crud-api-response.dec
 
 // classes
 export { CrudQueryHelper } from './services/helpers/crud-query.helper';
-export { TypeOrmCrudService } from './services/typeorm-crud.service';
+export { CrudService } from './services/crud.service';
 export { CrudBaseController } from './crud/controllers/crud-base.controller';
 
 // dto

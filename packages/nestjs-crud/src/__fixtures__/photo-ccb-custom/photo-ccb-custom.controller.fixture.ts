@@ -5,7 +5,7 @@ import { CrudBody } from '../../crud/decorators/params/crud-body.decorator';
 import { CrudRequest } from '../../crud/decorators/params/crud-request.decorator';
 import { CrudSoftDelete } from '../../crud/decorators/routes/crud-soft-delete.decorator';
 import { CrudRequestInterface } from '../../crud/interfaces/crud-request.interface';
-import { TypeOrmCrudService } from '../../services/typeorm-crud.service';
+import { CrudService } from '../../services/crud.service';
 import { ConfigurableCrudBuilder } from '../../util/configurable-crud.builder';
 import { PhotoCreateManyDtoFixture } from '../photo/dto/photo-create-many.dto.fixture';
 import { PhotoCreateDtoFixture } from '../photo/dto/photo-create.dto.fixture';
@@ -15,7 +15,7 @@ import { PhotoDtoFixture } from '../photo/dto/photo.dto.fixture';
 import { PhotoCreatableInterfaceFixture } from '../photo/interfaces/photo-creatable.interface.fixture';
 import { PhotoEntityInterfaceFixture } from '../photo/interfaces/photo-entity.interface.fixture';
 import { PhotoUpdatableInterfaceFixture } from '../photo/interfaces/photo-updatable.interface.fixture';
-import { PhotoFixture } from '../photo/photo.entity.fixture';
+import { PhotoTypeOrmCrudAdapterFixture } from '../photo/photo-typeorm-crud.adapter.fixture';
 
 export const PHOTO_CRUD_SERVICE_TOKEN = Symbol('__PHOTO_CRUD_SERVICE_TOKEN__');
 
@@ -25,7 +25,7 @@ const crudBuilder = new ConfigurableCrudBuilder<
   PhotoUpdatableInterfaceFixture
 >({
   service: {
-    entity: PhotoFixture,
+    adapter: PhotoTypeOrmCrudAdapterFixture,
     injectionToken: PHOTO_CRUD_SERVICE_TOKEN,
   },
   controller: {
@@ -78,7 +78,7 @@ export class PhotoCcbCustomControllerFixture extends CrudBaseController<
 > {
   constructor(
     @Inject(PHOTO_CRUD_SERVICE_TOKEN)
-    protected crudService: TypeOrmCrudService<PhotoEntityInterfaceFixture>,
+    protected crudService: CrudService<PhotoEntityInterfaceFixture>,
   ) {
     super(crudService);
   }

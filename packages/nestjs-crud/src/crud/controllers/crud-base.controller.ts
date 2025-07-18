@@ -4,7 +4,7 @@ import { DeepPartial } from '@concepta/nestjs-common';
 
 import { AdditionalCrudMethodArgs } from '../../crud.types';
 import { CrudMethodNotImplementedException } from '../../exceptions/crud-method-not-implemented.exception';
-import { TypeOrmCrudService } from '../../services/typeorm-crud.service';
+import { CrudService } from '../../services/crud.service';
 import { CrudControllerInterface } from '../interfaces/crud-controller.interface';
 import { CrudCreateManyInterface } from '../interfaces/crud-create-many.interface';
 import { CrudRequestInterface } from '../interfaces/crud-request.interface';
@@ -17,7 +17,7 @@ export class CrudBaseController<
   Replaceable extends Creatable = Creatable,
 > implements CrudControllerInterface<Entity, Creatable, Updatable, Replaceable>
 {
-  constructor(protected crudService: TypeOrmCrudService<Entity>) {}
+  constructor(protected crudService: CrudService<Entity>) {}
 
   getMany(
     _crudRequest: CrudRequestInterface,
@@ -75,7 +75,7 @@ export class CrudBaseController<
   recoverOne(
     _crudRequest: CrudRequestInterface,
     ..._rest: AdditionalCrudMethodArgs
-  ): Promise<Entity> {
+  ): Promise<Entity | void> {
     throw new CrudMethodNotImplementedException(this, this.recoverOne);
   }
 }

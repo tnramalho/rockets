@@ -1,14 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Injectable, PlainLiteralObject } from '@nestjs/common';
 
+import { CrudAdapter } from '../../../crud/adapters/crud.adapter';
 import { CrudCreateManyInterface } from '../../../crud/interfaces/crud-create-many.interface';
 import { CrudRequestOptionsInterface } from '../../../crud/interfaces/crud-request-options.interface';
 import { CrudRequestInterface } from '../../../crud/interfaces/crud-request.interface';
-import { CrudService } from '../../../crud/services/crud-service.abstract';
 import { CrudRequestParsedParamsInterface } from '../../../request/interfaces/crud-request-parsed-params.interface';
 
 @Injectable()
-export class TestService<T extends PlainLiteralObject> extends CrudService<T> {
+export class TestCrudAdapter<
+  T extends PlainLiteralObject,
+> extends CrudAdapter<T> {
+  entityName(): string {
+    return 'TestEntity';
+  }
+
   async getMany(req: CrudRequestInterface): Promise<any> {
     return { req };
   }

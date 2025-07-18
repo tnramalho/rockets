@@ -54,5 +54,5 @@ export interface CrudControllerInterface<
   recoverOne?(
     crudRequest: CrudRequestInterface,
     ...rest: AdditionalCrudMethodArgs
-  ): Promise<Entity>;
+  ): Promise<Entity | void>;
 }

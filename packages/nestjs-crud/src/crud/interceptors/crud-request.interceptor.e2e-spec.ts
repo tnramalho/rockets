@@ -4,8 +4,8 @@ import { Param, ParseIntPipe, Query, UseInterceptors } from '@nestjs/common';
 import { NestApplication } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
 
+import { TestCrudAdapter } from '../../__fixtures__/crud/adapters/test-crud.adapter';
 import { TestModelDto } from '../../__fixtures__/crud/models/test.model';
-import { TestService } from '../../__fixtures__/crud/services/test.service';
 import { CrudModule } from '../../crud.module';
 import { CrudRequestQueryBuilder } from '../../request/crud-request-query.builder';
 import { CrudGetMany } from '../decorators/actions/crud-get-many.decorator';
@@ -72,7 +72,7 @@ describe('#crud', () => {
     },
   })
   class Test2Controller {
-    constructor(public service: TestService<TestModelDto>) {}
+    constructor(public service: TestCrudAdapter<TestModelDto>) {}
 
     @UseInterceptors(CrudRequestInterceptor)
     @CrudGetOne({ path: 'normal/:id' })
@@ -102,7 +102,7 @@ describe('#crud', () => {
   beforeAll(async () => {
     const module = await Test.createTestingModule({
       imports: [CrudModule.forRoot({})],
-      providers: [TestService],
+      providers: [TestCrudAdapter],
       controllers: [TestController, Test2Controller],
     }).compile();
     app = module.createNestApplication();

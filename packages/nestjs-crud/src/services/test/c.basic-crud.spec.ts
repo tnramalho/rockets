@@ -8,15 +8,17 @@ import { getDataSourceToken, TypeOrmModule } from '@nestjs/typeorm';
 
 import { ExceptionsFilter } from '@concepta/nestjs-common';
 
+import { CompanyCrudService } from '../../__fixtures__/typeorm/company/company-crud.service';
+import { CompanyTypeOrmCrudAdapter } from '../../__fixtures__/typeorm/company/company-typeorm-crud.adapter';
 import { CompanyEntity } from '../../__fixtures__/typeorm/company/company.entity';
-import { CompanyService } from '../../__fixtures__/typeorm/company/company.service';
 import { CompanyCreateManyDto } from '../../__fixtures__/typeorm/company/dto/company-create-many.dto';
 import { CompanyCreateDto } from '../../__fixtures__/typeorm/company/dto/company-create.dto';
 import { CompanyPaginatedDto } from '../../__fixtures__/typeorm/company/dto/company-paginated.dto';
 import { CompanyUpdateDto } from '../../__fixtures__/typeorm/company/dto/company-update.dto';
 import { CompanyDto } from '../../__fixtures__/typeorm/company/dto/company.dto';
+import { DeviceCrudService } from '../../__fixtures__/typeorm/device/device-crud.service';
+import { DeviceTypeOrmCrudAdapter } from '../../__fixtures__/typeorm/device/device-typeorm-crud.adapter';
 import { DeviceEntity } from '../../__fixtures__/typeorm/device/device.entity';
-import { DeviceService } from '../../__fixtures__/typeorm/device/device.service';
 import { DeviceCreateDto } from '../../__fixtures__/typeorm/device/dto/device-create.dto';
 import { DeviceDto } from '../../__fixtures__/typeorm/device/dto/device.dto';
 import { ormSqliteConfig } from '../../__fixtures__/typeorm/orm.sqlite.config';
@@ -59,7 +61,7 @@ describe('#crud-typeorm', () => {
     @CrudLimit(3)
     @CrudAlwaysPaginate(true)
     class CompaniesController0 {
-      constructor(public service: CompanyService) {}
+      constructor(public service: CompanyCrudService) {}
 
       @CrudGetMany()
       getMany(@CrudRequest() request: CrudRequestInterface) {
@@ -77,12 +79,12 @@ describe('#crud-typeorm', () => {
         controllers: [CompaniesController0],
         providers: [
           { provide: APP_FILTER, useClass: ExceptionsFilter },
-          CompanyService,
+          CompanyTypeOrmCrudAdapter,
+          CompanyCrudService,
         ],
       }).compile();
 
       app = fixture.createNestApplication();
-      // service = app.get<CompaniesService>(CompaniesService);
 
       await app.init();
       server = app.getHttpServer();
@@ -90,10 +92,6 @@ describe('#crud-typeorm', () => {
       const datasource = app.get<DataSource>(getDataSourceToken());
       const seeds = new Seeds();
       await seeds.up(datasource.createQueryRunner());
-    });
-
-    beforeEach(() => {
-      // qb = RequestQueryBuilder.create();
     });
 
     afterAll(async () => {
@@ -128,7 +126,7 @@ describe('#crud-typeorm', () => {
     })
     @CrudAlwaysPaginate(true)
     class CompaniesController {
-      constructor(public service: CompanyService) {}
+      constructor(public service: CompanyCrudService) {}
 
       @CrudGetMany()
       getMany(@CrudRequest() request: CrudRequestInterface) {
@@ -146,7 +144,8 @@ describe('#crud-typeorm', () => {
         controllers: [CompaniesController],
         providers: [
           { provide: APP_FILTER, useClass: ExceptionsFilter },
-          CompanyService,
+          CompanyTypeOrmCrudAdapter,
+          CompanyCrudService,
         ],
       }).compile();
 
@@ -215,7 +214,6 @@ describe('#crud-typeorm', () => {
     let app: INestApplication;
     let server: ReturnType<INestApplication['getHttpServer']>;
     let qb: CrudRequestQueryBuilder;
-    let service: CompanyService;
 
     @CrudController({
       path: 'companies',
@@ -236,7 +234,7 @@ describe('#crud-typeorm', () => {
     })
     @CrudSoftDelete(true)
     class CompaniesController {
-      constructor(public service: CompanyService) {}
+      constructor(public service: CompanyCrudService) {}
 
       @CrudGetMany()
       getMany(@CrudRequest() request: CrudRequestInterface) {
@@ -303,7 +301,7 @@ describe('#crud-typeorm', () => {
       },
     })
     class DevicesController {
-      constructor(public service: DeviceService) {}
+      constructor(public service: DeviceCrudService) {}
 
       @CrudCreateOne({ returnShallow: true })
       createOne(
@@ -329,13 +327,15 @@ describe('#crud-typeorm', () => {
         controllers: [CompaniesController, DevicesController],
         providers: [
           { provide: APP_FILTER, useClass: ExceptionsFilter },
-          CompanyService,
-          DeviceService,
+          CompanyTypeOrmCrudAdapter,
+          CompanyCrudService,
+          DeviceTypeOrmCrudAdapter,
+          DeviceCrudService,
         ],
       }).compile();
 
       app = fixture.createNestApplication();
-      service = app.get<CompanyService>(CompanyService);
+      // service = app.get<CompanyService>(CompanyService);
 
       await app.init();
       server = app.getHttpServer();
@@ -351,27 +351,6 @@ describe('#crud-typeorm', () => {
 
     afterAll(async () => {
       await app.close();
-    });
-
-    describe('#find', () => {
-      it('should return entities', async () => {
-        const data = await service.find();
-        expect(data.length).toBe(9);
-      });
-    });
-
-    describe('#findOne', () => {
-      it('should return one entity', async () => {
-        const data = await service.findOne({ where: { id: 1 } });
-        expect(data?.id).toBe(1);
-      });
-    });
-
-    describe('#count', () => {
-      it('should return number', async () => {
-        const data = await service.count();
-        expect(typeof data).toBe('number');
-      });
     });
 
     describe('#getAll', () => {

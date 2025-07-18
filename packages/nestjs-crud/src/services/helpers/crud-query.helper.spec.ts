@@ -7,7 +7,7 @@ import { SCondition } from '../../request/types/crud-request-query.types';
 
 import { CrudQueryHelper } from './crud-query.helper';
 
-describe('TypeOrmService', () => {
+describe('CrudQueryHelper', () => {
   let crudQueryService: CrudQueryHelper;
 
   beforeEach(async () => {

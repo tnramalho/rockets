@@ -10,7 +10,7 @@ import { CrudRequestOptionsInterface } from '../interfaces/crud-request-options.
 import { CrudRequestInterface } from '../interfaces/crud-request.interface';
 import { CrudResponsePaginatedInterface } from '../interfaces/crud-response-paginated.interface';
 
-export abstract class CrudService<T extends PlainLiteralObject> {
+export abstract class CrudAdapter<T extends PlainLiteralObject> {
   throwBadRequestException(msg?: unknown): BadRequestException {
     throw new BadRequestException(msg);
   }
@@ -119,6 +119,8 @@ export abstract class CrudService<T extends PlainLiteralObject> {
       .map((p) => rawParams[p].field)
       .filter((field): field is string => typeof field === 'string');
   }
+
+  abstract entityName(): string;
 
   abstract getMany(
     req: CrudRequestInterface,
