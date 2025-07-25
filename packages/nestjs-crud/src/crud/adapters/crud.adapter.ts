@@ -1,6 +1,7 @@
-import { objKeys } from '@nestjsx/util';
+import { hasLength, isObject, objKeys } from '@nestjsx/util';
+import { plainToClass } from 'class-transformer';
 
-import { BadRequestException, PlainLiteralObject } from '@nestjs/common';
+import { BadRequestException, PlainLiteralObject, Type } from '@nestjs/common';
 
 import { CrudRequestParsedParamsInterface } from '../../request/interfaces/crud-request-parsed-params.interface';
 import { CrudCreateManyInterface } from '../interfaces/crud-create-many.interface';
@@ -120,6 +121,75 @@ export abstract class CrudAdapter<T extends PlainLiteralObject> {
       .filter((field): field is string => typeof field === 'string');
   }
 
+  /**
+   * Get parameter filters from parsed request.
+   *
+   * @param parsed - The parsed request parameters.
+   * @returns An object containing parameter filters.
+   */
+  public getParamFilters(
+    parsed: CrudRequestInterface['parsed'],
+  ): PlainLiteralObject {
+    const filters: Record<string, unknown> = {};
+
+    /* istanbul ignore else */
+    if (hasLength(parsed.paramsFilter)) {
+      for (const filter of parsed.paramsFilter) {
+        filters[filter.field] = filter.value;
+      }
+    }
+
+    return filters;
+  }
+
+  protected getAllowedColumns(
+    columns: string[],
+    options: CrudQueryOptionsInterface,
+  ): string[] {
+    return (!options.exclude || !options.exclude.length) &&
+      (!options.allow || !options.allow.length)
+      ? columns
+      : columns.filter(
+          (column) =>
+            (options.exclude && options.exclude.length
+              ? !options.exclude.some((col) => col === column)
+              : true) &&
+            (options.allow && options.allow.length
+              ? options.allow.some((col) => col === column)
+              : true),
+        );
+  }
+
+  protected prepareEntityBeforeSave(
+    dto: T | Partial<T>,
+    parsed: CrudRequestInterface['parsed'],
+  ): T | undefined {
+    if (!isObject(dto)) {
+      return undefined;
+    }
+
+    if (hasLength(parsed.paramsFilter)) {
+      for (const filter of parsed.paramsFilter) {
+        if (filter.field in dto) {
+          (dto as Record<string, unknown>)[filter.field] = filter.value;
+        }
+      }
+    }
+
+    if (!hasLength(objKeys(dto))) {
+      return undefined;
+    }
+
+    return dto instanceof this.entityType()
+      ? Object.assign(dto)
+      : plainToClass(
+          this.entityType(),
+          { ...dto },
+          parsed.classTransformOptions,
+        );
+  }
+
+  abstract entityType(): Type<T>;
   abstract entityName(): string;
 
   abstract getMany(

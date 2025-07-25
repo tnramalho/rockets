@@ -1,5 +1,4 @@
 import {
-  ClassType,
   hasLength,
   isArrayFull,
   isObject,
@@ -20,7 +19,7 @@ import {
   OrderByCondition,
 } from 'typeorm';
 
-import { NotFoundException, PlainLiteralObject } from '@nestjs/common';
+import { NotFoundException, PlainLiteralObject, Type } from '@nestjs/common';
 
 import { LiteralObject } from '@concepta/nestjs-common';
 
@@ -72,8 +71,8 @@ export class TypeOrmCrudAdapter<
     return this.repo.metadata.name;
   }
 
-  protected get entityType(): ClassType<T> {
-    return this.repo.target as ClassType<T>;
+  public entityType(): Type<T> {
+    return this.repo.target as Type<T>;
   }
 
   protected get alias(): string {
@@ -187,7 +186,7 @@ export class TypeOrmCrudAdapter<
     const toSave = { ...found, ...dto, ...paramsFilters };
     const updated = await this.repo.save(
       plainToClass(
-        this.entityType,
+        this.entityType(),
         toSave,
         req.parsed.classTransformOptions,
       ) as unknown as DeepPartial<T>,
@@ -236,7 +235,7 @@ export class TypeOrmCrudAdapter<
     };
     const replaced = await this.repo.save(
       plainToClass(
-        this.entityType,
+        this.entityType(),
         toSave,
         req.parsed.classTransformOptions,
       ) as unknown as DeepPartial<T>,
@@ -271,7 +270,7 @@ export class TypeOrmCrudAdapter<
     const found = await this.getOneOrFail(req, returnDeleted);
     const toReturn = returnDeleted
       ? plainToClass(
-          this.entityType,
+          this.entityType(),
           { ...found },
           req.parsed.classTransformOptions,
         )
@@ -282,27 +281,6 @@ export class TypeOrmCrudAdapter<
       : await this.repo.remove(found);
 
     return toReturn;
-  }
-
-  /**
-   * Get parameter filters from parsed request.
-   *
-   * @param parsed - The parsed request parameters.
-   * @returns An object containing parameter filters.
-   */
-  public getParamFilters(
-    parsed: CrudRequestInterface['parsed'],
-  ): LiteralObject {
-    const filters: Record<string, unknown> = {};
-
-    /* istanbul ignore else */
-    if (hasLength(parsed.paramsFilter)) {
-      for (const filter of parsed.paramsFilter) {
-        filters[filter.field] = filter.value;
-      }
-    }
-
-    return filters;
   }
 
   /**
@@ -434,51 +412,6 @@ export class TypeOrmCrudAdapter<
     } else {
       throw new NotFoundException(`${this.alias} not found`);
     }
-  }
-
-  protected prepareEntityBeforeSave(
-    dto: T | Partial<T>,
-    parsed: CrudRequestInterface['parsed'],
-  ): T | undefined {
-    /* istanbul ignore if */
-    if (!isObject(dto)) {
-      return undefined;
-    }
-
-    if (hasLength(parsed.paramsFilter)) {
-      for (const filter of parsed.paramsFilter) {
-        if (filter.field in dto) {
-          (dto as Record<string, unknown>)[filter.field] = filter.value;
-        }
-      }
-    }
-
-    /* istanbul ignore if */
-    if (!hasLength(objKeys(dto))) {
-      return undefined;
-    }
-
-    return dto instanceof this.entityType
-      ? Object.assign(dto)
-      : plainToClass(this.entityType, { ...dto }, parsed.classTransformOptions);
-  }
-
-  protected getAllowedColumns(
-    columns: string[],
-    options: CrudQueryOptionsInterface,
-  ): string[] {
-    return (!options.exclude || !options.exclude.length) &&
-      (!options.allow || /* istanbul ignore next */ !options.allow.length)
-      ? columns
-      : columns.filter(
-          (column) =>
-            (options.exclude && options.exclude.length
-              ? !options.exclude.some((col) => col === column)
-              : /* istanbul ignore next */ true) &&
-            (options.allow && options.allow.length
-              ? options.allow.some((col) => col === column)
-              : /* istanbul ignore next */ true),
-        );
   }
 
   protected getEntityColumns(entityMetadata: EntityMetadata): {
