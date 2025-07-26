@@ -1,19 +1,9 @@
-import {
-  hasLength,
-  hasValue,
-  isString,
-  isArrayFull,
-  isDate,
-  isDateString,
-  isObject,
-  isStringFull,
-  objKeys,
-  isNil,
-  ObjectLiteral,
-} from '@nestjsx/util';
 import { ClassTransformOptions } from 'class-transformer';
 
 import { PlainLiteralObject } from '@nestjs/common';
+import { isNil, isObject, isString } from '@nestjs/common/utils/shared.utils';
+
+import { hasValue, isDateString, isStringFull } from '../util/validation';
 
 import { CrudRequestQueryBuilder } from './crud-request-query.builder';
 import {
@@ -46,7 +36,7 @@ export class CrudRequestQueryParser<Entity extends PlainLiteralObject>
 
   public paramsFilter: QueryFilter<Entity>[] = [];
 
-  public authPersist: ObjectLiteral | undefined;
+  public authPersist: PlainLiteralObject | undefined;
 
   public classTransformOptions: ClassTransformOptions | undefined;
 
@@ -103,9 +93,9 @@ export class CrudRequestQueryParser<Entity extends PlainLiteralObject>
 
   parseQuery(query: PlainLiteralObject): this {
     if (isObject(query)) {
-      const paramNames = objKeys(query);
+      const paramNames = Object.keys(query);
 
-      if (hasLength(paramNames)) {
+      if (paramNames.length) {
         this._query = query;
         this._paramNames = paramNames;
         const searchData = this._query[this.getParamNames('search')[0]];
@@ -148,9 +138,9 @@ export class CrudRequestQueryParser<Entity extends PlainLiteralObject>
     options: CrudRequestParamsOptionsInterface<Entity>,
   ): this {
     if (isObject(params)) {
-      const paramNames = objKeys(params);
+      const paramNames = Object.keys(params);
 
-      if (hasLength(paramNames)) {
+      if (paramNames.length) {
         this._params = params;
         this._paramsOptions = options;
         this.paramsFilter = paramNames
@@ -166,7 +156,7 @@ export class CrudRequestQueryParser<Entity extends PlainLiteralObject>
     return this;
   }
 
-  setAuthPersist(persist: ObjectLiteral = {}) {
+  setAuthPersist(persist: PlainLiteralObject = {}) {
     this.authPersist = persist || /* istanbul ignore next */ {};
   }
 
@@ -217,7 +207,7 @@ export class CrudRequestQueryParser<Entity extends PlainLiteralObject>
       return [parser.call(this, value)];
     }
 
-    if (isArrayFull(value)) {
+    if (Array.isArray(value) && value.length) {
       return (value as string[]).map((val) => parser(val));
     }
 
@@ -235,7 +225,7 @@ export class CrudRequestQueryParser<Entity extends PlainLiteralObject>
       return [parser.call(this, value)];
     }
 
-    if (isArrayFull(value)) {
+    if (Array.isArray(value) && value.length) {
       return (value as string[]).map((val) => parser(val));
     }
 
@@ -253,7 +243,7 @@ export class CrudRequestQueryParser<Entity extends PlainLiteralObject>
       return [parser.call(this, value)];
     }
 
-    if (isArrayFull(value)) {
+    if (Array.isArray(value) && value.length) {
       return (value as string[]).map((val) => parser(val));
     }
 
@@ -271,7 +261,7 @@ export class CrudRequestQueryParser<Entity extends PlainLiteralObject>
       return [parser.call(this, value)];
     }
 
-    if (isArrayFull(value)) {
+    if (Array.isArray(value) && value.length) {
       return (value as string[]).map((val) => parser(val));
     }
 
@@ -290,7 +280,7 @@ export class CrudRequestQueryParser<Entity extends PlainLiteralObject>
   ): R[] {
     const param = this.getParamNames(type);
 
-    if (isArrayFull(param)) {
+    if (Array.isArray(param) && param.length) {
       return param.reduce(
         (a: R[], name) => [
           ...a,
@@ -306,7 +296,7 @@ export class CrudRequestQueryParser<Entity extends PlainLiteralObject>
   private parseFilterQueryParam(): QueryFilter<Entity>[] {
     const param = this.getParamNames('filter');
 
-    if (isArrayFull(param)) {
+    if (Array.isArray(param) && param.length) {
       return param.reduce(
         (a: QueryFilter<Entity>[], name) => [
           ...a,
@@ -322,7 +312,7 @@ export class CrudRequestQueryParser<Entity extends PlainLiteralObject>
   private parseOrQueryParam(): QueryFilter<Entity>[] {
     const param = this.getParamNames('or');
 
-    if (isArrayFull(param)) {
+    if (Array.isArray(param) && param.length) {
       return param.reduce(
         (a: QueryFilter<Entity>[], name) => [
           ...a,
@@ -338,7 +328,7 @@ export class CrudRequestQueryParser<Entity extends PlainLiteralObject>
   private parseSortQueryParam(): QuerySort<Entity>[] {
     const param = this.getParamNames('sort');
 
-    if (isArrayFull(param)) {
+    if (Array.isArray(param) && param.length) {
       return param.reduce(
         (a: QuerySort<Entity>[], name) => [
           ...a,
@@ -355,7 +345,7 @@ export class CrudRequestQueryParser<Entity extends PlainLiteralObject>
     try {
       const parsed = JSON.parse(val);
 
-      if (!isDate(parsed) && isObject(parsed)) {
+      if (parsed instanceof Date === false && isObject(parsed)) {
         // throw new Error('Don\'t support object now');
         return val;
       } else if (

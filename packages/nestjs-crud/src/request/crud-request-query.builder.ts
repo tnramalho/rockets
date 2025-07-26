@@ -1,14 +1,14 @@
-import {
-  hasValue,
-  isObject,
-  isString,
-  isArrayFull,
-  isNil,
-  isUndefined,
-} from '@nestjsx/util';
 import { stringify } from 'qs';
 
 import { PlainLiteralObject } from '@nestjs/common';
+import {
+  isNil,
+  isObject,
+  isString,
+  isUndefined,
+} from '@nestjs/common/utils/shared.utils';
+
+import { hasValue } from '../util/validation';
 
 import {
   validateCondition,
@@ -131,7 +131,7 @@ export class CrudRequestQueryBuilder<
   }
 
   select(fields: QueryFields<Entity>): this {
-    if (isArrayFull(fields) && this.paramNames.fields) {
+    if (Array.isArray(fields) && fields.length && this.paramNames.fields) {
       validateFields(fields);
       this.queryObject[this.paramNames.fields] = fields.join(
         this.options.delimStr,

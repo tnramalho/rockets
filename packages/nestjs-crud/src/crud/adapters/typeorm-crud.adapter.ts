@@ -1,12 +1,3 @@
-import {
-  hasLength,
-  isArrayFull,
-  isObject,
-  isUndefined,
-  objKeys,
-  isNil,
-  isNull,
-} from '@nestjsx/util';
 import { oO } from '@zmotivat0r/o0';
 import { plainToClass } from 'class-transformer';
 import {
@@ -25,6 +16,11 @@ import {
   PlainLiteralObject,
   Type,
 } from '@nestjs/common';
+import {
+  isNil,
+  isObject,
+  isUndefined,
+} from '@nestjs/common/utils/shared.utils';
 
 import { CrudEntityColumn } from '../../crud.types';
 import { comparisonOperatorKeys } from '../../request/crud-request.utils';
@@ -153,7 +149,7 @@ export class TypeOrmCrudAdapter<
     req: CrudRequestInterface<Entity>,
     dto: CrudCreateManyInterface<Entity | Partial<Entity>>,
   ): Promise<Entity[]> {
-    if (!isObject(dto) || !isArrayFull(dto.bulk)) {
+    if (!isObject(dto) || !Array.isArray(dto.bulk) || !dto.bulk.length) {
       this.throwBadRequestException('Empty data. Nothing to save.');
     }
 
@@ -165,7 +161,7 @@ export class TypeOrmCrudAdapter<
       (d): d is Entity => !isUndefined(d),
     );
 
-    if (!hasLength(bulk)) {
+    if (!bulk.length) {
       this.throwBadRequestException('Empty data. Nothing to save.');
     }
 
@@ -436,11 +432,11 @@ export class TypeOrmCrudAdapter<
   ) {
     /* istanbul ignore else */
     if (isObject(search)) {
-      const keys = objKeys(search);
+      const keys = Object.keys(search);
       /* istanbul ignore else */
       if (keys.length) {
         // search: {$and: [...], ...}
-        if (search?.$and && isArrayFull(search.$and)) {
+        if (search?.$and && Array.isArray(search.$and) && search.$and.length) {
           // search: {$and: [{}]}
           if (search.$and.length === 1) {
             this.setSearchCondition(builder, search.$and[0], condition);
@@ -459,7 +455,7 @@ export class TypeOrmCrudAdapter<
           }
         }
         // search: {$or: [...], ...}
-        else if (isArrayFull(search.$or)) {
+        else if (Array.isArray(search.$or) && search.$or.length) {
           // search: {$or: [...]}
           if (keys.length === 1) {
             // search: {$or: [{}]}
@@ -585,7 +581,7 @@ export class TypeOrmCrudAdapter<
     const index = `${field}${time[0]}${time[1]}`;
     const condFilter = {
       field,
-      operator: isNull(value) ? '$isnull' : operator,
+      operator: value === null ? '$isnull' : operator,
       value,
     };
 
@@ -601,7 +597,7 @@ export class TypeOrmCrudAdapter<
     condition: SConditionKey,
     field: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    object: any,
+    object: { [k: string]: any; $or?: any; $and?: any },
   ) {
     /* istanbul ignore else */
     if (isObject(object)) {
@@ -612,7 +608,7 @@ export class TypeOrmCrudAdapter<
         const value = object[operator];
 
         if (isObject(object.$or)) {
-          const orKeys = objKeys(object.$or);
+          const orKeys = Object.keys(object.$or);
           this.setSearchFieldObjectCondition(
             builder,
             orKeys.length === 1 ? condition : '$or',
@@ -635,7 +631,7 @@ export class TypeOrmCrudAdapter<
                 if (operator !== '$or') {
                   this.builderSetWhere(qb, condition, field, value, operator);
                 } else {
-                  const orKeys = objKeys(object.$or);
+                  const orKeys = Object.keys(object.$or);
 
                   if (orKeys.length === 1) {
                     this.setSearchFieldObjectCondition(
@@ -746,15 +742,10 @@ export class TypeOrmCrudAdapter<
   ): { str: string; params: PlainLiteralObject } {
     const field = this.getFieldWithAlias(cond.field);
 
-    const likeOperator =
-      this.dbName === 'postgres' ? 'ILIKE' : /* istanbul ignore next */ 'LIKE';
+    const likeOperator = this.dbName === 'postgres' ? 'ILIKE' : 'LIKE';
 
     let str: string;
     let params: PlainLiteralObject | undefined = undefined;
-
-    if (cond.operator[0] !== '$') {
-      cond.operator = ('$' + cond.operator) as ComparisonOperator;
-    }
 
     switch (cond.operator) {
       case '$eq':
@@ -885,16 +876,6 @@ export class TypeOrmCrudAdapter<
     }
 
     return { str, params };
-  }
-
-  private checkFilterIsArray(cond: QueryFilter<Entity>, withLength?: boolean) {
-    if (
-      !Array.isArray(cond.value) ||
-      !cond.value.length ||
-      (!isNil(withLength) ? withLength : false)
-    ) {
-      this.throwBadRequestException(`Invalid column '${cond.field}' value`);
-    }
   }
 
   private checkSqlInjection(field: string): string {

@@ -1,6 +1,5 @@
-import { isString } from '@nestjsx/util';
-
 import { PlainLiteralObject } from '@nestjs/common';
+import { isString } from '@nestjs/common/utils/shared.utils';
 
 import { CrudRequestQueryBuilder } from '../../request/crud-request-query.builder';
 import { CrudOptionsInterface } from '../interfaces/crud-options.interface';

@@ -1,8 +1,7 @@
-import { ClassType } from '@nestjsx/util';
 import { plainToClass } from 'class-transformer';
 import { MigrationInterface, Repository, QueryRunner } from 'typeorm';
 
-import { PlainLiteralObject } from '@nestjs/common';
+import { PlainLiteralObject, Type } from '@nestjs/common';
 
 import { CompanyEntity } from './company/company.entity';
 import { NoteEntity } from './note/note.entity';
@@ -16,7 +15,7 @@ export class Seeds implements MigrationInterface {
   ): Promise<T[]> {
     return repo.save(
       data.map((partial: Partial<T>) =>
-        plainToClass(repo.target as ClassType<T>, partial, {
+        plainToClass(repo.target as Type<T>, partial, {
           ignoreDecorators: true,
         }),
       ),

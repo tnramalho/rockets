@@ -1,16 +1,18 @@
-import { hasLength, isObject, objKeys } from '@nestjsx/util';
 import { plainToClass } from 'class-transformer';
 
 import { BadRequestException, PlainLiteralObject, Type } from '@nestjs/common';
+import { isObject } from '@nestjs/common/utils/shared.utils';
 
 import { CrudEntityColumn } from '../../crud.types';
 import { CrudRequestParsedParamsInterface } from '../../request/interfaces/crud-request-parsed-params.interface';
+import { QueryFilter } from '../../request/types/crud-request-query.types';
 import { CrudCreateManyInterface } from '../interfaces/crud-create-many.interface';
 import { CrudParamsOptionsInterface } from '../interfaces/crud-params-options.interface';
 import { CrudQueryOptionsInterface } from '../interfaces/crud-query-options.interface';
 import { CrudRequestOptionsInterface } from '../interfaces/crud-request-options.interface';
 import { CrudRequestInterface } from '../interfaces/crud-request.interface';
 import { CrudResponsePaginatedInterface } from '../interfaces/crud-response-paginated.interface';
+import { queryFilterIsArray } from '../util';
 
 export abstract class CrudAdapter<Entity extends PlainLiteralObject> {
   throwBadRequestException(msg?: unknown): BadRequestException {
@@ -115,7 +117,7 @@ export abstract class CrudAdapter<Entity extends PlainLiteralObject> {
   ): CrudEntityColumn<Entity>[] {
     const rawParams: CrudParamsOptionsInterface<Entity> = options.params ?? {};
 
-    const params = objKeys(rawParams).filter(
+    const params = Object.keys(rawParams).filter(
       (n) => rawParams[n] && rawParams[n].primary,
     );
 
@@ -134,7 +136,7 @@ export abstract class CrudAdapter<Entity extends PlainLiteralObject> {
     const filters: Partial<Record<CrudEntityColumn<Entity>, unknown>> = {};
 
     /* istanbul ignore else */
-    if (hasLength(parsed.paramsFilter)) {
+    if (parsed.paramsFilter.length) {
       for (const filter of parsed.paramsFilter) {
         filters[filter.field] = filter.value;
       }
@@ -161,6 +163,14 @@ export abstract class CrudAdapter<Entity extends PlainLiteralObject> {
         );
   }
 
+  checkFilterIsArray(cond: QueryFilter<Entity>): boolean {
+    if (queryFilterIsArray(cond)) {
+      return true;
+    }
+
+    throw new BadRequestException(`Invalid column '${cond.field}' value`);
+  }
+
   protected prepareEntityBeforeSave(
     dto: Partial<Entity>,
     parsed: CrudRequestParsedParamsInterface<Entity>,
@@ -169,7 +179,7 @@ export abstract class CrudAdapter<Entity extends PlainLiteralObject> {
       return undefined;
     }
 
-    if (hasLength(parsed.paramsFilter)) {
+    if (parsed.paramsFilter.length) {
       for (const filter of parsed.paramsFilter) {
         if (filter.field in dto) {
           (dto as Record<string, unknown>)[filter.field] = filter.value;
@@ -177,7 +187,7 @@ export abstract class CrudAdapter<Entity extends PlainLiteralObject> {
       }
     }
 
-    if (!hasLength(objKeys(dto))) {
+    if (!Object.keys(dto).length) {
       return undefined;
     }
 

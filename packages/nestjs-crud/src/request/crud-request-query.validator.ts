@@ -1,13 +1,7 @@
-import {
-  isArrayStrings,
-  isStringFull,
-  isObject,
-  isNumber,
-  isNil,
-  objKeys,
-} from '@nestjsx/util';
-
 import { PlainLiteralObject } from '@nestjs/common';
+import { isNil, isNumber, isObject } from '@nestjs/common/utils/shared.utils';
+
+import { isArrayStrings, isStringFull } from '../util/validation';
 
 import { CrudRequestQueryException } from './exceptions/crud-request-query.exception';
 import { CrudRequestParamsOptionsInterface } from './interfaces/crud-request-params-options.interface';
@@ -38,7 +32,7 @@ export const deprecatedComparisonOperatorsList = [
 ];
 export const comparisonOperatorsList = [
   ...deprecatedComparisonOperatorsList,
-  ...objKeys(CondOperator).map(
+  ...Object.keys(CondOperator).map(
     (n) => CondOperator[n as keyof typeof CondOperator],
   ),
 ];
@@ -78,12 +72,16 @@ export function validateComparisonOperator(operator: ComparisonOperator): void {
   }
 }
 
-export function isSortOrder(value: string): value is QuerySortOperator {
+export function isSortOrder(value: unknown): value is QuerySortOperator {
   return value === 'ASC' || value === 'DESC';
 }
 
-export function validateSort(sort: PlainLiteralObject): void {
-  if (!isObject(sort) || !isStringFull(sort.field)) {
+export function validateSort(sort: { field?: unknown; order?: unknown }): void {
+  if (
+    !isObject(sort) ||
+    'field' in sort === false ||
+    !isStringFull(sort.field)
+  ) {
     throw new CrudRequestQueryException({
       message: 'Invalid sort field. String expected',
     });

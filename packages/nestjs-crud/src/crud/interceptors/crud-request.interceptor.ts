@@ -1,5 +1,3 @@
-import { isFunction, isArrayFull, hasLength } from '@nestjsx/util';
-
 import {
   CallHandler,
   ExecutionContext,
@@ -7,6 +5,7 @@ import {
   NestInterceptor,
   PlainLiteralObject,
 } from '@nestjs/common';
+import { isFunction } from '@nestjs/common/utils/shared.utils';
 
 import { CRUD_MODULE_CRUD_REQUEST_KEY } from '../../crud.constants';
 import { CrudRequestException } from '../../exceptions/crud-request.exception';
@@ -102,7 +101,7 @@ export class CrudRequestInterceptor<
     const optionsFilter =
       crudOptions.query?.filter !== undefined &&
       Array.isArray(crudOptions.query?.filter) &&
-      isArrayFull(crudOptions.query?.filter)
+      crudOptions.query?.filter.length
         ? (crudOptions.query?.filter).map(parser.convertFilterToSearch)
         : [(crudOptions.query?.filter as SCondition<T>) || {}];
 
@@ -110,7 +109,7 @@ export class CrudRequestInterceptor<
 
     if (parser.search) {
       search = [parser.search];
-    } else if (hasLength(parser.filter) && hasLength(parser.or)) {
+    } else if (parser.filter.length && parser.or.length) {
       search =
         parser.filter.length === 1 && parser.or.length === 1
           ? [
@@ -129,10 +128,10 @@ export class CrudRequestInterceptor<
                 ],
               },
             ];
-    } else if (hasLength(parser.filter)) {
+    } else if (parser.filter.length) {
       search = parser.filter.map(parser.convertFilterToSearch);
     } else {
-      if (hasLength(parser.or)) {
+      if (parser.or.length) {
         search =
           parser.or.length === 1
             ? [parser.convertFilterToSearch(parser.or[0])]
@@ -155,7 +154,7 @@ export class CrudRequestInterceptor<
     if (params) {
       parser.parseParams(params, crudOptions.params ?? {});
 
-      return isArrayFull(parser.paramsFilter)
+      return Array.isArray(parser.paramsFilter) && parser.paramsFilter.length
         ? parser.paramsFilter.map(parser.convertFilterToSearch)
         : [];
     }
