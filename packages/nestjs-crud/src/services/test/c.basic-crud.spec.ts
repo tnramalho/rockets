@@ -64,7 +64,7 @@ describe('#crud-typeorm', () => {
       constructor(public service: CompanyCrudService) {}
 
       @CrudGetMany()
-      getMany(@CrudRequest() request: CrudRequestInterface) {
+      getMany(@CrudRequest() request: CrudRequestInterface<CompanyEntity>) {
         return this.service.getMany(request);
       }
     }
@@ -129,7 +129,7 @@ describe('#crud-typeorm', () => {
       constructor(public service: CompanyCrudService) {}
 
       @CrudGetMany()
-      getMany(@CrudRequest() request: CrudRequestInterface) {
+      getMany(@CrudRequest() request: CrudRequestInterface<CompanyEntity>) {
         return this.service.getMany(request);
       }
     }
@@ -237,18 +237,18 @@ describe('#crud-typeorm', () => {
       constructor(public service: CompanyCrudService) {}
 
       @CrudGetMany()
-      getMany(@CrudRequest() request: CrudRequestInterface) {
+      getMany(@CrudRequest() request: CrudRequestInterface<CompanyEntity>) {
         return this.service.getMany(request);
       }
 
       @CrudGetOne()
-      getOne(@CrudRequest() request: CrudRequestInterface) {
+      getOne(@CrudRequest() request: CrudRequestInterface<CompanyEntity>) {
         return this.service.getOne(request);
       }
 
       @CrudCreateOne()
       createOne(
-        @CrudRequest() request: CrudRequestInterface,
+        @CrudRequest() request: CrudRequestInterface<CompanyEntity>,
         @CrudBody() dto: CompanyCreateDto,
       ) {
         return this.service.createOne(request, dto);
@@ -256,7 +256,7 @@ describe('#crud-typeorm', () => {
 
       @CrudCreateMany({ path: 'bulk' })
       createMany(
-        @CrudRequest() request: CrudRequestInterface,
+        @CrudRequest() request: CrudRequestInterface<CompanyEntity>,
         @CrudBody() dto: CompanyCreateManyDto,
       ) {
         return this.service.createMany(request, dto);
@@ -264,7 +264,7 @@ describe('#crud-typeorm', () => {
 
       @CrudUpdateOne()
       updateOne(
-        @CrudRequest() request: CrudRequestInterface,
+        @CrudRequest() request: CrudRequestInterface<CompanyEntity>,
         @CrudBody() dto: CompanyUpdateDto,
       ) {
         return this.service.updateOne(request, dto);
@@ -272,19 +272,19 @@ describe('#crud-typeorm', () => {
 
       @CrudReplaceOne()
       replaceOne(
-        @CrudRequest() request: CrudRequestInterface,
+        @CrudRequest() request: CrudRequestInterface<CompanyEntity>,
         @CrudBody() dto: CompanyCreateDto,
       ) {
         return this.service.replaceOne(request, dto);
       }
 
       @CrudDeleteOne({ returnDeleted: true })
-      deleteOne(@CrudRequest() request: CrudRequestInterface) {
+      deleteOne(@CrudRequest() request: CrudRequestInterface<CompanyEntity>) {
         return this.service.deleteOne(request);
       }
 
       @CrudRecoverOne({ path: ':id/recover' })
-      recoverOne(@CrudRequest() request: CrudRequestInterface) {
+      recoverOne(@CrudRequest() request: CrudRequestInterface<CompanyEntity>) {
         return this.service.recoverOne(request);
       }
     }
@@ -305,7 +305,7 @@ describe('#crud-typeorm', () => {
 
       @CrudCreateOne({ returnShallow: true })
       createOne(
-        @CrudRequest() request: CrudRequestInterface,
+        @CrudRequest() request: CrudRequestInterface<DeviceEntity>,
         @CrudBody() dto: DeviceCreateDto,
       ) {
         return this.service.createOne(request, dto);

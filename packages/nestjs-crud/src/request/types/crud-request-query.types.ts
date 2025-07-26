@@ -1,42 +1,32 @@
-export type QueryFields = string[];
+import { PlainLiteralObject } from '@nestjs/common';
 
-export type QueryFilter = {
-  field: string;
+import { CrudEntityColumn } from '../../crud.types';
+
+export type QueryFields<T extends PlainLiteralObject> = CrudEntityColumn<T>[];
+
+export type QueryFilter<T extends PlainLiteralObject> = {
+  field: CrudEntityColumn<T>;
   operator: ComparisonOperator;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  value?: any;
+  value?: unknown;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type QueryFilterArr = [string, ComparisonOperator, any?];
+export type QueryFilterArr<T extends PlainLiteralObject> = [
+  CrudEntityColumn<T>,
+  ComparisonOperator,
+  unknown?,
+];
 
-export type QueryJoinArr = [string, QueryFields?];
-
-export type QuerySort = {
-  field: string;
+export type QuerySort<T extends PlainLiteralObject> = {
+  field: CrudEntityColumn<T>;
   order: QuerySortOperator;
 };
 
-export type QuerySortArr = [string, QuerySortOperator];
+export type QuerySortArr<T extends PlainLiteralObject> = [
+  CrudEntityColumn<T>,
+  QuerySortOperator,
+];
 
 export type QuerySortOperator = 'ASC' | 'DESC';
-
-type DeprecatedCondOperator =
-  | 'eq'
-  | 'ne'
-  | 'gt'
-  | 'lt'
-  | 'gte'
-  | 'lte'
-  | 'starts'
-  | 'ends'
-  | 'cont'
-  | 'excl'
-  | 'in'
-  | 'notin'
-  | 'isnull'
-  | 'notnull'
-  | 'between';
 
 export enum CondOperator {
   EQUALS = '$eq',
@@ -64,55 +54,61 @@ export enum CondOperator {
   NOT_IN_LOW = '$notinL',
 }
 
-export type ComparisonOperator = DeprecatedCondOperator | keyof SFieldOperator;
+export type ComparisonOperator = keyof SFieldOperator;
 
 // new search
 export type SPrimitivesVal = string | number | boolean;
 
-export type SFiledValues = SPrimitivesVal | Array<SPrimitivesVal>;
+export type SFieldValues = SPrimitivesVal | Array<SPrimitivesVal>;
 
 export type SFieldOperator = {
-  $eq?: SFiledValues;
-  $ne?: SFiledValues;
-  $gt?: SFiledValues;
-  $lt?: SFiledValues;
-  $gte?: SFiledValues;
-  $lte?: SFiledValues;
-  $starts?: SFiledValues;
-  $ends?: SFiledValues;
-  $cont?: SFiledValues;
-  $excl?: SFiledValues;
-  $in?: SFiledValues;
-  $notin?: SFiledValues;
-  $between?: SFiledValues;
-  $isnull?: SFiledValues;
-  $notnull?: SFiledValues;
-  $eqL?: SFiledValues;
-  $neL?: SFiledValues;
-  $startsL?: SFiledValues;
-  $endsL?: SFiledValues;
-  $contL?: SFiledValues;
-  $exclL?: SFiledValues;
-  $inL?: SFiledValues;
-  $notinL?: SFiledValues;
+  $eq?: SFieldValues;
+  $ne?: SFieldValues;
+  $gt?: SFieldValues;
+  $lt?: SFieldValues;
+  $gte?: SFieldValues;
+  $lte?: SFieldValues;
+  $starts?: SFieldValues;
+  $ends?: SFieldValues;
+  $cont?: SFieldValues;
+  $excl?: SFieldValues;
+  $in?: SFieldValues;
+  $notin?: SFieldValues;
+  $between?: SFieldValues;
+  $isnull?: SFieldValues;
+  $notnull?: SFieldValues;
+  $eqL?: SFieldValues;
+  $neL?: SFieldValues;
+  $startsL?: SFieldValues;
+  $endsL?: SFieldValues;
+  $contL?: SFieldValues;
+  $exclL?: SFieldValues;
+  $inL?: SFieldValues;
+  $notinL?: SFieldValues;
   $or?: SFieldOperator;
   $and?: never;
 };
 
 export type SField = SPrimitivesVal | SFieldOperator;
 
-export type SFields = {
-  [key: string]: SField | Array<SFields | SConditionAND> | undefined | null;
-  $or?: Array<SFields | SConditionAND>;
+export type SFields<T extends PlainLiteralObject> = Partial<
+  Record<
+    CrudEntityColumn<T>,
+    SField | Array<SFields<T> | SConditionAND<T>> | undefined | null
+  >
+> & {
+  $or?: Array<SCondition<T>>;
   $and?: never;
 };
 
-export type SConditionAND = {
+export type SConditionAND<T extends PlainLiteralObject> = {
   [key: string]: unknown;
-  $and?: Array<SFields | SConditionAND>;
+  $and?: Array<SCondition<T>>;
   $or?: never;
 };
 
 export type SConditionKey = '$and' | '$or';
 
-export type SCondition = SFields | SConditionAND;
+export type SCondition<T extends PlainLiteralObject> =
+  | SFields<T>
+  | SConditionAND<T>;

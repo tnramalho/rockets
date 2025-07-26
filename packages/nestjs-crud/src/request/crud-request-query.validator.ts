@@ -2,11 +2,12 @@ import {
   isArrayStrings,
   isStringFull,
   isObject,
-  isEqual,
   isNumber,
   isNil,
   objKeys,
 } from '@nestjsx/util';
+
+import { PlainLiteralObject } from '@nestjs/common';
 
 import { CrudRequestQueryException } from './exceptions/crud-request-query.exception';
 import { CrudRequestParamsOptionsInterface } from './interfaces/crud-request-params-options.interface';
@@ -15,7 +16,7 @@ import {
   CondOperator,
   QueryFields,
   QueryFilter,
-  QuerySort,
+  QuerySortOperator,
 } from './types/crud-request-query.types';
 
 export const deprecatedComparisonOperatorsList = [
@@ -47,7 +48,9 @@ export const sortOrdersList = ['ASC', 'DESC'];
 const comparisonOperatorsListStr = comparisonOperatorsList.join();
 const sortOrdersListStr = sortOrdersList.join();
 
-export function validateFields(fields: QueryFields): void {
+export function validateFields<T extends PlainLiteralObject>(
+  fields: QueryFields<T>,
+): void {
   if (!isArrayStrings(fields)) {
     throw new CrudRequestQueryException({
       message: 'Invalid fields. Array of strings expected',
@@ -55,8 +58,8 @@ export function validateFields(fields: QueryFields): void {
   }
 }
 
-export function validateCondition(
-  val: QueryFilter,
+export function validateCondition<T extends PlainLiteralObject>(
+  val: QueryFilter<T>,
   cond: 'filter' | 'or' | 'search',
 ): void {
   if (!isObject(val) || !isStringFull(val.field)) {
@@ -75,16 +78,17 @@ export function validateComparisonOperator(operator: ComparisonOperator): void {
   }
 }
 
-export function validateSort(sort: QuerySort): void {
+export function isSortOrder(value: string): value is QuerySortOperator {
+  return value === 'ASC' || value === 'DESC';
+}
+
+export function validateSort(sort: PlainLiteralObject): void {
   if (!isObject(sort) || !isStringFull(sort.field)) {
     throw new CrudRequestQueryException({
       message: 'Invalid sort field. String expected',
     });
   }
-  if (
-    !isEqual(sort.order, sortOrdersList[0]) &&
-    !isEqual(sort.order, sortOrdersList[1])
-  ) {
+  if (!isSortOrder(sort.order)) {
     throw new CrudRequestQueryException({
       message: `Invalid sort order. ${sortOrdersListStr} expected`,
     });
@@ -102,8 +106,8 @@ export function validateNumeric(
   }
 }
 
-export function validateParamOption(
-  options: CrudRequestParamsOptionsInterface,
+export function validateParamOption<T extends PlainLiteralObject>(
+  options: CrudRequestParamsOptionsInterface<T>,
   name: string,
 ) {
   if (!isObject(options)) {

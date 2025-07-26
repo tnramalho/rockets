@@ -20,21 +20,21 @@ export class CrudBaseController<
   constructor(protected crudService: CrudService<Entity>) {}
 
   getMany(
-    _crudRequest: CrudRequestInterface,
+    _crudRequest: CrudRequestInterface<Entity>,
     ..._rest: AdditionalCrudMethodArgs
   ): Promise<CrudResponsePaginatedInterface<Entity> | Entity[]> {
     throw new CrudMethodNotImplementedException(this, this.getMany);
   }
 
   getOne(
-    _crudRequest: CrudRequestInterface,
+    _crudRequest: CrudRequestInterface<Entity>,
     ..._rest: AdditionalCrudMethodArgs
   ): Promise<Entity> {
     throw new CrudMethodNotImplementedException(this, this.getOne);
   }
 
   createOne(
-    _crudRequest: CrudRequestInterface,
+    _crudRequest: CrudRequestInterface<Entity>,
     _dto: Creatable,
     ..._rest: AdditionalCrudMethodArgs
   ): Promise<Entity> {
@@ -42,7 +42,7 @@ export class CrudBaseController<
   }
 
   createMany(
-    _crudRequest: CrudRequestInterface,
+    _crudRequest: CrudRequestInterface<Entity>,
     _dto: CrudCreateManyInterface<Creatable>,
     ..._rest: AdditionalCrudMethodArgs
   ): Promise<Entity[]> {
@@ -50,7 +50,7 @@ export class CrudBaseController<
   }
 
   updateOne(
-    _crudRequest: CrudRequestInterface,
+    _crudRequest: CrudRequestInterface<Entity>,
     _dto: Updatable,
     ..._rest: AdditionalCrudMethodArgs
   ): Promise<Entity> {
@@ -58,7 +58,7 @@ export class CrudBaseController<
   }
 
   replaceOne(
-    _crudRequest: CrudRequestInterface,
+    _crudRequest: CrudRequestInterface<Entity>,
     _dto: Replaceable,
     ..._rest: AdditionalCrudMethodArgs
   ): Promise<Entity> {
@@ -66,14 +66,14 @@ export class CrudBaseController<
   }
 
   deleteOne(
-    _crudRequest: CrudRequestInterface,
+    _crudRequest: CrudRequestInterface<Entity>,
     ..._rest: AdditionalCrudMethodArgs
   ): Promise<Entity | void> {
     throw new CrudMethodNotImplementedException(this, this.deleteOne);
   }
 
   recoverOne(
-    _crudRequest: CrudRequestInterface,
+    _crudRequest: CrudRequestInterface<Entity>,
     ..._rest: AdditionalCrudMethodArgs
   ): Promise<Entity | void> {
     throw new CrudMethodNotImplementedException(this, this.recoverOne);

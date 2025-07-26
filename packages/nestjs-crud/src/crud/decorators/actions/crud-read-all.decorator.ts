@@ -1,4 +1,4 @@
-import { applyDecorators, Get } from '@nestjs/common';
+import { applyDecorators, Get, PlainLiteralObject } from '@nestjs/common';
 
 import { CrudActions } from '../../enums/crud-actions.enum';
 import { CrudReadAllOptionsInterface } from '../../interfaces/crud-route-options.interface';
@@ -12,7 +12,9 @@ import { CrudValidate } from '../routes/crud-validate.decorator';
 /**
  * CRUD Read All route decorator
  */
-export const CrudReadAll = (options: CrudReadAllOptionsInterface = {}) => {
+export const CrudReadAll = <T extends PlainLiteralObject = PlainLiteralObject>(
+  options: CrudReadAllOptionsInterface<T> = {},
+) => {
   const { path, validation, serialization, api } = options;
 
   return applyDecorators(

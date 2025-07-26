@@ -1,3 +1,4 @@
+import { PlainLiteralObject } from '@nestjs/common';
 import { ApiParam, ApiParamOptions } from '@nestjs/swagger';
 
 import { CrudException } from '../../../exceptions/crud.exception';
@@ -9,12 +10,12 @@ import { CrudReflectionService } from '../../../services/crud-reflection.service
  * Add an ApiParam to every method with a crud action.
  */
 export const CrudInitApiParams =
-  (): ClassDecorator =>
+  <T extends PlainLiteralObject = PlainLiteralObject>(): ClassDecorator =>
   (...args: Parameters<ClassDecorator>) => {
     // get the args
     const [classTarget] = args;
 
-    const reflectionService = new CrudReflectionService();
+    const reflectionService = new CrudReflectionService<T>();
 
     // get the api param options
     const apiParamsMetadata =

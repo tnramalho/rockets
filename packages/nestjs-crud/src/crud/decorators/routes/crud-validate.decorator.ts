@@ -1,4 +1,4 @@
-import { SetMetadata } from '@nestjs/common';
+import { PlainLiteralObject, SetMetadata } from '@nestjs/common';
 
 import { CRUD_MODULE_ROUTE_VALIDATION_METADATA } from '../../../crud.constants';
 import { CrudValidationOptions } from '../../../crud.types';
@@ -17,5 +17,6 @@ import { CrudValidationOptions } from '../../../crud.types';
  *
  * @param options - crud validation options
  */
-export const CrudValidate = (options?: CrudValidationOptions) =>
-  SetMetadata(CRUD_MODULE_ROUTE_VALIDATION_METADATA, options);
+export const CrudValidate = <T extends PlainLiteralObject = PlainLiteralObject>(
+  options?: CrudValidationOptions<T>,
+) => SetMetadata(CRUD_MODULE_ROUTE_VALIDATION_METADATA, options);

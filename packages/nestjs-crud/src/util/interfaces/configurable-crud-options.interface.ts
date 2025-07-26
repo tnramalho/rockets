@@ -19,13 +19,20 @@ export interface ConfigurableCrudOptions<Entity extends PlainLiteralObject> {
     injectionToken: InjectionToken;
     adapter: Type<CrudAdapter<Entity>>;
   };
-  controller: CrudControllerOptionsInterface & CrudExtraDecoratorsInterface;
-  getMany?: CrudReadAllOptionsInterface & CrudExtraDecoratorsInterface;
-  getOne?: CrudReadOneOptionsInterface & CrudExtraDecoratorsInterface;
-  createMany?: CrudCreateManyOptionsInterface & CrudExtraDecoratorsInterface;
-  createOne?: CrudCreateOneOptionsInterface & CrudExtraDecoratorsInterface;
-  updateOne?: CrudUpdateOneOptionsInterface & CrudExtraDecoratorsInterface;
-  replaceOne?: CrudReplaceOneOptionsInterface & CrudExtraDecoratorsInterface;
-  deleteOne?: CrudDeleteOneOptionsInterface & CrudExtraDecoratorsInterface;
-  recoverOne?: CrudRecoverOneOptionsInterface & CrudExtraDecoratorsInterface;
+  controller: CrudControllerOptionsInterface<Entity> &
+    CrudExtraDecoratorsInterface;
+  getMany?: CrudReadAllOptionsInterface<Entity> & CrudExtraDecoratorsInterface;
+  getOne?: CrudReadOneOptionsInterface<Entity> & CrudExtraDecoratorsInterface;
+  createMany?: CrudCreateManyOptionsInterface<Entity> &
+    CrudExtraDecoratorsInterface;
+  createOne?: CrudCreateOneOptionsInterface<Entity> &
+    CrudExtraDecoratorsInterface;
+  updateOne?: CrudUpdateOneOptionsInterface<Entity> &
+    CrudExtraDecoratorsInterface;
+  replaceOne?: CrudReplaceOneOptionsInterface<Entity> &
+    CrudExtraDecoratorsInterface;
+  deleteOne?: CrudDeleteOneOptionsInterface<Entity> &
+    CrudExtraDecoratorsInterface;
+  recoverOne?: CrudRecoverOneOptionsInterface<Entity> &
+    CrudExtraDecoratorsInterface;
 }

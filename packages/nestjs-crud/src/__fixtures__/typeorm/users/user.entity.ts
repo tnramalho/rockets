@@ -21,9 +21,6 @@ export class UserEntity extends BaseEntity {
   @Column(() => NameEntity)
   name!: NameEntity;
 
-  @Column({ nullable: true })
-  profileId?: number | null;
-
   @Column({ nullable: false })
   companyId?: number;
 

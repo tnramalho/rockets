@@ -63,7 +63,7 @@ describe('#crud-typeorm', () => {
       constructor(public service: CompanyCrudService) {}
 
       @CrudGetMany()
-      getMany(@CrudRequest() request: CrudRequestInterface) {
+      getMany(@CrudRequest() request: CrudRequestInterface<CompanyEntity>) {
         return this.service.getMany(request);
       }
     }
@@ -85,18 +85,18 @@ describe('#crud-typeorm', () => {
       constructor(public service: ProjectCrudService) {}
 
       @CrudGetMany()
-      getMany(@CrudRequest() request: CrudRequestInterface) {
+      getMany(@CrudRequest() request: CrudRequestInterface<ProjectEntity>) {
         return this.service.getMany(request);
       }
 
       @CrudGetOne()
-      getOne(@CrudRequest() request: CrudRequestInterface) {
+      getOne(@CrudRequest() request: CrudRequestInterface<ProjectEntity>) {
         return this.service.getOne(request);
       }
 
       @CrudUpdateOne()
       updateOne(
-        @CrudRequest() request: CrudRequestInterface,
+        @CrudRequest() request: CrudRequestInterface<ProjectEntity>,
         @CrudBody() project: ProjectCreateDto,
       ) {
         return this.service.updateOne(request, project);
@@ -111,7 +111,7 @@ describe('#crud-typeorm', () => {
       constructor(public service: ProjectCrudService) {}
 
       @CrudGetMany()
-      getMany(@CrudRequest() request: CrudRequestInterface) {
+      getMany(@CrudRequest() request: CrudRequestInterface<ProjectEntity>) {
         return this.service.getMany(request);
       }
     }
@@ -125,7 +125,7 @@ describe('#crud-typeorm', () => {
       constructor(public service: ProjectCrudService) {}
 
       @CrudGetMany()
-      getMany(@CrudRequest() request: CrudRequestInterface) {
+      getMany(@CrudRequest() request: CrudRequestInterface<ProjectEntity>) {
         return this.service.getMany(request);
       }
     }
@@ -139,7 +139,7 @@ describe('#crud-typeorm', () => {
       constructor(public service: ProjectCrudService) {}
 
       @CrudGetMany()
-      getMany(@CrudRequest() request: CrudRequestInterface) {
+      getMany(@CrudRequest() request: CrudRequestInterface<ProjectEntity>) {
         return this.service.getMany(request);
       }
     }
@@ -152,7 +152,7 @@ describe('#crud-typeorm', () => {
       constructor(public service: UserCrudService) {}
 
       @CrudGetMany()
-      getMany(@CrudRequest() request: CrudRequestInterface) {
+      getMany(@CrudRequest() request: CrudRequestInterface<UserEntity>) {
         return this.service.getMany(request);
       }
     }
@@ -165,7 +165,7 @@ describe('#crud-typeorm', () => {
       constructor(public service: NoteCrudService) {}
 
       @CrudGetMany()
-      getMany(@CrudRequest() request: CrudRequestInterface) {
+      getMany(@CrudRequest() request: CrudRequestInterface<NoteEntity>) {
         return this.service.getMany(request);
       }
     }
@@ -226,7 +226,7 @@ describe('#crud-typeorm', () => {
     describe('#select', () => {
       it('should throw status 400', (done) => {
         const query = qb
-          .setFilter({ field: 'invalid', operator: 'isnull' })
+          .setFilter({ field: 'invalid', operator: '$isnull' })
           .query();
         request(server)
           .get('/companies')
@@ -268,10 +268,10 @@ describe('#crud-typeorm', () => {
         const query = qb
           .setFilter({
             field: 'name',
-            operator: 'notin',
+            operator: '$notin',
             value: ['Name2', 'Name3'],
           })
-          .setOr({ field: 'domain', operator: 'cont', value: 5 })
+          .setOr({ field: 'domain', operator: '$cont', value: 5 })
           .query();
         request(server)
           .get('/companies')
@@ -284,9 +284,9 @@ describe('#crud-typeorm', () => {
       });
       it('should return with filter and or, 2', (done) => {
         const query = qb
-          .setFilter({ field: 'name', operator: 'ends', value: 'foo' })
-          .setOr({ field: 'name', operator: 'starts', value: 'P' })
-          .setOr({ field: 'isActive', operator: 'eq', value: true })
+          .setFilter({ field: 'name', operator: '$ends', value: 'foo' })
+          .setOr({ field: 'name', operator: '$starts', value: 'P' })
+          .setOr({ field: 'isActive', operator: '$eq', value: true })
           .query();
         request(server)
           .get('/projects')
@@ -299,9 +299,9 @@ describe('#crud-typeorm', () => {
       });
       it('should return with filter and or, 3', (done) => {
         const query = qb
-          .setOr({ field: 'companyId', operator: 'gt', value: 22 })
-          .setFilter({ field: 'companyId', operator: 'gte', value: 6 })
-          .setFilter({ field: 'companyId', operator: 'lt', value: 10 })
+          .setOr({ field: 'companyId', operator: '$gt', value: 22 })
+          .setFilter({ field: 'companyId', operator: '$gte', value: 6 })
+          .setFilter({ field: 'companyId', operator: '$lt', value: 10 })
           .query();
         request(server)
           .get('/projects')
@@ -314,10 +314,10 @@ describe('#crud-typeorm', () => {
       });
       it('should return with filter and or, 4', (done) => {
         const query = qb
-          .setOr({ field: 'companyId', operator: 'in', value: [6, 10] })
-          .setOr({ field: 'companyId', operator: 'lte', value: 10 })
-          .setFilter({ field: 'isActive', operator: 'eq', value: false })
-          .setFilter({ field: 'description', operator: 'notnull' })
+          .setOr({ field: 'companyId', operator: '$in', value: [6, 10] })
+          .setOr({ field: 'companyId', operator: '$lte', value: 10 })
+          .setFilter({ field: 'isActive', operator: '$eq', value: false })
+          .setFilter({ field: 'description', operator: '$notnull' })
           .query();
         request(server)
           .get('/projects')
@@ -330,7 +330,7 @@ describe('#crud-typeorm', () => {
       });
       it('should return with filter and or, 6', (done) => {
         const query = qb
-          .setOr({ field: 'companyId', operator: 'isnull' })
+          .setOr({ field: 'companyId', operator: '$isnull' })
           .query();
         request(server)
           .get('/projects')
@@ -343,7 +343,7 @@ describe('#crud-typeorm', () => {
       });
       it('should return with filter and or, 6', (done) => {
         const query = qb
-          .setOr({ field: 'companyId', operator: 'between', value: [1, 5] })
+          .setOr({ field: 'companyId', operator: '$between', value: [1, 5] })
           .query();
         request(server)
           .get('/projects')
@@ -356,7 +356,7 @@ describe('#crud-typeorm', () => {
       });
       it('should return with filter, 1', (done) => {
         const query = qb
-          .setOr({ field: 'companyId', operator: 'eq', value: 1 })
+          .setOr({ field: 'companyId', operator: '$eq', value: 1 })
           .query();
         request(server)
           .get('/projects')

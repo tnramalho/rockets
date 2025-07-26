@@ -7,15 +7,20 @@ import { SCondition } from '../../request/types/crud-request-query.types';
 
 import { CrudQueryHelper } from './crud-query.helper';
 
+class TestEntity {
+  name!: string;
+}
+
 describe('CrudQueryHelper', () => {
-  let crudQueryService: CrudQueryHelper;
+  let crudQueryService: CrudQueryHelper<TestEntity>;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       providers: [CrudQueryHelper],
     }).compile();
 
-    crudQueryService = moduleRef.get<CrudQueryHelper>(CrudQueryHelper);
+    crudQueryService =
+      moduleRef.get<CrudQueryHelper<TestEntity>>(CrudQueryHelper);
   });
 
   describe('IsDefined', () => {
@@ -28,13 +33,13 @@ describe('CrudQueryHelper', () => {
     describe('when adding search', () => {
       it('should add search', async () => {
         // the fake request
-        const req = { parsed: {} } as CrudRequestInterface;
+        const req = { parsed: {} } as CrudRequestInterface<TestEntity>;
 
         req.parsed.search = {
           name: 'apple',
         };
 
-        const options: CrudServiceQueryOptionsInterface = {
+        const options: CrudServiceQueryOptionsInterface<TestEntity> = {
           filter: {
             name: 'pear',
           },
@@ -42,7 +47,7 @@ describe('CrudQueryHelper', () => {
 
         crudQueryService.modifyRequest(req, options);
 
-        expect(req.parsed.search).toEqual<SCondition>({
+        expect(req.parsed.search).toEqual<SCondition<TestEntity>>({
           $and: [
             {
               name: 'apple',
@@ -60,15 +65,17 @@ describe('CrudQueryHelper', () => {
         // the fake request
         const req = {
           options: { query: { alwaysPaginate: true } },
-        } as CrudRequestInterface;
+        } as CrudRequestInterface<TestEntity>;
 
-        const options: CrudServiceQueryOptionsInterface = {
+        const options: CrudServiceQueryOptionsInterface<TestEntity> = {
           cache: false,
         };
 
         crudQueryService.modifyRequest(req, options);
 
-        expect(req.options.query).toEqual<CrudQueryOptionsInterface>({
+        expect(req.options.query).toEqual<
+          CrudQueryOptionsInterface<TestEntity>
+        >({
           alwaysPaginate: true,
           cache: false,
         });

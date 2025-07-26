@@ -15,14 +15,18 @@ import {
   Repository,
   SelectQueryBuilder,
   DataSourceOptions,
-  EntityMetadata,
   OrderByCondition,
+  WhereExpressionBuilder,
 } from 'typeorm';
 
-import { NotFoundException, PlainLiteralObject, Type } from '@nestjs/common';
+import {
+  BadRequestException,
+  NotFoundException,
+  PlainLiteralObject,
+  Type,
+} from '@nestjs/common';
 
-import { LiteralObject } from '@concepta/nestjs-common';
-
+import { CrudEntityColumn } from '../../crud.types';
 import { comparisonOperatorKeys } from '../../request/crud-request.utils';
 import { CrudRequestParsedParamsInterface } from '../../request/interfaces/crud-request-parsed-params.interface';
 import {
@@ -41,17 +45,17 @@ import { CrudResponsePaginatedInterface } from '../interfaces/crud-response-pagi
 import { CrudAdapter } from './crud.adapter';
 
 export class TypeOrmCrudAdapter<
-  T extends PlainLiteralObject,
-> extends CrudAdapter<T> {
+  Entity extends PlainLiteralObject,
+> extends CrudAdapter<Entity> {
   protected dbName: DataSourceOptions['type'];
 
-  protected entityColumns: string[] = [];
+  protected entityColumns: CrudEntityColumn<Entity>[] = [];
 
-  protected entityPrimaryColumns: string[] = [];
+  protected entityPrimaryColumns: CrudEntityColumn<Entity>[] = [];
 
   protected entityHasDeleteColumn = false;
 
-  protected entityColumnsHash: LiteralObject = {};
+  protected entityColumnsHash: Record<string, unknown> = {};
 
   protected sqlInjectionRegEx: RegExp[] = [
     /(%27)|(\')|(--)|(%23)|(#)/gi,
@@ -60,7 +64,7 @@ export class TypeOrmCrudAdapter<
     /((%27)|(\'))union/gi,
   ];
 
-  constructor(protected repo: Repository<T>) {
+  constructor(protected repo: Repository<Entity>) {
     super();
 
     this.dbName = this.repo.metadata.connection.options.type;
@@ -71,8 +75,8 @@ export class TypeOrmCrudAdapter<
     return this.repo.metadata.name;
   }
 
-  public entityType(): Type<T> {
-    return this.repo.target as Type<T>;
+  public entityType(): Type<Entity> {
+    return this.repo.target as Type<Entity>;
   }
 
   protected get alias(): string {
@@ -85,8 +89,8 @@ export class TypeOrmCrudAdapter<
    * @param req - The CRUD request interface.
    */
   public async getMany(
-    req: CrudRequestInterface,
-  ): Promise<CrudResponsePaginatedInterface<T> | T[]> {
+    req: CrudRequestInterface<Entity>,
+  ): Promise<CrudResponsePaginatedInterface<Entity> | Entity[]> {
     const { parsed, options } = req;
     const builder = await this.createBuilder(parsed, options);
     return this.doGetMany(builder, parsed, options);
@@ -97,7 +101,7 @@ export class TypeOrmCrudAdapter<
    *
    * @param req - The CRUD request interface.
    */
-  public async getOne(req: CrudRequestInterface): Promise<T> {
+  public async getOne(req: CrudRequestInterface<Entity>): Promise<Entity> {
     return this.getOneOrFail(req);
   }
 
@@ -108,26 +112,24 @@ export class TypeOrmCrudAdapter<
    * @param dto - The DTO containing the entity data to create.
    */
   public async createOne(
-    req: CrudRequestInterface,
-    dto: T | Partial<T>,
-  ): Promise<T> {
+    req: CrudRequestInterface<Entity>,
+    dto: Entity | Partial<Entity>,
+  ): Promise<Entity> {
     const { returnShallow } = req.options.routes?.createOne ?? {};
     const entity = this.prepareEntityBeforeSave(dto, req.parsed);
+    let saved: Entity;
 
-    /* istanbul ignore if */
-    if (!entity) {
-      this.throwBadRequestException('Empty data. Nothing to save.');
+    if (entity) {
+      saved = await this.repo.save<Entity>(entity);
+    } else {
+      throw new BadRequestException();
     }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const saved = await this.repo.save<any>(entity);
 
     if (returnShallow) {
       return saved;
     } else {
       const primaryParams = this.getPrimaryParams(req.options);
 
-      /* istanbul ignore next */
       if (!primaryParams.length && primaryParams.some((p) => isNil(saved[p]))) {
         return saved;
       } else {
@@ -148,25 +150,26 @@ export class TypeOrmCrudAdapter<
    * @returns A promise resolving to an array of created entities.
    */
   public async createMany(
-    req: CrudRequestInterface,
-    dto: CrudCreateManyInterface<T | Partial<T>>,
-  ): Promise<T[]> {
-    /* istanbul ignore if */
+    req: CrudRequestInterface<Entity>,
+    dto: CrudCreateManyInterface<Entity | Partial<Entity>>,
+  ): Promise<Entity[]> {
     if (!isObject(dto) || !isArrayFull(dto.bulk)) {
       this.throwBadRequestException('Empty data. Nothing to save.');
     }
 
-    const bulk = dto.bulk
-      .map((one) => this.prepareEntityBeforeSave(one, req.parsed))
-      .filter((d) => !isUndefined(d));
+    const preparedBulk = dto.bulk.map((one) =>
+      this.prepareEntityBeforeSave(one, req.parsed),
+    );
 
-    /* istanbul ignore if */
+    const bulk: Entity[] = preparedBulk.filter(
+      (d): d is Entity => !isUndefined(d),
+    );
+
     if (!hasLength(bulk)) {
       this.throwBadRequestException('Empty data. Nothing to save.');
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.repo.save<any>(bulk, { chunk: 50 });
+    return this.repo.save<Entity>(bulk, { chunk: 50 });
   }
 
   /**
@@ -177,19 +180,15 @@ export class TypeOrmCrudAdapter<
    * @returns A promise resolving to the updated entity.
    */
   public async updateOne(
-    req: CrudRequestInterface,
-    dto: T | Partial<T>,
-  ): Promise<T> {
+    req: CrudRequestInterface<Entity>,
+    dto: Entity | Partial<Entity>,
+  ): Promise<Entity> {
     const { returnShallow } = req.options?.routes?.updateOne ?? {};
     const paramsFilters = this.getParamFilters(req.parsed);
     const found = await this.getOneOrFail(req, returnShallow);
     const toSave = { ...found, ...dto, ...paramsFilters };
     const updated = await this.repo.save(
-      plainToClass(
-        this.entityType(),
-        toSave,
-        req.parsed.classTransformOptions,
-      ) as unknown as DeepPartial<T>,
+      plainToClass(this.entityType(), toSave, req.parsed.classTransformOptions),
     );
 
     if (returnShallow) {
@@ -209,9 +208,9 @@ export class TypeOrmCrudAdapter<
    * @param req - The CRUD request interface.
    * @returns A promise resolving to the recovered entity.
    */
-  public async recoverOne(req: CrudRequestInterface): Promise<T> {
+  public async recoverOne(req: CrudRequestInterface<Entity>): Promise<Entity> {
     const found = await this.getOneOrFail(req, false, true);
-    return this.repo.recover(found as unknown as DeepPartial<T>);
+    return this.repo.recover(found);
   }
 
   /**
@@ -222,9 +221,9 @@ export class TypeOrmCrudAdapter<
    * @returns A promise resolving to the replaced entity.
    */
   public async replaceOne(
-    req: CrudRequestInterface,
-    dto: T | Partial<T>,
-  ): Promise<T> {
+    req: CrudRequestInterface<Entity>,
+    dto: Entity | Partial<Entity>,
+  ): Promise<Entity> {
     const { returnShallow } = req.options?.routes?.replaceOne ?? {};
     const paramsFilters = this.getParamFilters(req.parsed);
     const [_, found] = await oO(this.getOneOrFail(req, returnShallow));
@@ -234,11 +233,7 @@ export class TypeOrmCrudAdapter<
       ...paramsFilters,
     };
     const replaced = await this.repo.save(
-      plainToClass(
-        this.entityType(),
-        toSave,
-        req.parsed.classTransformOptions,
-      ) as unknown as DeepPartial<T>,
+      plainToClass(this.entityType(), toSave, req.parsed.classTransformOptions),
     );
 
     if (returnShallow) {
@@ -265,7 +260,9 @@ export class TypeOrmCrudAdapter<
    * @param req - The CRUD request interface.
    * @returns A promise resolving to the deleted entity or void.
    */
-  public async deleteOne(req: CrudRequestInterface): Promise<void | T> {
+  public async deleteOne(
+    req: CrudRequestInterface<Entity>,
+  ): Promise<void | Entity> {
     const { returnDeleted } = req.options?.routes?.deleteOne ?? {};
     const found = await this.getOneOrFail(req, returnDeleted);
     const toReturn = returnDeleted
@@ -277,7 +274,7 @@ export class TypeOrmCrudAdapter<
       : undefined;
 
     req.options?.query?.softDelete === true
-      ? await this.repo.softRemove(found as unknown as DeepPartial<T>)
+      ? await this.repo.softRemove(found as unknown as DeepPartial<Entity>)
       : await this.repo.remove(found);
 
     return toReturn;
@@ -293,11 +290,11 @@ export class TypeOrmCrudAdapter<
    * @returns A promise resolving to a SelectQueryBuilder instance.
    */
   public async createBuilder(
-    parsed: CrudRequestParsedParamsInterface,
-    options: CrudRequestOptionsInterface,
+    parsed: CrudRequestParsedParamsInterface<Entity>,
+    options: CrudRequestOptionsInterface<Entity>,
     many = true,
     withDeleted = false,
-  ): Promise<SelectQueryBuilder<T>> {
+  ): Promise<SelectQueryBuilder<Entity>> {
     // create query builder
     const builder = this.repo.createQueryBuilder(this.alias);
     // get select fields
@@ -357,10 +354,10 @@ export class TypeOrmCrudAdapter<
    * @param options - CRUD request options
    */
   protected async doGetMany(
-    builder: SelectQueryBuilder<T>,
-    query: CrudRequestParsedParamsInterface,
-    options: CrudRequestOptionsInterface,
-  ): Promise<CrudResponsePaginatedInterface<T> | T[]> {
+    builder: SelectQueryBuilder<Entity>,
+    query: CrudRequestParsedParamsInterface<Entity>,
+    options: CrudRequestOptionsInterface<Entity>,
+  ): Promise<CrudResponsePaginatedInterface<Entity> | Entity[]> {
     if (this.decidePagination(query, options)) {
       const [data, total] = await builder.getManyAndCount();
       const limit = builder.expressionMap.take;
@@ -390,10 +387,10 @@ export class TypeOrmCrudAdapter<
   }
 
   protected async getOneOrFail(
-    req: CrudRequestInterface,
+    req: CrudRequestInterface<Entity>,
     shallow = false,
     withDeleted = false,
-  ): Promise<T> {
+  ): Promise<Entity> {
     const { parsed, options } = req;
     const builder = shallow
       ? this.repo.createQueryBuilder(this.alias)
@@ -414,41 +411,27 @@ export class TypeOrmCrudAdapter<
     }
   }
 
-  protected getEntityColumns(entityMetadata: EntityMetadata): {
-    columns: string[];
-    primaryColumns: string[];
-  } {
-    const columns =
-      entityMetadata.columns.map((prop) => prop.propertyPath) ||
-      /* istanbul ignore next */ [];
-    const primaryColumns =
-      entityMetadata.primaryColumns.map((prop) => prop.propertyPath) ||
-      /* istanbul ignore next */ [];
-
-    return { columns, primaryColumns };
-  }
-
   protected setAndWhere(
-    cond: QueryFilter,
+    cond: QueryFilter<Entity>,
     i: unknown,
-    builder: SelectQueryBuilder<T>,
+    builder: WhereExpressionBuilder,
   ) {
     const { str, params } = this.mapOperatorsToQuery(cond, `andWhere${i}`);
     builder.andWhere(str, params);
   }
 
   protected setOrWhere(
-    cond: QueryFilter,
+    cond: QueryFilter<Entity>,
     i: unknown,
-    builder: SelectQueryBuilder<T>,
+    builder: WhereExpressionBuilder,
   ) {
     const { str, params } = this.mapOperatorsToQuery(cond, `orWhere${i}`);
     builder.orWhere(str, params);
   }
 
   protected setSearchCondition(
-    builder: SelectQueryBuilder<T>,
-    search: SCondition,
+    builder: WhereExpressionBuilder,
+    search: SCondition<Entity>,
     condition: SConditionKey = '$and',
   ) {
     /* istanbul ignore else */
@@ -467,9 +450,8 @@ export class TypeOrmCrudAdapter<
             this.builderAddBrackets(
               builder,
               condition,
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              new Brackets((qb: any) => {
-                search.$and?.forEach((item: SCondition) => {
+              new Brackets((qb) => {
+                search.$and?.forEach((item: SCondition<Entity>) => {
                   this.setSearchCondition(qb, item, '$and');
                 });
               }),
@@ -489,9 +471,8 @@ export class TypeOrmCrudAdapter<
               this.builderAddBrackets(
                 builder,
                 condition,
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                new Brackets((qb: any) => {
-                  search.$or?.forEach((item: SCondition) => {
+                new Brackets((qb) => {
+                  search.$or?.forEach((item: SCondition<Entity>) => {
                     this.setSearchCondition(qb, item, '$or');
                   });
                 }),
@@ -503,8 +484,7 @@ export class TypeOrmCrudAdapter<
             this.builderAddBrackets(
               builder,
               condition,
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              new Brackets((qb: any) => {
+              new Brackets((qb) => {
                 keys.forEach((field: string) => {
                   if (field !== '$or') {
                     const value = search[field];
@@ -525,9 +505,8 @@ export class TypeOrmCrudAdapter<
                       this.builderAddBrackets(
                         qb,
                         '$and',
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        new Brackets((qb2: any) => {
-                          search.$or?.forEach((item: SCondition) => {
+                        new Brackets((qb2) => {
+                          search.$or?.forEach((item: SCondition<Entity>) => {
                             this.setSearchCondition(qb2, item, '$or');
                           });
                         }),
@@ -561,8 +540,7 @@ export class TypeOrmCrudAdapter<
             this.builderAddBrackets(
               builder,
               condition,
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              new Brackets((qb: any) => {
+              new Brackets((qb) => {
                 keys.forEach((field: string) => {
                   const value = search[field];
                   if (!isObject(value)) {
@@ -585,7 +563,7 @@ export class TypeOrmCrudAdapter<
   }
 
   protected builderAddBrackets(
-    builder: SelectQueryBuilder<T>,
+    builder: WhereExpressionBuilder,
     condition: SConditionKey,
     brackets: Brackets,
   ) {
@@ -597,11 +575,10 @@ export class TypeOrmCrudAdapter<
   }
 
   protected builderSetWhere(
-    builder: SelectQueryBuilder<T>,
+    builder: WhereExpressionBuilder,
     condition: SConditionKey,
     field: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    value: any,
+    value: unknown,
     operator: ComparisonOperator = '$eq',
   ) {
     const time = process.hrtime();
@@ -620,7 +597,7 @@ export class TypeOrmCrudAdapter<
   }
 
   protected setSearchFieldObjectCondition(
-    builder: SelectQueryBuilder<T>,
+    builder: WhereExpressionBuilder,
     condition: SConditionKey,
     field: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -651,8 +628,7 @@ export class TypeOrmCrudAdapter<
           this.builderAddBrackets(
             builder,
             condition,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            new Brackets((qb: any) => {
+            new Brackets((qb) => {
               operators.forEach((operator: ComparisonOperator) => {
                 const value = object[operator];
 
@@ -672,8 +648,7 @@ export class TypeOrmCrudAdapter<
                     this.builderAddBrackets(
                       qb,
                       condition,
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      new Brackets((qb2: any) => {
+                      new Brackets((qb2) => {
                         this.setSearchFieldObjectCondition(
                           qb2,
                           '$or',
@@ -693,9 +668,9 @@ export class TypeOrmCrudAdapter<
   }
 
   protected getSelect(
-    query: CrudRequestParsedParamsInterface,
-    options: CrudQueryOptionsInterface,
-  ): string[] {
+    query: CrudRequestParsedParamsInterface<Entity>,
+    options: CrudQueryOptionsInterface<Entity>,
+  ): CrudEntityColumn<Entity>[] {
     const allowed = this.getAllowedColumns(this.entityColumns, options);
 
     const columns =
@@ -703,20 +678,24 @@ export class TypeOrmCrudAdapter<
         ? query.fields.filter((field) => allowed.some((col) => field === col))
         : allowed;
 
-    const select = new Set(
-      [
-        ...(options.persist && options.persist.length ? options.persist : []),
-        ...columns,
-        ...this.entityPrimaryColumns,
-      ].map((col) => `${this.alias}.${col}`),
+    const selectArray: CrudEntityColumn<Entity>[] = [
+      ...(options.persist && options.persist.length ? options.persist : []),
+      ...columns,
+      ...this.entityPrimaryColumns,
+    ];
+
+    const selectMapped = selectArray.map(
+      (col) => `${this.alias}.${String(col)}`,
     );
+
+    const select = new Set(selectMapped);
 
     return Array.from(select);
   }
 
   protected getSort(
-    query: CrudRequestParsedParamsInterface,
-    options: CrudQueryOptionsInterface,
+    query: CrudRequestParsedParamsInterface<Entity>,
+    options: CrudQueryOptionsInterface<Entity>,
   ): OrderByCondition {
     return query.sort && query.sort.length
       ? this.mapSort(query.sort)
@@ -749,7 +728,7 @@ export class TypeOrmCrudAdapter<
     }
   }
 
-  protected mapSort(sort: QuerySort[]): OrderByCondition {
+  protected mapSort(sort: QuerySort<Entity>[]): OrderByCondition {
     const params: OrderByCondition = {};
 
     for (let i = 0; i < sort.length; i++) {
@@ -762,14 +741,16 @@ export class TypeOrmCrudAdapter<
   }
 
   protected mapOperatorsToQuery(
-    cond: QueryFilter,
+    cond: QueryFilter<Entity>,
     param: string,
-  ): { str: string; params: LiteralObject } {
+  ): { str: string; params: PlainLiteralObject } {
     const field = this.getFieldWithAlias(cond.field);
+
     const likeOperator =
       this.dbName === 'postgres' ? 'ILIKE' : /* istanbul ignore next */ 'LIKE';
+
     let str: string;
-    let params: LiteralObject | undefined = undefined;
+    let params: PlainLiteralObject | undefined = undefined;
 
     if (cond.operator[0] !== '$') {
       cond.operator = ('$' + cond.operator) as ComparisonOperator;
@@ -841,7 +822,12 @@ export class TypeOrmCrudAdapter<
         break;
 
       case '$between':
-        this.checkFilterIsArray(cond, cond.value.length !== 2);
+        if (!Array.isArray(cond.value) || cond.value.length !== 2) {
+          throw new BadRequestException(
+            `Invalid column '${cond.field}' value for BETWEEN operator, must be an array with two elements`,
+          );
+        }
+
         str = `${field} BETWEEN :${param}0 AND :${param}1`;
         params = {
           [`${param}0`]: cond.value[0],
@@ -901,8 +887,7 @@ export class TypeOrmCrudAdapter<
     return { str, params };
   }
 
-  private checkFilterIsArray(cond: QueryFilter, withLength?: boolean) {
-    /* istanbul ignore if */
+  private checkFilterIsArray(cond: QueryFilter<Entity>, withLength?: boolean) {
     if (
       !Array.isArray(cond.value) ||
       !cond.value.length ||
@@ -913,10 +898,8 @@ export class TypeOrmCrudAdapter<
   }
 
   private checkSqlInjection(field: string): string {
-    /* istanbul ignore else */
     if (this.sqlInjectionRegEx.length) {
       for (let i = 0; i < this.sqlInjectionRegEx.length; i++) {
-        /* istanbul ignore else */
         if (this.sqlInjectionRegEx[0].test(field)) {
           this.throwBadRequestException(`SQL injection detected: "${field}"`);
         }

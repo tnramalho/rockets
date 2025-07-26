@@ -18,8 +18,11 @@ import { CrudOptionsInterface } from '../interfaces/crud-options.interface';
 import { CrudRequestInterface } from '../interfaces/crud-request.interface';
 
 @Injectable()
-export class CrudRequestInterceptor implements NestInterceptor {
-  constructor(private reflectionService: CrudReflectionService) {}
+export class CrudRequestInterceptor<
+  T extends PlainLiteralObject = PlainLiteralObject,
+> implements NestInterceptor
+{
+  constructor(private reflectionService: CrudReflectionService<T>) {}
 
   intercept(context: ExecutionContext, next: CallHandler) {
     const req = context.switchToHttp().getRequest();
@@ -56,9 +59,9 @@ export class CrudRequestInterceptor implements NestInterceptor {
   }
 
   getCrudRequest(
-    parser: CrudRequestQueryParser,
-    crudOptions: Partial<CrudOptionsInterface>,
-  ): CrudRequestInterface {
+    parser: CrudRequestQueryParser<T>,
+    crudOptions: Partial<CrudOptionsInterface<T>>,
+  ): CrudRequestInterface<T> {
     const parsed = parser.getParsed();
     const { query, routes, params } = crudOptions;
 
@@ -73,11 +76,11 @@ export class CrudRequestInterceptor implements NestInterceptor {
   }
 
   getSearch(
-    parser: CrudRequestQueryParser,
-    crudOptions: Partial<CrudOptionsInterface>,
+    parser: CrudRequestQueryParser<T>,
+    crudOptions: Partial<CrudOptionsInterface<T>>,
     action: CrudActions,
     params?: PlainLiteralObject,
-  ): SCondition[] {
+  ): SCondition<T>[] {
     // params condition
     const paramsSearch = this.getParamsSearch(parser, crudOptions, params);
 
@@ -101,9 +104,9 @@ export class CrudRequestInterceptor implements NestInterceptor {
       Array.isArray(crudOptions.query?.filter) &&
       isArrayFull(crudOptions.query?.filter)
         ? (crudOptions.query?.filter).map(parser.convertFilterToSearch)
-        : [(crudOptions.query?.filter as SCondition) || {}];
+        : [(crudOptions.query?.filter as SCondition<T>) || {}];
 
-    let search: SCondition[] = [];
+    let search: SCondition<T>[] = [];
 
     if (parser.search) {
       search = [parser.search];
@@ -145,10 +148,10 @@ export class CrudRequestInterceptor implements NestInterceptor {
   }
 
   getParamsSearch(
-    parser: CrudRequestQueryParser,
-    crudOptions: Partial<CrudOptionsInterface>,
+    parser: CrudRequestQueryParser<T>,
+    crudOptions: Partial<CrudOptionsInterface<T>>,
     params?: PlainLiteralObject,
-  ): SCondition[] {
+  ): SCondition<T>[] {
     if (params) {
       parser.parseParams(params, crudOptions.params ?? {});
 

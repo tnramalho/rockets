@@ -1,4 +1,4 @@
-import { applyDecorators, Post } from '@nestjs/common';
+import { applyDecorators, PlainLiteralObject, Post } from '@nestjs/common';
 
 import { CRUD_MODULE_ROUTE_CREATE_MANY_DEFAULT_PATH } from '../../../crud.constants';
 import { CrudValidationOptions } from '../../../crud.types';
@@ -14,8 +14,10 @@ import { CrudValidate } from '../routes/crud-validate.decorator';
 /**
  * CRUD Create Many route decorator
  */
-export const CrudCreateMany = (
-  options: CrudCreateManyOptionsInterface = {},
+export const CrudCreateMany = <
+  T extends PlainLiteralObject = PlainLiteralObject,
+>(
+  options: CrudCreateManyOptionsInterface<T> = {},
 ) => {
   const {
     path = CRUD_MODULE_ROUTE_CREATE_MANY_DEFAULT_PATH,
@@ -25,7 +27,7 @@ export const CrudCreateMany = (
     api,
   } = { ...options };
 
-  const validationMerged: CrudValidationOptions = dto
+  const validationMerged: CrudValidationOptions<T> = dto
     ? { expectedType: dto, ...validation }
     : validation;
 

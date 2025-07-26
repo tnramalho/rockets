@@ -89,7 +89,9 @@ export const CRUD_MODULE_API_PARAMS_METADATA =
 export const CRUD_MODULE_API_RESPONSE_METADATA =
   'CRUD_MODULE_API_RESPONSE_METADATA';
 
-export const CRUD_MODULE_DEFAULT_PARAMS_OPTIONS: CrudParamsOptionsInterface = {
+export const CRUD_MODULE_DEFAULT_PARAMS_OPTIONS: CrudParamsOptionsInterface<{
+  id?: { field?: string };
+}> = {
   id: { field: 'id', type: 'string', primary: true },
 };
 

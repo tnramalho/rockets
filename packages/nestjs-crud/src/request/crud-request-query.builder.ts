@@ -8,7 +8,7 @@ import {
 } from '@nestjsx/util';
 import { stringify } from 'qs';
 
-import { LiteralObject } from '@concepta/nestjs-common';
+import { PlainLiteralObject } from '@nestjs/common';
 
 import {
   validateCondition,
@@ -28,7 +28,9 @@ import {
 } from './types/crud-request-query.types';
 
 // tslint:disable:variable-name ban-types
-export class CrudRequestQueryBuilder {
+export class CrudRequestQueryBuilder<
+  Entity extends PlainLiteralObject = PlainLiteralObject,
+> {
   private static _options: Required<CrudRequestQueryBuilderOptionsInterface> & {
     paramNamesMap: Required<
       CrudRequestQueryBuilderOptionsInterface['paramNamesMap']
@@ -53,11 +55,11 @@ export class CrudRequestQueryBuilder {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public queryObject: { [key: string]: any } = {};
+  public queryObject: Record<string, any> = {};
 
   public queryString = '';
 
-  private paramNames: LiteralObject<string> = {};
+  private paramNames: Record<string, string> = {};
 
   constructor() {
     this.setParamNames();
@@ -78,9 +80,9 @@ export class CrudRequestQueryBuilder {
     return CrudRequestQueryBuilder._options;
   }
 
-  static create(
+  static create<T extends PlainLiteralObject>(
     params?: CrudCreateQueryParamsInterface,
-  ): CrudRequestQueryBuilder {
+  ): CrudRequestQueryBuilder<T> {
     const qb = new CrudRequestQueryBuilder();
     return isObject(params) && params !== undefined
       ? qb.createFromParams(params)
@@ -128,7 +130,7 @@ export class CrudRequestQueryBuilder {
     return this.queryString;
   }
 
-  select(fields: QueryFields): this {
+  select(fields: QueryFields<Entity>): this {
     if (isArrayFull(fields) && this.paramNames.fields) {
       validateFields(fields);
       this.queryObject[this.paramNames.fields] = fields.join(
@@ -138,7 +140,7 @@ export class CrudRequestQueryBuilder {
     return this;
   }
 
-  search(s: SCondition) {
+  search(s: SCondition<Entity>) {
     if (!isNil(s) && isObject(s) && this.paramNames.search) {
       this.queryObject[this.paramNames.search] = JSON.stringify(s);
     }
@@ -146,30 +148,41 @@ export class CrudRequestQueryBuilder {
   }
 
   setFilter(
-    f: QueryFilter | QueryFilterArr | Array<QueryFilter | QueryFilterArr>,
+    f:
+      | QueryFilter<Entity>
+      | QueryFilterArr<Entity>
+      | Array<QueryFilter<Entity> | QueryFilterArr<Entity>>,
   ): this {
     this.setCondition(f, 'filter');
     return this;
   }
 
   setOr(
-    f: QueryFilter | QueryFilterArr | Array<QueryFilter | QueryFilterArr>,
+    f:
+      | QueryFilter<Entity>
+      | QueryFilterArr<Entity>
+      | Array<QueryFilter<Entity> | QueryFilterArr<Entity>>,
   ): this {
     this.setCondition(f, 'or');
     return this;
   }
 
-  sortBy(s: QuerySort | QuerySortArr | Array<QuerySort | QuerySortArr>): this {
+  sortBy(
+    s:
+      | QuerySort<Entity>
+      | QuerySortArr<Entity>
+      | Array<QuerySort<Entity> | QuerySortArr<Entity>>,
+  ): this {
     if (!isNil(s)) {
       const param = this.checkQueryObjectParam('sort', []);
       if (param) {
         this.queryObject[param] = [
           ...this.queryObject[param],
           ...(Array.isArray(s) && !isString(s[0])
-            ? (s as Array<QuerySort | QuerySortArr>).map((o) =>
+            ? (s as Array<QuerySort<Entity> | QuerySortArr<Entity>>).map((o) =>
                 this.addSortBy(o),
               )
-            : [this.addSortBy(s as QuerySort | QuerySortArr)]),
+            : [this.addSortBy(s as QuerySort<Entity> | QuerySortArr<Entity>)]),
         ];
       }
     }
@@ -202,14 +215,14 @@ export class CrudRequestQueryBuilder {
   }
 
   cond(
-    f: QueryFilter | QueryFilterArr,
+    f: QueryFilter<Entity> | QueryFilterArr<Entity>,
     cond: 'filter' | 'or' | 'search' = 'search',
   ): string {
     const filter = Array.isArray(f)
       ? { field: f[0], operator: f[1], value: f[2] }
       : f;
     validateCondition(filter, cond);
-    const d = this.options.delim;
+    const d = this.options.delim ?? CrudRequestQueryBuilder._options.delim;
 
     return (
       filter.field +
@@ -219,8 +232,10 @@ export class CrudRequestQueryBuilder {
     );
   }
 
-  private addSortBy(s: QuerySort | QuerySortArr): string {
-    const sort = Array.isArray(s) ? { field: s[0], order: s[1] } : s;
+  private addSortBy(s: QuerySort<Entity> | QuerySortArr<Entity>): string {
+    const sort: QuerySort<Entity> = Array.isArray(s)
+      ? { field: s[0], order: s[1] }
+      : s;
     validateSort(sort);
     const ds = this.options.delimStr;
 
@@ -275,8 +290,7 @@ export class CrudRequestQueryBuilder {
     cond: keyof NonNullable<
       CrudRequestQueryBuilderOptionsInterface['paramNamesMap']
     >,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    defaults: any,
+    defaults: unknown,
   ): string | undefined {
     const param = this.paramNames[cond];
 
@@ -288,7 +302,10 @@ export class CrudRequestQueryBuilder {
   }
 
   private setCondition(
-    f: QueryFilter | QueryFilterArr | Array<QueryFilter | QueryFilterArr>,
+    f:
+      | QueryFilter<Entity>
+      | QueryFilterArr<Entity>
+      | Array<QueryFilter<Entity> | QueryFilterArr<Entity>>,
     cond: 'filter' | 'or',
   ): void {
     if (!isNil(f)) {
@@ -297,10 +314,15 @@ export class CrudRequestQueryBuilder {
         this.queryObject[param] = [
           ...this.queryObject[param],
           ...(Array.isArray(f) && !isString(f[0])
-            ? (f as Array<QueryFilter | QueryFilterArr>).map((o) =>
-                this.cond(o, cond),
+            ? (f as Array<QueryFilter<Entity> | QueryFilterArr<Entity>>).map(
+                (o) => this.cond(o, cond),
               )
-            : [this.cond(f as QueryFilter | QueryFilterArr, cond)]),
+            : [
+                this.cond(
+                  f as QueryFilter<Entity> | QueryFilterArr<Entity>,
+                  cond,
+                ),
+              ]),
         ];
       }
     }

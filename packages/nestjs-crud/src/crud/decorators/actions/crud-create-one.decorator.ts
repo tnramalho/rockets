@@ -1,4 +1,9 @@
-import { applyDecorators, Post, SetMetadata } from '@nestjs/common';
+import {
+  applyDecorators,
+  PlainLiteralObject,
+  Post,
+  SetMetadata,
+} from '@nestjs/common';
 
 import { CRUD_MODULE_ROUTE_CREATE_ONE_METADATA } from '../../../crud.constants';
 import { CrudActions } from '../../enums/crud-actions.enum';
@@ -13,7 +18,11 @@ import { CrudValidate } from '../routes/crud-validate.decorator';
 /**
  * CRUD Create One route decorator
  */
-export const CrudCreateOne = (options: CrudCreateOneOptionsInterface = {}) => {
+export const CrudCreateOne = <
+  T extends PlainLiteralObject = PlainLiteralObject,
+>(
+  options: CrudCreateOneOptionsInterface<T> = {},
+) => {
   const { path, validation, serialization, api, ...rest } = { ...options };
 
   return applyDecorators(

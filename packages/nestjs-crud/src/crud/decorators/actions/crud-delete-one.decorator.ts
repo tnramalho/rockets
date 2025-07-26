@@ -1,4 +1,9 @@
-import { applyDecorators, Delete, SetMetadata } from '@nestjs/common';
+import {
+  applyDecorators,
+  Delete,
+  PlainLiteralObject,
+  SetMetadata,
+} from '@nestjs/common';
 
 import {
   CRUD_MODULE_ROUTE_ID_DEFAULT_PATH,
@@ -16,7 +21,11 @@ import { CrudValidate } from '../routes/crud-validate.decorator';
 /**
  * CRUD Delete One route decorator
  */
-export const CrudDeleteOne = (options: CrudDeleteOneOptionsInterface = {}) => {
+export const CrudDeleteOne = <
+  T extends PlainLiteralObject = PlainLiteralObject,
+>(
+  options: CrudDeleteOneOptionsInterface<T> = {},
+) => {
   const {
     path = CRUD_MODULE_ROUTE_ID_DEFAULT_PATH,
     validation,

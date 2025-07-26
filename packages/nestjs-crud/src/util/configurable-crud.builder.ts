@@ -207,7 +207,7 @@ export class ConfigurableCrudBuilder<
     if (options?.getMany) {
       InternalCrudClass.prototype.getMany = async function (
         this: InternalCrudClass,
-        crudRequest: CrudRequestInterface,
+        crudRequest: CrudRequestInterface<Entity>,
       ) {
         return this.crudService.getMany(crudRequest);
       };
@@ -223,7 +223,7 @@ export class ConfigurableCrudBuilder<
     if (options?.getOne) {
       InternalCrudClass.prototype.getOne = async function (
         this: InternalCrudClass,
-        crudRequest: CrudRequestInterface,
+        crudRequest: CrudRequestInterface<Entity>,
       ) {
         return this.crudService.getOne(crudRequest);
       };
@@ -239,7 +239,7 @@ export class ConfigurableCrudBuilder<
     if (options?.createMany) {
       InternalCrudClass.prototype.createMany = async function (
         this: InternalCrudClass,
-        crudRequest: CrudRequestInterface,
+        crudRequest: CrudRequestInterface<Entity>,
         createManyDto: CrudCreateManyInterface<Creatable>,
       ) {
         return this.crudService.createMany(crudRequest, {
@@ -264,7 +264,7 @@ export class ConfigurableCrudBuilder<
     if (options?.createOne) {
       InternalCrudClass.prototype.createOne = async function (
         this: InternalCrudClass,
-        crudRequest: CrudRequestInterface,
+        crudRequest: CrudRequestInterface<Entity>,
         createDto: Creatable,
       ) {
         return this.crudService.createOne(
@@ -289,7 +289,7 @@ export class ConfigurableCrudBuilder<
     if (options?.updateOne) {
       InternalCrudClass.prototype.updateOne = async function (
         this: InternalCrudClass,
-        crudRequest: CrudRequestInterface,
+        crudRequest: CrudRequestInterface<Entity>,
         updateDto: Updatable,
       ) {
         return this.crudService.updateOne(
@@ -314,7 +314,7 @@ export class ConfigurableCrudBuilder<
     if (options?.replaceOne) {
       InternalCrudClass.prototype.replaceOne = async function (
         this: InternalCrudClass,
-        crudRequest: CrudRequestInterface,
+        crudRequest: CrudRequestInterface<Entity>,
         replaceDto: Replaceable,
       ) {
         return this.crudService.replaceOne(
@@ -339,7 +339,7 @@ export class ConfigurableCrudBuilder<
     if (options?.deleteOne) {
       InternalCrudClass.prototype.deleteOne = async function (
         this: InternalCrudClass,
-        crudRequest: CrudRequestInterface,
+        crudRequest: CrudRequestInterface<Entity>,
       ) {
         return this.crudService.deleteOne(crudRequest);
       };
@@ -358,7 +358,7 @@ export class ConfigurableCrudBuilder<
     if (options?.recoverOne) {
       InternalCrudClass.prototype.recoverOne = async function (
         this: InternalCrudClass,
-        crudRequest: CrudRequestInterface,
+        crudRequest: CrudRequestInterface<Entity>,
       ) {
         return this.crudService.recoverOne(crudRequest);
       };

@@ -8,6 +8,10 @@ import { TestCrudAdapter } from '../../__fixtures__/crud/adapters/test-crud.adap
 import { TestModelDto } from '../../__fixtures__/crud/models/test.model';
 import { CrudModule } from '../../crud.module';
 import { CrudRequestQueryBuilder } from '../../request/crud-request-query.builder';
+import {
+  QueryFilterArr,
+  QuerySortArr,
+} from '../../request/types/crud-request-query.types';
 import { CrudGetMany } from '../decorators/actions/crud-get-many.decorator';
 import { CrudGetOne } from '../decorators/actions/crud-get-one.decorator';
 import { CrudController } from '../decorators/controller/crud-controller.decorator';
@@ -23,7 +27,7 @@ describe('#crud', () => {
     path: 'test',
     model: { type: TestModelDto },
     params: {
-      someParam: { field: 'someParam', type: 'number' },
+      someParam: { field: 'age', type: 'number' },
     },
     serialization: {
       toInstanceOptions: {
@@ -38,7 +42,7 @@ describe('#crud', () => {
   })
   class TestController {
     @CrudGetMany({ path: '/query' })
-    async query(@CrudRequest() req: CrudRequestInterface) {
+    async query(@CrudRequest() req: CrudRequestInterface<TestModelDto>) {
       return req;
     }
 
@@ -58,7 +62,7 @@ describe('#crud', () => {
     model: { type: TestModelDto },
     params: {
       id: { field: 'id', type: 'number' },
-      someParam: { field: 'someParam', type: 'number' },
+      someParam: { field: 'age', type: 'number' },
     },
     serialization: {
       toInstanceOptions: {
@@ -76,7 +80,7 @@ describe('#crud', () => {
 
     @UseInterceptors(CrudRequestInterceptor)
     @CrudGetOne({ path: 'normal/:id' })
-    async normal(@CrudRequest() req: CrudRequestInterface) {
+    async normal(@CrudRequest() req: CrudRequestInterface<TestModelDto>) {
       return { filter: req.parsed.paramsFilter };
     }
 
@@ -89,7 +93,7 @@ describe('#crud', () => {
     @UseInterceptors(CrudRequestInterceptor)
     @CrudGetOne({ path: 'other2/:id/twoParams/:someParam' })
     async twoParams(
-      @CrudRequest() req: CrudRequestInterface,
+      @CrudRequest() req: CrudRequestInterface<TestModelDto>,
       @Param('someParam', ParseIntPipe) _p: number,
     ) {
       return { filter: req.parsed.paramsFilter };
@@ -126,16 +130,14 @@ describe('#crud', () => {
       const page = 2;
       const limit = 10;
       const fields = ['a', 'b', 'c'];
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const sorts: any[][] = [
-        ['a', 'ASC'],
-        ['b', 'DESC'],
+      const sorts: QuerySortArr<TestModelDto>[] = [
+        ['firstName', 'ASC'],
+        ['lastName', 'DESC'],
       ];
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const filters: any[][] = [
-        ['a', 'eq', 1],
-        ['c', 'in', [1, 2, 3]],
-        ['d', 'notnull'],
+      const filters: QueryFilterArr<TestModelDto>[] = [
+        ['id', '$in', [1, 2, 3]],
+        ['firstName', '$eq', 'John'],
+        ['lastName', '$notnull'],
       ];
 
       qb.setPage(page).setLimit(limit);

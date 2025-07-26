@@ -1,10 +1,10 @@
-import { Body } from '@nestjs/common';
+import { Body, PlainLiteralObject } from '@nestjs/common';
 
 import { CrudValidationOptions } from '../../crud.types';
 
-export interface CrudValidationMetadataInterface {
+export interface CrudValidationMetadataInterface<T extends PlainLiteralObject> {
   propertyKey: string | symbol;
   parameterIndex: number;
-  validation: CrudValidationOptions | undefined;
+  validation: CrudValidationOptions<T> | undefined;
   pipes: Parameters<typeof Body>[1][] | [];
 }

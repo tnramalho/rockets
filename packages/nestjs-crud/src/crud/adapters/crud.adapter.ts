@@ -3,6 +3,7 @@ import { plainToClass } from 'class-transformer';
 
 import { BadRequestException, PlainLiteralObject, Type } from '@nestjs/common';
 
+import { CrudEntityColumn } from '../../crud.types';
 import { CrudRequestParsedParamsInterface } from '../../request/interfaces/crud-request-parsed-params.interface';
 import { CrudCreateManyInterface } from '../interfaces/crud-create-many.interface';
 import { CrudParamsOptionsInterface } from '../interfaces/crud-params-options.interface';
@@ -11,7 +12,7 @@ import { CrudRequestOptionsInterface } from '../interfaces/crud-request-options.
 import { CrudRequestInterface } from '../interfaces/crud-request.interface';
 import { CrudResponsePaginatedInterface } from '../interfaces/crud-response-paginated.interface';
 
-export abstract class CrudAdapter<T extends PlainLiteralObject> {
+export abstract class CrudAdapter<Entity extends PlainLiteralObject> {
   throwBadRequestException(msg?: unknown): BadRequestException {
     throw new BadRequestException(msg);
   }
@@ -27,11 +28,11 @@ export abstract class CrudAdapter<T extends PlainLiteralObject> {
    * @param offset - number of items to skip
    */
   createPageInfo(
-    data: T[],
+    data: Entity[],
     total: number | undefined,
     limit: number | undefined,
     offset: number | undefined,
-  ): CrudResponsePaginatedInterface<T> {
+  ): CrudResponsePaginatedInterface<Entity> {
     return {
       data,
       count: data.length,
@@ -48,13 +49,13 @@ export abstract class CrudAdapter<T extends PlainLiteralObject> {
    * @param options - crud request options
    */
   decidePagination(
-    parsed: CrudRequestParsedParamsInterface,
-    options: CrudRequestOptionsInterface,
+    parsed: CrudRequestParsedParamsInterface<Entity>,
+    options: CrudRequestOptionsInterface<Entity>,
   ): boolean {
     return (
       options.query?.alwaysPaginate ||
       ((Number.isFinite(parsed.page) || Number.isFinite(parsed.offset)) &&
-        /* istanbul ignore next */ !!this.getTake(parsed, options.query ?? {}))
+        !!this.getTake(parsed, options.query ?? {}))
     );
   }
 
@@ -65,8 +66,8 @@ export abstract class CrudAdapter<T extends PlainLiteralObject> {
    * @param options - query options
    */
   getTake(
-    query: CrudRequestParsedParamsInterface,
-    options: CrudQueryOptionsInterface,
+    query: CrudRequestParsedParamsInterface<Entity>,
+    options: CrudQueryOptionsInterface<Entity>,
   ): number | null {
     if (query.limit) {
       return options.maxLimit
@@ -75,7 +76,7 @@ export abstract class CrudAdapter<T extends PlainLiteralObject> {
           : options.maxLimit
         : query.limit;
     }
-    /* istanbul ignore if */
+
     if (options.limit) {
       return options.maxLimit
         ? options.limit <= options.maxLimit
@@ -94,7 +95,7 @@ export abstract class CrudAdapter<T extends PlainLiteralObject> {
    * @param take - number of resources to be fetched
    */
   getSkip(
-    query: CrudRequestParsedParamsInterface,
+    query: CrudRequestParsedParamsInterface<Entity>,
     take: number | null,
   ): number | null {
     return query.page && take
@@ -109,8 +110,10 @@ export abstract class CrudAdapter<T extends PlainLiteralObject> {
    *
    * @param options - crud request options
    */
-  getPrimaryParams(options: CrudRequestOptionsInterface): string[] {
-    const rawParams: CrudParamsOptionsInterface = options.params ?? {};
+  getPrimaryParams(
+    options: CrudRequestOptionsInterface<Entity>,
+  ): CrudEntityColumn<Entity>[] {
+    const rawParams: CrudParamsOptionsInterface<Entity> = options.params ?? {};
 
     const params = objKeys(rawParams).filter(
       (n) => rawParams[n] && rawParams[n].primary,
@@ -127,10 +130,8 @@ export abstract class CrudAdapter<T extends PlainLiteralObject> {
    * @param parsed - The parsed request parameters.
    * @returns An object containing parameter filters.
    */
-  public getParamFilters(
-    parsed: CrudRequestInterface['parsed'],
-  ): PlainLiteralObject {
-    const filters: Record<string, unknown> = {};
+  public getParamFilters(parsed: CrudRequestParsedParamsInterface<Entity>) {
+    const filters: Partial<Record<CrudEntityColumn<Entity>, unknown>> = {};
 
     /* istanbul ignore else */
     if (hasLength(parsed.paramsFilter)) {
@@ -142,10 +143,10 @@ export abstract class CrudAdapter<T extends PlainLiteralObject> {
     return filters;
   }
 
-  protected getAllowedColumns(
-    columns: string[],
-    options: CrudQueryOptionsInterface,
-  ): string[] {
+  getAllowedColumns(
+    columns: CrudEntityColumn<Entity>[],
+    options: CrudQueryOptionsInterface<Entity>,
+  ): CrudEntityColumn<Entity>[] {
     return (!options.exclude || !options.exclude.length) &&
       (!options.allow || !options.allow.length)
       ? columns
@@ -161,9 +162,9 @@ export abstract class CrudAdapter<T extends PlainLiteralObject> {
   }
 
   protected prepareEntityBeforeSave(
-    dto: T | Partial<T>,
-    parsed: CrudRequestInterface['parsed'],
-  ): T | undefined {
+    dto: Partial<Entity>,
+    parsed: CrudRequestParsedParamsInterface<Entity>,
+  ): Entity | undefined {
     if (!isObject(dto)) {
       return undefined;
     }
@@ -189,36 +190,38 @@ export abstract class CrudAdapter<T extends PlainLiteralObject> {
         );
   }
 
-  abstract entityType(): Type<T>;
+  abstract entityType(): Type<Entity>;
   abstract entityName(): string;
 
   abstract getMany(
-    req: CrudRequestInterface,
-  ): Promise<CrudResponsePaginatedInterface<T> | T[]>;
+    req: CrudRequestInterface<Entity>,
+  ): Promise<CrudResponsePaginatedInterface<Entity> | Entity[]>;
 
-  abstract getOne(req: CrudRequestInterface): Promise<T>;
+  abstract getOne(req: CrudRequestInterface<Entity>): Promise<Entity>;
 
   abstract createOne(
-    req: CrudRequestInterface,
-    dto: T | Partial<T>,
-  ): Promise<T>;
+    req: CrudRequestInterface<Entity>,
+    dto: Entity | Partial<Entity>,
+  ): Promise<Entity>;
 
   abstract createMany(
-    req: CrudRequestInterface,
+    req: CrudRequestInterface<Entity>,
     dto: CrudCreateManyInterface,
-  ): Promise<T[]>;
+  ): Promise<Entity[]>;
 
   abstract updateOne(
-    req: CrudRequestInterface,
-    dto: T | Partial<T>,
-  ): Promise<T>;
+    req: CrudRequestInterface<Entity>,
+    dto: Entity | Partial<Entity>,
+  ): Promise<Entity>;
 
   abstract replaceOne(
-    req: CrudRequestInterface,
-    dto: T | Partial<T>,
-  ): Promise<T>;
+    req: CrudRequestInterface<Entity>,
+    dto: Entity | Partial<Entity>,
+  ): Promise<Entity>;
 
-  abstract deleteOne(req: CrudRequestInterface): Promise<void | T>;
+  abstract deleteOne(req: CrudRequestInterface<Entity>): Promise<void | Entity>;
 
-  abstract recoverOne(req: CrudRequestInterface): Promise<void | T>;
+  abstract recoverOne(
+    req: CrudRequestInterface<Entity>,
+  ): Promise<void | Entity>;
 }

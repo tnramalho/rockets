@@ -19,9 +19,6 @@ export class UserDto {
   isActive!: boolean;
 
   @Expose()
-  profileId?: number | null;
-
-  @Expose()
   companyId?: number;
 
   @Expose()

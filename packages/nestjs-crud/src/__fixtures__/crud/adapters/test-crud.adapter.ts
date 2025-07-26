@@ -21,44 +21,44 @@ export class TestCrudAdapter<
     return TestEntity as Type<T>;
   }
 
-  async getMany(req: CrudRequestInterface): Promise<any> {
+  async getMany(req: CrudRequestInterface<T>): Promise<any> {
     return { req };
   }
 
-  async getOne(req: CrudRequestInterface): Promise<any> {
+  async getOne(req: CrudRequestInterface<T>): Promise<any> {
     return { req };
   }
 
-  async createOne(req: CrudRequestInterface, dto: T): Promise<any> {
+  async createOne(req: CrudRequestInterface<T>, dto: T): Promise<any> {
     return { req, dto };
   }
 
   async createMany(
-    req: CrudRequestInterface,
+    req: CrudRequestInterface<T>,
     dto: CrudCreateManyInterface<T>,
   ): Promise<any> {
     return { req, dto };
   }
 
-  async updateOne(req: CrudRequestInterface, dto: T): Promise<any> {
+  async updateOne(req: CrudRequestInterface<T>, dto: T): Promise<any> {
     return { req, dto };
   }
 
-  async replaceOne(req: CrudRequestInterface, dto: T): Promise<any> {
+  async replaceOne(req: CrudRequestInterface<T>, dto: T): Promise<any> {
     return { req, dto };
   }
 
-  async deleteOne(req: CrudRequestInterface): Promise<any> {
+  async deleteOne(req: CrudRequestInterface<T>): Promise<any> {
     return { req };
   }
 
-  async recoverOne(req: CrudRequestInterface): Promise<any> {
+  async recoverOne(req: CrudRequestInterface<T>): Promise<any> {
     return { req };
   }
 
   decidePagination(
-    _parsed: CrudRequestParsedParamsInterface,
-    _options: CrudRequestOptionsInterface,
+    _parsed: CrudRequestParsedParamsInterface<T>,
+    _options: CrudRequestOptionsInterface<T>,
   ): boolean {
     return true;
   }

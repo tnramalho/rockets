@@ -84,18 +84,25 @@ export class PhotoCcbCustomControllerFixture extends CrudBaseController<
   }
 
   @CrudGetMany
-  async getMany(@CrudRequest() crudRequest: CrudRequestInterface) {
+  async getMany(
+    @CrudRequest()
+    crudRequest: CrudRequestInterface<PhotoEntityInterfaceFixture>,
+  ) {
     return this.crudService.getMany(crudRequest);
   }
 
   @CrudGetOne
-  async getOne(@CrudRequest() crudRequest: CrudRequestInterface) {
+  async getOne(
+    @CrudRequest()
+    crudRequest: CrudRequestInterface<PhotoEntityInterfaceFixture>,
+  ) {
     return this.crudService.getOne(crudRequest);
   }
 
   @CrudCreateMany
   async createMany(
-    @CrudRequest() crudRequest: CrudRequestInterface,
+    @CrudRequest()
+    crudRequest: CrudRequestInterface<PhotoEntityInterfaceFixture>,
     @CrudBody() dto: PhotoCreateManyDtoFixture,
   ) {
     return this.crudService.createMany(crudRequest, dto);
@@ -103,7 +110,8 @@ export class PhotoCcbCustomControllerFixture extends CrudBaseController<
 
   @CrudCreateOne
   async createOne(
-    @CrudRequest() crudRequest: CrudRequestInterface,
+    @CrudRequest()
+    crudRequest: CrudRequestInterface<PhotoEntityInterfaceFixture>,
     @CrudBody() dto: PhotoCreateDtoFixture,
   ) {
     return this.crudService.createOne(crudRequest, dto);
@@ -111,7 +119,8 @@ export class PhotoCcbCustomControllerFixture extends CrudBaseController<
 
   @CrudUpdateOne
   async updateOne(
-    @CrudRequest() crudRequest: CrudRequestInterface,
+    @CrudRequest()
+    crudRequest: CrudRequestInterface<PhotoEntityInterfaceFixture>,
     @CrudBody() dto: PhotoUpdateDtoFixture,
   ) {
     return this.crudService.updateOne(crudRequest, dto);
@@ -119,19 +128,26 @@ export class PhotoCcbCustomControllerFixture extends CrudBaseController<
 
   @CrudReplaceOne
   async replaceOne(
-    @CrudRequest() crudRequest: CrudRequestInterface,
+    @CrudRequest()
+    crudRequest: CrudRequestInterface<PhotoEntityInterfaceFixture>,
     @CrudBody() dto: PhotoUpdateDtoFixture,
   ) {
     return this.crudService.replaceOne(crudRequest, dto);
   }
 
   @CrudDeleteOne
-  async deleteOne(@CrudRequest() crudRequest: CrudRequestInterface) {
+  async deleteOne(
+    @CrudRequest()
+    crudRequest: CrudRequestInterface<PhotoEntityInterfaceFixture>,
+  ) {
     return this.crudService.deleteOne(crudRequest);
   }
 
   @CrudRecoverOne
-  async recoverOne(@CrudRequest() crudRequest: CrudRequestInterface) {
+  async recoverOne(
+    @CrudRequest()
+    crudRequest: CrudRequestInterface<PhotoEntityInterfaceFixture>,
+  ) {
     return this.crudService.recoverOne(crudRequest);
   }
 }

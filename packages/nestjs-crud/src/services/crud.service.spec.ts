@@ -16,7 +16,10 @@ jest.mock('../crud/adapters/typeorm-crud.adapter');
 
 describe(CrudService.name, () => {
   // fake entity/repo
-  class Thing {}
+  class Thing {
+    name!: string;
+  }
+
   class ThingRepository extends Repository<Thing> {}
 
   // test orm service
@@ -33,8 +36,8 @@ describe(CrudService.name, () => {
   }
 
   let ormService: TestCrudService;
-  let mockRequest: CrudRequestInterface;
-  let mockOverrides: CrudServiceQueryOptionsInterface;
+  let mockRequest: CrudRequestInterface<Thing>;
+  let mockOverrides: CrudServiceQueryOptionsInterface<Thing>;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -51,7 +54,7 @@ describe(CrudService.name, () => {
     mockRequest = {
       options: { query: { alwaysPaginate: true } },
       parsed: { search: { name: 'apple' } },
-    } as unknown as CrudRequestInterface;
+    } as unknown as CrudRequestInterface<Thing>;
 
     mockOverrides = {
       filter: { name: 'pear' },

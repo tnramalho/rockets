@@ -1,4 +1,9 @@
-import { applyDecorators, Put, SetMetadata } from '@nestjs/common';
+import {
+  applyDecorators,
+  PlainLiteralObject,
+  Put,
+  SetMetadata,
+} from '@nestjs/common';
 
 import {
   CRUD_MODULE_ROUTE_ID_DEFAULT_PATH,
@@ -18,8 +23,10 @@ import { CrudValidate } from '../routes/crud-validate.decorator';
 /**
  * CRUD Replace One route decorator
  */
-export const CrudReplaceOne = (
-  options: CrudReplaceOneOptionsInterface = {},
+export const CrudReplaceOne = <
+  T extends PlainLiteralObject = PlainLiteralObject,
+>(
+  options: CrudReplaceOneOptionsInterface<T> = {},
 ) => {
   const {
     path = CRUD_MODULE_ROUTE_ID_DEFAULT_PATH,
@@ -30,7 +37,7 @@ export const CrudReplaceOne = (
     ...rest
   } = { ...options };
 
-  const validationMerged: CrudValidationOptions = dto
+  const validationMerged: CrudValidationOptions<T> = dto
     ? { expectedType: dto, ...validation }
     : validation;
 

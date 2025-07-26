@@ -49,18 +49,18 @@ describe('#crud', () => {
       constructor(public service: TestCrudAdapter<TestModelDto>) {}
 
       @CrudGetMany()
-      async getMany(@CrudRequest() req: CrudRequestInterface) {
+      async getMany(@CrudRequest() req: CrudRequestInterface<TestModelDto>) {
         return this.service.getMany(req);
       }
 
       @CrudGetOne()
-      async getOne(@CrudRequest() req: CrudRequestInterface) {
+      async getOne(@CrudRequest() req: CrudRequestInterface<TestModelDto>) {
         return this.service.getOne(req);
       }
 
       @CrudCreateOne()
       async createOne(
-        @CrudRequest() req: CrudRequestInterface,
+        @CrudRequest() req: CrudRequestInterface<TestModelDto>,
         @CrudBody() dto: TestModelCreateDto,
       ) {
         return this.service.createOne(req, dto);
@@ -68,7 +68,7 @@ describe('#crud', () => {
 
       @CrudReplaceOne()
       async replaceOne(
-        @CrudRequest() req: CrudRequestInterface,
+        @CrudRequest() req: CrudRequestInterface<TestModelDto>,
         @CrudBody() dto: TestModelCreateDto,
       ) {
         return this.service.replaceOne(req, dto);
@@ -76,7 +76,7 @@ describe('#crud', () => {
 
       @CrudUpdateOne()
       async updateOne(
-        @CrudRequest() req: CrudRequestInterface,
+        @CrudRequest() req: CrudRequestInterface<TestModelDto>,
         @CrudBody() dto: TestModelUpdateDto,
       ) {
         return this.service.updateOne(req, dto);
@@ -84,14 +84,14 @@ describe('#crud', () => {
 
       @CrudCreateMany()
       async createMany(
-        @CrudRequest() req: CrudRequestInterface,
+        @CrudRequest() req: CrudRequestInterface<TestModelDto>,
         @CrudBody() dto: TestModelCreateManyDto,
       ) {
         return this.service.createMany(req, dto);
       }
 
       @CrudDeleteOne()
-      async deleteOne(@CrudRequest() req: CrudRequestInterface) {
+      async deleteOne(@CrudRequest() req: CrudRequestInterface<TestModelDto>) {
         return this.service.deleteOne(req);
       }
     }
@@ -130,7 +130,7 @@ describe('#crud', () => {
           });
       });
       it('should return status 400', (done) => {
-        const query = qb.setFilter({ field: 'foo', operator: 'gt' }).query();
+        const query = qb.setFilter({ field: 'foo', operator: '$gt' }).query();
         request(server)
           .get('/test')
           .query(query)

@@ -10,15 +10,16 @@ import { CrudQueryHelper } from './helpers/crud-query.helper';
 
 // TODO: TYPEORM - review what to do
 @Injectable()
-export class CrudService<T extends PlainLiteralObject> {
-  constructor(protected crudAdapter: CrudAdapter<T>) {}
+export class CrudService<Entity extends PlainLiteralObject> {
+  constructor(protected crudAdapter: CrudAdapter<Entity>) {}
 
-  protected readonly crudQueryHelper: CrudQueryHelper = new CrudQueryHelper();
+  protected readonly crudQueryHelper: CrudQueryHelper<Entity> =
+    new CrudQueryHelper();
 
   async getMany(
-    req: CrudRequestInterface,
-    queryOptions?: CrudServiceQueryOptionsInterface,
-  ): Promise<T[] | CrudResponsePaginatedInterface<T>> {
+    req: CrudRequestInterface<Entity>,
+    queryOptions?: CrudServiceQueryOptionsInterface<Entity>,
+  ): Promise<Entity[] | CrudResponsePaginatedInterface<Entity>> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
 
@@ -45,9 +46,9 @@ export class CrudService<T extends PlainLiteralObject> {
   }
 
   async getOne(
-    req: CrudRequestInterface,
-    queryOptions?: CrudServiceQueryOptionsInterface,
-  ): ReturnType<CrudAdapter<T>['getOne']> {
+    req: CrudRequestInterface<Entity>,
+    queryOptions?: CrudServiceQueryOptionsInterface<Entity>,
+  ): ReturnType<CrudAdapter<Entity>['getOne']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
     // return parent result
@@ -61,10 +62,10 @@ export class CrudService<T extends PlainLiteralObject> {
   }
 
   async createMany(
-    req: CrudRequestInterface,
-    dto: Parameters<CrudAdapter<T>['createMany']>[1],
-    queryOptions?: CrudServiceQueryOptionsInterface,
-  ): ReturnType<CrudAdapter<T>['createMany']> {
+    req: CrudRequestInterface<Entity>,
+    dto: Parameters<CrudAdapter<Entity>['createMany']>[1],
+    queryOptions?: CrudServiceQueryOptionsInterface<Entity>,
+  ): ReturnType<CrudAdapter<Entity>['createMany']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
     // return parent result
@@ -78,10 +79,10 @@ export class CrudService<T extends PlainLiteralObject> {
   }
 
   async createOne(
-    req: CrudRequestInterface,
-    dto: Parameters<CrudAdapter<T>['createOne']>[1],
-    queryOptions?: CrudServiceQueryOptionsInterface,
-  ): ReturnType<CrudAdapter<T>['createOne']> {
+    req: CrudRequestInterface<Entity>,
+    dto: Parameters<CrudAdapter<Entity>['createOne']>[1],
+    queryOptions?: CrudServiceQueryOptionsInterface<Entity>,
+  ): ReturnType<CrudAdapter<Entity>['createOne']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
     // return parent result
@@ -95,10 +96,10 @@ export class CrudService<T extends PlainLiteralObject> {
   }
 
   async updateOne(
-    req: CrudRequestInterface,
-    dto: Parameters<CrudAdapter<T>['updateOne']>[1],
-    queryOptions?: CrudServiceQueryOptionsInterface,
-  ): ReturnType<CrudAdapter<T>['updateOne']> {
+    req: CrudRequestInterface<Entity>,
+    dto: Parameters<CrudAdapter<Entity>['updateOne']>[1],
+    queryOptions?: CrudServiceQueryOptionsInterface<Entity>,
+  ): ReturnType<CrudAdapter<Entity>['updateOne']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
     // return parent result
@@ -112,10 +113,10 @@ export class CrudService<T extends PlainLiteralObject> {
   }
 
   async replaceOne(
-    req: CrudRequestInterface,
-    dto: Parameters<CrudAdapter<T>['replaceOne']>[1],
-    queryOptions?: CrudServiceQueryOptionsInterface,
-  ): ReturnType<CrudAdapter<T>['replaceOne']> {
+    req: CrudRequestInterface<Entity>,
+    dto: Parameters<CrudAdapter<Entity>['replaceOne']>[1],
+    queryOptions?: CrudServiceQueryOptionsInterface<Entity>,
+  ): ReturnType<CrudAdapter<Entity>['replaceOne']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
     // return parent result
@@ -129,9 +130,9 @@ export class CrudService<T extends PlainLiteralObject> {
   }
 
   async deleteOne(
-    req: CrudRequestInterface,
-    queryOptions?: CrudServiceQueryOptionsInterface,
-  ): ReturnType<CrudAdapter<T>['deleteOne']> {
+    req: CrudRequestInterface<Entity>,
+    queryOptions?: CrudServiceQueryOptionsInterface<Entity>,
+  ): ReturnType<CrudAdapter<Entity>['deleteOne']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
     // return parent result
@@ -145,9 +146,9 @@ export class CrudService<T extends PlainLiteralObject> {
   }
 
   async recoverOne(
-    req: CrudRequestInterface,
-    queryOptions?: CrudServiceQueryOptionsInterface,
-  ): ReturnType<CrudAdapter<T>['recoverOne']> {
+    req: CrudRequestInterface<Entity>,
+    queryOptions?: CrudServiceQueryOptionsInterface<Entity>,
+  ): ReturnType<CrudAdapter<Entity>['recoverOne']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
     // return parent result

@@ -1,4 +1,8 @@
-import { applyDecorators, Controller } from '@nestjs/common';
+import {
+  applyDecorators,
+  Controller,
+  PlainLiteralObject,
+} from '@nestjs/common';
 
 import { CRUD_MODULE_DEFAULT_PARAMS_OPTIONS } from '../../../crud.constants';
 import { CrudControllerOptionsInterface } from '../../interfaces/crud-controller-options.interface';
@@ -18,7 +22,9 @@ import { CrudInitValidation } from './crud-init-validation.decorator';
  *
  * This decorator is a helper for calling the most common controller level decorators.
  */
-export function CrudController(options: CrudControllerOptionsInterface) {
+export function CrudController<
+  T extends PlainLiteralObject = PlainLiteralObject,
+>(options: CrudControllerOptionsInterface<T>) {
   // break out options
   const { path, host, ...moreOptions } = options;
 
@@ -26,7 +32,7 @@ export function CrudController(options: CrudControllerOptionsInterface) {
   return applyDecorators(
     Controller({ path, host }),
     CrudModel(moreOptions.model),
-    CrudParams(moreOptions.params ?? CRUD_MODULE_DEFAULT_PARAMS_OPTIONS),
+    CrudParams<T>(moreOptions.params ?? CRUD_MODULE_DEFAULT_PARAMS_OPTIONS),
     CrudValidate(moreOptions.validation),
     CrudSerialize(moreOptions.serialization),
     CrudInitValidation(),

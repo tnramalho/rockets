@@ -1,14 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, PlainLiteralObject } from '@nestjs/common';
 
 import { CrudRequestInterface } from '../../crud/interfaces/crud-request.interface';
 import { CrudServiceQueryOptionsInterface } from '../../crud/interfaces/crud-service-query-options.interface';
 import { SCondition } from '../../request/types/crud-request-query.types';
 
 @Injectable()
-export class CrudQueryHelper {
+export class CrudQueryHelper<Entity extends PlainLiteralObject> {
   modifyRequest(
-    req: CrudRequestInterface,
-    options?: CrudServiceQueryOptionsInterface,
+    req: CrudRequestInterface<Entity>,
+    options?: CrudServiceQueryOptionsInterface<Entity>,
   ) {
     // get any options?
     if (options) {
@@ -22,8 +22,8 @@ export class CrudQueryHelper {
   }
 
   mergeOptions(
-    req: CrudRequestInterface,
-    options: Omit<CrudServiceQueryOptionsInterface, 'filter'>,
+    req: CrudRequestInterface<Entity>,
+    options: Omit<CrudServiceQueryOptionsInterface<Entity>, 'filter'>,
   ) {
     // already have options on request?
     if (req.options) {
@@ -40,7 +40,7 @@ export class CrudQueryHelper {
     }
   }
 
-  addSearch(req: CrudRequestInterface, search?: SCondition) {
+  addSearch(req: CrudRequestInterface<Entity>, search?: SCondition<Entity>) {
     if (search) {
       if (req.parsed.search) {
         req.parsed.search = {

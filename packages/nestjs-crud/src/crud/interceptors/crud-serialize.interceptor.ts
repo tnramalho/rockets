@@ -31,11 +31,14 @@ type ResponseType =
   | (PlainLiteralObject & CrudResponsePaginatedInterface)
   | Array<PlainLiteralObject>;
 
-export class CrudSerializeInterceptor implements NestInterceptor {
+export class CrudSerializeInterceptor<
+  T extends PlainLiteralObject = PlainLiteralObject,
+> implements NestInterceptor
+{
   constructor(
     @Inject(CRUD_MODULE_SETTINGS_TOKEN)
     private settings: CrudModuleSettingsInterface,
-    private reflectionService: CrudReflectionService,
+    private reflectionService: CrudReflectionService<T>,
   ) {}
 
   /**

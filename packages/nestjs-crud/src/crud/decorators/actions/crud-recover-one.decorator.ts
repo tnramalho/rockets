@@ -1,4 +1,9 @@
-import { applyDecorators, Patch, SetMetadata } from '@nestjs/common';
+import {
+  applyDecorators,
+  Patch,
+  PlainLiteralObject,
+  SetMetadata,
+} from '@nestjs/common';
 
 import {
   CRUD_MODULE_ROUTE_RECOVER_ONE_DEFAULT_PATH,
@@ -16,8 +21,10 @@ import { CrudValidate } from '../routes/crud-validate.decorator';
 /**
  * CRUD Recover One route decorator
  */
-export const CrudRecoverOne = (
-  options: CrudRecoverOneOptionsInterface = {},
+export const CrudRecoverOne = <
+  T extends PlainLiteralObject = PlainLiteralObject,
+>(
+  options: CrudRecoverOneOptionsInterface<T> = {},
 ) => {
   const {
     path = CRUD_MODULE_ROUTE_RECOVER_ONE_DEFAULT_PATH,

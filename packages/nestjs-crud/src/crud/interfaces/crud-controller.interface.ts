@@ -1,3 +1,5 @@
+import { PlainLiteralObject } from '@nestjs/common';
+
 import { DeepPartial } from '@concepta/nestjs-common';
 
 import { AdditionalCrudMethodArgs } from '../../crud.types';
@@ -7,52 +9,52 @@ import { CrudRequestInterface } from './crud-request.interface';
 import { CrudResponsePaginatedInterface } from './crud-response-paginated.interface';
 
 export interface CrudControllerInterface<
-  Entity,
-  Creatable extends DeepPartial<Entity>,
-  Updatable extends DeepPartial<Entity>,
+  Entity extends PlainLiteralObject,
+  Creatable extends DeepPartial<Entity> = DeepPartial<Entity>,
+  Updatable extends DeepPartial<Entity> = DeepPartial<Entity>,
   Replaceable extends Creatable = Creatable,
 > {
   getMany?(
-    crudRequest: CrudRequestInterface,
+    crudRequest: CrudRequestInterface<Entity>,
     ...rest: AdditionalCrudMethodArgs
   ): Promise<CrudResponsePaginatedInterface<Entity> | Entity[]>;
 
   getOne?(
-    crudRequest: CrudRequestInterface,
+    crudRequest: CrudRequestInterface<Entity>,
     ...rest: AdditionalCrudMethodArgs
   ): Promise<Entity>;
 
   createOne?(
-    crudRequest: CrudRequestInterface,
+    crudRequest: CrudRequestInterface<Entity>,
     dto: Creatable,
     ...rest: AdditionalCrudMethodArgs
   ): Promise<Entity>;
 
   createMany?(
-    crudRequest: CrudRequestInterface,
+    crudRequest: CrudRequestInterface<Entity>,
     dto: CrudCreateManyInterface<Creatable>,
     ...rest: AdditionalCrudMethodArgs
   ): Promise<Entity[]>;
 
   updateOne?(
-    crudRequest: CrudRequestInterface,
+    crudRequest: CrudRequestInterface<Entity>,
     dto: Updatable,
     ...rest: AdditionalCrudMethodArgs
   ): Promise<Entity>;
 
   replaceOne?(
-    crudRequest: CrudRequestInterface,
+    crudRequest: CrudRequestInterface<Entity>,
     dto: Replaceable,
     ...rest: AdditionalCrudMethodArgs
   ): Promise<Entity>;
 
   deleteOne?(
-    crudRequest: CrudRequestInterface,
+    crudRequest: CrudRequestInterface<Entity>,
     ...rest: AdditionalCrudMethodArgs
   ): Promise<Entity | void>;
 
   recoverOne?(
-    crudRequest: CrudRequestInterface,
+    crudRequest: CrudRequestInterface<Entity>,
     ...rest: AdditionalCrudMethodArgs
   ): Promise<Entity | void>;
 }

@@ -1,3 +1,5 @@
+import { PlainLiteralObject } from '@nestjs/common';
+
 import {
   QueryFilter,
   SCondition,
@@ -5,7 +7,7 @@ import {
 
 import { QueryFilterFunction } from './query-filter-function.type';
 
-export type QueryFilterOption =
-  | QueryFilter[]
-  | SCondition
-  | QueryFilterFunction;
+export type QueryFilterOption<T extends PlainLiteralObject> =
+  | QueryFilter<T>[]
+  | SCondition<T>
+  | QueryFilterFunction<T>;

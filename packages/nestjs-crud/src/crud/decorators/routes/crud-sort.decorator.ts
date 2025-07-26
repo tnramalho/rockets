@@ -1,4 +1,4 @@
-import { SetMetadata } from '@nestjs/common';
+import { PlainLiteralObject, SetMetadata } from '@nestjs/common';
 
 import { CRUD_MODULE_ROUTE_QUERY_SORT_METADATA } from '../../../crud.constants';
 import { CrudServiceQueryOptionsInterface } from '../../interfaces/crud-service-query-options.interface';
@@ -8,5 +8,8 @@ import { CrudServiceQueryOptionsInterface } from '../../interfaces/crud-service-
  *
  * Set the CRUD sort query option.
  */
-export const CrudSort = (sort: CrudServiceQueryOptionsInterface['sort']) =>
-  SetMetadata(CRUD_MODULE_ROUTE_QUERY_SORT_METADATA, sort);
+export const CrudSort = <
+  Entity extends PlainLiteralObject = PlainLiteralObject,
+>(
+  sort: CrudServiceQueryOptionsInterface<Entity>['sort'],
+) => SetMetadata(CRUD_MODULE_ROUTE_QUERY_SORT_METADATA, sort);

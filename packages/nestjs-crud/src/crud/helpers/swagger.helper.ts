@@ -1,5 +1,7 @@
 import { isString } from '@nestjsx/util';
 
+import { PlainLiteralObject } from '@nestjs/common';
+
 import { CrudRequestQueryBuilder } from '../../request/crud-request-query.builder';
 import { CrudOptionsInterface } from '../interfaces/crud-options.interface';
 import { CrudRouteName } from '../types/crud-route-name.type';
@@ -16,9 +18,9 @@ export const swaggerPkgJson = safeRequire('@nestjs/swagger/package.json', () =>
 );
 
 export class Swagger {
-  static createQueryParamsMeta(
+  static createQueryParamsMeta<T extends PlainLiteralObject>(
     name: CrudRouteName,
-    options: CrudOptionsInterface,
+    options: CrudOptionsInterface<T>,
   ) {
     /* istanbul ignore if */
     if (!swaggerConst) {

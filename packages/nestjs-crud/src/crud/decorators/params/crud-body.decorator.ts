@@ -1,4 +1,4 @@
-import { SetMetadata } from '@nestjs/common';
+import { PlainLiteralObject, SetMetadata } from '@nestjs/common';
 
 import { CRUD_MODULE_PARAM_BODY_METADATA } from '../../../crud.constants';
 import { DecoratorTargetObject } from '../../../crud.types';
@@ -10,7 +10,7 @@ import { CrudValidationMetadataInterface } from '../../interfaces/crud-validatio
 /**
  * \@CrudBody() parameter decorator
  */
-export function CrudBody(
+export function CrudBody<T extends PlainLiteralObject = PlainLiteralObject>(
   options?: CrudBodyOptionsInterface,
 ): ParameterDecorator {
   return (target: DecoratorTargetObject, ...rest) => {
@@ -26,7 +26,7 @@ export function CrudBody(
 
     const previousValues = reflectionService.getBodyParamOptions(target) || [];
 
-    const value: CrudValidationMetadataInterface = {
+    const value: CrudValidationMetadataInterface<T> = {
       propertyKey,
       parameterIndex,
       validation: options?.validation,

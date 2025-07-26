@@ -1,14 +1,14 @@
-import { ValidationPipeOptions } from '@nestjs/common';
+import { PlainLiteralObject, ValidationPipeOptions } from '@nestjs/common';
 
 import { CrudModelOptionsInterface } from './crud-model-options.interface';
 import { CrudParamsOptionsInterface } from './crud-params-options.interface';
 import { CrudQueryOptionsInterface } from './crud-query-options.interface';
 import { CrudRoutesOptionsInterface } from './crud-routes-options.interface';
 
-export interface CrudOptionsInterface {
+export interface CrudOptionsInterface<T extends PlainLiteralObject> {
   model: CrudModelOptionsInterface;
-  query?: CrudQueryOptionsInterface;
+  query?: CrudQueryOptionsInterface<T>;
   routes?: CrudRoutesOptionsInterface;
-  params?: CrudParamsOptionsInterface;
+  params?: CrudParamsOptionsInterface<T>;
   validation?: ValidationPipeOptions | false;
 }

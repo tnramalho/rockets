@@ -23,6 +23,7 @@ import {
   validateSort,
   validateUUID,
 } from './crud-request-query.validator';
+import { splitSortString } from './crud-request.utils';
 import { CrudRequestQueryException } from './exceptions/crud-request-query.exception';
 import { CrudRequestParamsOptionsInterface } from './interfaces/crud-request-params-options.interface';
 import { CrudRequestParsedParamsInterface } from './interfaces/crud-request-parsed-params.interface';
@@ -38,24 +39,24 @@ import {
 } from './types/crud-request-query.types';
 
 // tslint:disable:variable-name ban-types
-export class CrudRequestQueryParser
-  implements CrudRequestParsedParamsInterface
+export class CrudRequestQueryParser<Entity extends PlainLiteralObject>
+  implements CrudRequestParsedParamsInterface<Entity>
 {
-  public fields: QueryFields = [];
+  public fields: QueryFields<Entity> = [];
 
-  public paramsFilter: QueryFilter[] = [];
+  public paramsFilter: QueryFilter<Entity>[] = [];
 
   public authPersist: ObjectLiteral | undefined;
 
   public classTransformOptions: ClassTransformOptions | undefined;
 
-  public search: SCondition | undefined;
+  public search: SCondition<Entity> | undefined;
 
-  public filter: QueryFilter[] = [];
+  public filter: QueryFilter<Entity>[] = [];
 
-  public or: QueryFilter[] = [];
+  public or: QueryFilter<Entity>[] = [];
 
-  public sort: QuerySort[] = [];
+  public sort: QuerySort<Entity>[] = [];
 
   public limit: number | undefined;
 
@@ -73,17 +74,17 @@ export class CrudRequestQueryParser
 
   private _paramNames: string[] = [];
 
-  private _paramsOptions: CrudRequestParamsOptionsInterface | undefined;
+  private _paramsOptions: CrudRequestParamsOptionsInterface<Entity> | undefined;
 
   private get _options(): Required<CrudRequestQueryBuilderOptionsInterface> {
     return CrudRequestQueryBuilder.getOptions();
   }
 
-  static create(): CrudRequestQueryParser {
+  static create<T extends PlainLiteralObject>(): CrudRequestQueryParser<T> {
     return new CrudRequestQueryParser();
   }
 
-  getParsed(): CrudRequestParsedParamsInterface {
+  getParsed(): CrudRequestParsedParamsInterface<Entity> {
     return {
       fields: this.fields,
       paramsFilter: this.paramsFilter,
@@ -144,7 +145,7 @@ export class CrudRequestQueryParser
 
   parseParams(
     params: PlainLiteralObject,
-    options: CrudRequestParamsOptionsInterface,
+    options: CrudRequestParamsOptionsInterface<Entity>,
   ): this {
     if (isObject(params)) {
       const paramNames = objKeys(params);
@@ -156,7 +157,9 @@ export class CrudRequestQueryParser
           .map((name) => {
             return this.paramParser(name);
           })
-          .filter((filter): filter is QueryFilter => filter !== undefined);
+          .filter(
+            (filter): filter is QueryFilter<Entity> => filter !== undefined,
+          );
       }
     }
 
@@ -171,18 +174,20 @@ export class CrudRequestQueryParser
     this.classTransformOptions = options || /* istanbul ignore next */ {};
   }
 
-  convertFilterToSearch(filter: QueryFilter): SFields | SConditionAND {
+  convertFilterToSearch(
+    filter: QueryFilter<Entity>,
+  ): SFields<Entity> | SConditionAND<Entity> {
     return filter
       ? {
           [filter.field]: {
             // [filter.operator]: isEmptyValue[filter.operator] ? isEmptyValue[filter.operator] : filter.value,
             [filter.operator]:
-              filter.operator === 'isnull' || filter.operator === 'notnull'
+              filter.operator === '$isnull' || filter.operator === '$notnull'
                 ? true
                 : filter.value,
           },
         }
-      : /* istanbul ignore next */ {};
+      : {};
   }
 
   private getParamNames(
@@ -202,7 +207,7 @@ export class CrudRequestQueryParser
     U extends keyof NonNullable<
       CrudRequestQueryBuilderOptionsInterface['paramNamesMap']
     >,
-    R extends CrudRequestParsedParamsInterface[U],
+    R extends CrudRequestParsedParamsInterface<Entity>[U],
   >(
     value: string | string[],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -223,7 +228,7 @@ export class CrudRequestQueryParser
     value: NonNullable<
       CrudRequestQueryBuilderOptionsInterface['paramNamesMap']
     >['filter'],
-  ): QueryFilter[] {
+  ): QueryFilter<Entity>[] {
     const parser = this.conditionParser.bind(this, 'filter');
 
     if (typeof value === 'string' && isStringFull(value)) {
@@ -241,7 +246,7 @@ export class CrudRequestQueryParser
     value: NonNullable<
       CrudRequestQueryBuilderOptionsInterface['paramNamesMap']
     >['or'],
-  ): QueryFilter[] {
+  ): QueryFilter<Entity>[] {
     const parser = this.conditionParser.bind(this, 'or');
 
     if (typeof value === 'string' && isStringFull(value)) {
@@ -259,7 +264,7 @@ export class CrudRequestQueryParser
     value: NonNullable<
       CrudRequestQueryBuilderOptionsInterface['paramNamesMap']
     >['sort'],
-  ): QuerySort[] {
+  ): QuerySort<Entity>[] {
     const parser = this.sortParser.bind(this);
 
     if (typeof value === 'string' && isStringFull(value)) {
@@ -277,7 +282,7 @@ export class CrudRequestQueryParser
     U extends keyof NonNullable<
       CrudRequestQueryBuilderOptionsInterface['paramNamesMap']
     >,
-    R extends CrudRequestParsedParamsInterface[U],
+    R extends CrudRequestParsedParamsInterface<Entity>[U],
   >(
     type: U,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -298,12 +303,12 @@ export class CrudRequestQueryParser
     return [];
   }
 
-  private parseFilterQueryParam(): QueryFilter[] {
+  private parseFilterQueryParam(): QueryFilter<Entity>[] {
     const param = this.getParamNames('filter');
 
     if (isArrayFull(param)) {
       return param.reduce(
-        (a: QueryFilter[], name) => [
+        (a: QueryFilter<Entity>[], name) => [
           ...a,
           ...this.getFilterParamValues(this._query[name]),
         ],
@@ -314,12 +319,12 @@ export class CrudRequestQueryParser
     return [];
   }
 
-  private parseOrQueryParam(): QueryFilter[] {
+  private parseOrQueryParam(): QueryFilter<Entity>[] {
     const param = this.getParamNames('or');
 
     if (isArrayFull(param)) {
       return param.reduce(
-        (a: QueryFilter[], name) => [
+        (a: QueryFilter<Entity>[], name) => [
           ...a,
           ...this.getOrParamValues(this._query[name]),
         ],
@@ -330,12 +335,12 @@ export class CrudRequestQueryParser
     return [];
   }
 
-  private parseSortQueryParam(): QuerySort[] {
+  private parseSortQueryParam(): QuerySort<Entity>[] {
     const param = this.getParamNames('sort');
 
     if (isArrayFull(param)) {
       return param.reduce(
-        (a: QuerySort[], name) => [
+        (a: QuerySort<Entity>[], name) => [
           ...a,
           ...this.getSortParamValues(this._query[name]),
         ],
@@ -379,11 +384,11 @@ export class CrudRequestQueryParser
     }
   }
 
-  private fieldsParser(data: string): QueryFields {
+  private fieldsParser(data: string): QueryFields<Entity> {
     return data.split(this._options.delimStr);
   }
 
-  private parseSearchQueryParam(d: string): SCondition | undefined {
+  private parseSearchQueryParam(d: string): SCondition<Entity> | undefined {
     try {
       if (isNil(d)) {
         return undefined;
@@ -406,7 +411,7 @@ export class CrudRequestQueryParser
   private conditionParser(
     cond: 'filter' | 'or' | 'search',
     data: string,
-  ): QueryFilter {
+  ): QueryFilter<Entity> {
     const isArrayValue = [
       'in',
       'notin',
@@ -433,22 +438,16 @@ export class CrudRequestQueryParser
       throw new CrudRequestQueryException({ message: `Invalid ${cond} value` });
     }
 
-    const condition: QueryFilter = { field, operator, value };
+    const condition: QueryFilter<Entity> = { field, operator, value };
     validateCondition(condition, cond);
 
     return condition;
   }
 
-  private sortParser(data: string): QuerySort {
-    const param = data.split(this._options.delimStr);
-    const sort: QuerySort = {
-      field: param[0],
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      order: param[1] as any,
-    };
+  private sortParser(data: string): QuerySort<Entity> {
+    const sort = splitSortString(data, this._options.delimStr);
     validateSort(sort);
-
-    return sort;
+    return sort as QuerySort<Entity>;
   }
 
   private numericParser(
@@ -461,8 +460,8 @@ export class CrudRequestQueryParser
     return val;
   }
 
-  private paramParser(name: string): QueryFilter | undefined {
-    const paramsOptions: CrudRequestParamsOptionsInterface =
+  private paramParser(name: string): QueryFilter<Entity> | undefined {
+    const paramsOptions: CrudRequestParamsOptionsInterface<Entity> =
       this._paramsOptions ?? {};
 
     validateParamOption(paramsOptions, name);

@@ -71,7 +71,7 @@ describe('#request-query', () => {
       });
       it('should throw an error, 2', () => {
         expect(
-          (qb.setFilter as any).bind(qb, { field: 'foo', operator: 'bar' }),
+          (qb.setFilter as any).bind(qb, { field: 'foo', operator: '$bar' }),
         ).toThrowError(CrudRequestQueryException);
       });
       it('should throw an error, 3', () => {
@@ -80,37 +80,37 @@ describe('#request-query', () => {
         );
       });
       it('should set filter, 1', () => {
-        qb.setFilter({ field: 'foo', operator: 'eq', value: 'bar' });
-        const expected = ['foo||eq||bar'];
+        qb.setFilter({ field: 'foo', operator: '$eq', value: 'bar' });
+        const expected = ['foo||$eq||bar'];
         expect(qb.queryObject.filter).toIncludeSameMembers(expected);
       });
       it('should set filter, 2', () => {
         qb.setFilter([
-          { field: 'foo', operator: 'eq', value: 'bar' },
-          { field: 'baz', operator: 'ne', value: 'zoo' },
+          { field: 'foo', operator: '$eq', value: 'bar' },
+          { field: 'baz', operator: '$ne', value: 'zoo' },
         ]);
-        const expected = ['foo||eq||bar', 'baz||ne||zoo'];
+        const expected = ['foo||$eq||bar', 'baz||$ne||zoo'];
         expect(qb.queryObject.filter).toIncludeSameMembers(expected);
       });
       it('should set filter, 3', () => {
         qb.setFilter([
-          ['foo', 'eq', 'bar'],
-          { field: 'baz', operator: 'ne', value: 'zoo' },
+          ['foo', '$eq', 'bar'],
+          { field: 'baz', operator: '$ne', value: 'zoo' },
         ]);
-        const expected = ['foo||eq||bar', 'baz||ne||zoo'];
+        const expected = ['foo||$eq||bar', 'baz||$ne||zoo'];
         expect(qb.queryObject.filter).toIncludeSameMembers(expected);
       });
       it('should set filter, 4', () => {
         qb.setFilter([
-          ['foo', 'eq', 'bar'],
-          ['baz', 'ne', 'zoo'],
+          ['foo', '$eq', 'bar'],
+          ['baz', '$ne', 'zoo'],
         ]);
-        const expected = ['foo||eq||bar', 'baz||ne||zoo'];
+        const expected = ['foo||$eq||bar', 'baz||$ne||zoo'];
         expect(qb.queryObject.filter).toIncludeSameMembers(expected);
       });
       it('should set filter, 5', () => {
-        qb.setFilter(['foo', 'eq', 'bar']);
-        const expected = ['foo||eq||bar'];
+        qb.setFilter(['foo', '$eq', 'bar']);
+        const expected = ['foo||$eq||bar'];
         expect(qb.queryObject.filter).toIncludeSameMembers(expected);
       });
     });
@@ -127,7 +127,7 @@ describe('#request-query', () => {
       });
       it('should throw an error, 2', () => {
         expect(
-          (qb.setOr as any).bind(qb, { field: 'foo', operator: 'bar' }),
+          (qb.setOr as any).bind(qb, { field: 'foo', operator: '$bar' }),
         ).toThrowError(CrudRequestQueryException);
       });
       it('should throw an error, 3', () => {
@@ -136,16 +136,16 @@ describe('#request-query', () => {
         );
       });
       it('should set or, 1', () => {
-        qb.setOr({ field: 'foo', operator: 'eq', value: 'bar' });
-        const expected = ['foo||eq||bar'];
+        qb.setOr({ field: 'foo', operator: '$eq', value: 'bar' });
+        const expected = ['foo||$eq||bar'];
         expect(qb.queryObject.or).toIncludeSameMembers(expected);
       });
       it('should set or, 2', () => {
         qb.setOr([
-          { field: 'foo', operator: 'eq', value: 'bar' },
-          { field: 'baz', operator: 'ne', value: 'zoo' },
+          { field: 'foo', operator: '$eq', value: 'bar' },
+          { field: 'baz', operator: '$ne', value: 'zoo' },
         ]);
-        const expected = ['foo||eq||bar', 'baz||ne||zoo'];
+        const expected = ['foo||$eq||bar', 'baz||$ne||zoo'];
         expect(qb.queryObject.or).toIncludeSameMembers(expected);
       });
     });
@@ -269,13 +269,13 @@ describe('#request-query', () => {
         );
       });
       it('should return a filter string from an object', () => {
-        const test = qb.cond({ field: 'foo', operator: 'eq', value: 'bar' });
-        const expected = 'foo||eq||bar';
+        const test = qb.cond({ field: 'foo', operator: '$eq', value: 'bar' });
+        const expected = 'foo||$eq||bar';
         expect(test).toBe(expected);
       });
       it('should return a filter string from an array', () => {
-        const test = qb.cond(['foo', 'eq', 'bar']);
-        const expected = 'foo||eq||bar';
+        const test = qb.cond(['foo', '$eq', 'bar']);
+        const expected = 'foo||$eq||bar';
         expect(test).toBe(expected);
       });
     });
@@ -300,19 +300,19 @@ describe('#request-query', () => {
         const test = qb
           .select(['foo', 'bar'])
           .setFilter([
-            { field: 'is', operator: 'notnull' },
-            { field: 'foo', operator: 'lt', value: 10 },
+            { field: 'is', operator: '$notnull' },
+            { field: 'foo', operator: '$lt', value: 10 },
           ])
           .query(false);
         const expected =
-          'fields=foo,bar&filter[0]=is||notnull&filter[1]=foo||lt||10';
+          'fields=foo,bar&filter[0]=is||$notnull&filter[1]=foo||$lt||10';
         expect(test).toBe(expected);
       });
       it('should return a valid query string', () => {
         const test = qb
           .select(['foo', 'bar'])
-          .setFilter(['is', 'notnull'])
-          .setOr({ field: 'ok', operator: 'ne', value: false })
+          .setFilter(['is', '$notnull'])
+          .setOr({ field: 'ok', operator: '$ne', value: false })
           .setLimit(1)
           .setOffset(2)
           .setPage(3)
@@ -321,7 +321,7 @@ describe('#request-query', () => {
           .setIncludeDeleted(1)
           .query(false);
         const expected =
-          'fields=foo,bar&filter[0]=is||notnull&or[0]=ok||ne||false&limit=1&offset=2&page=3&sort[0]=foo,DESC&cache=0&include_deleted=1'; // eslint-disable-line
+          'fields=foo,bar&filter[0]=is||$notnull&or[0]=ok||$ne||false&limit=1&offset=2&page=3&sort[0]=foo,DESC&cache=0&include_deleted=1'; // eslint-disable-line
         expect(test).toBe(expected);
       });
     });
@@ -358,8 +358,8 @@ describe('#request-query', () => {
       it('should return a valid query string, 1', () => {
         const test = CrudRequestQueryBuilder.create({
           fields: ['foo', 'bar'],
-          filter: ['is', 'notnull'],
-          or: { field: 'ok', operator: 'ne', value: false },
+          filter: ['is', '$notnull'],
+          or: { field: 'ok', operator: '$ne', value: false },
           limit: 1,
           offset: 2,
           page: 3,
@@ -367,7 +367,7 @@ describe('#request-query', () => {
           resetCache: true,
         }).query(false);
         const expected =
-          'fields=foo,bar&filter[0]=is||notnull&or[0]=ok||ne||false&limit=1&offset=2&page=3&sort[0]=foo,DESC&cache=0';
+          'fields=foo,bar&filter[0]=is||$notnull&or[0]=ok||$ne||false&limit=1&offset=2&page=3&sort[0]=foo,DESC&cache=0';
         expect(test).toBe(expected);
       });
       it('should return a valid query string, 2', () => {

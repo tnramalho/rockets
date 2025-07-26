@@ -5,9 +5,16 @@ import { CrudRequestParamsOptionsInterface } from './interfaces/crud-request-par
 import { CrudRequestParsedParamsInterface } from './interfaces/crud-request-parsed-params.interface';
 import { QueryFilter, QuerySort } from './types/crud-request-query.types';
 
+class TestEntity {
+  foo!: unknown;
+  bar!: unknown;
+  baz!: unknown;
+  bigInt!: number;
+}
+
 describe('#request-query', () => {
   describe('RequestQueryParser', () => {
-    let qp: CrudRequestQueryParser;
+    let qp: CrudRequestQueryParser<TestEntity>;
 
     beforeEach(() => {
       qp = CrudRequestQueryParser.create();
@@ -59,108 +66,108 @@ describe('#request-query', () => {
           expect(test.filter).toMatchObject(expected);
         });
         it('should throw an error, 1', () => {
-          const query = { filter: 'foo||invalid||bar' };
+          const query = { filter: 'foo||$invalid||bar' };
           expect(qp.parseQuery.bind(qp, query)).toThrowError(
             CrudRequestQueryException,
           );
         });
         it('should throw an error, 2', () => {
-          const query = { filter: 'foo||eq' };
+          const query = { filter: 'foo||$eq' };
           expect(qp.parseQuery.bind(qp, query)).toThrowError(
             CrudRequestQueryException,
           );
         });
         it('should set array, 1', () => {
-          const query = { filter: 'foo||eq||bar' };
-          const expected: QueryFilter[] = [
-            { field: 'foo', operator: 'eq', value: 'bar' },
+          const query = { filter: 'foo||$eq||bar' };
+          const expected: QueryFilter<TestEntity>[] = [
+            { field: 'foo', operator: '$eq', value: 'bar' },
           ];
           const test = qp.parseQuery(query);
           expect(test.filter[0]).toMatchObject(expected[0]);
         });
         it('should set array, 2', () => {
-          const query = { filter: ['foo||eq||bar', 'baz||ne||boo'] };
-          const expected: QueryFilter[] = [
-            { field: 'foo', operator: 'eq', value: 'bar' },
-            { field: 'baz', operator: 'ne', value: 'boo' },
+          const query = { filter: ['foo||$eq||bar', 'baz||$ne||boo'] };
+          const expected: QueryFilter<TestEntity>[] = [
+            { field: 'foo', operator: '$eq', value: 'bar' },
+            { field: 'baz', operator: '$ne', value: 'boo' },
           ];
           const test = qp.parseQuery(query);
           expect(test.filter[0]).toMatchObject(expected[0]);
           expect(test.filter[1]).toMatchObject(expected[1]);
         });
         it('should set array, 3', () => {
-          const query = { filter: ['foo||in||1,2'] };
-          const expected: QueryFilter[] = [
-            { field: 'foo', operator: 'in', value: [1, 2] },
+          const query = { filter: ['foo||$in||1,2'] };
+          const expected: QueryFilter<TestEntity>[] = [
+            { field: 'foo', operator: '$in', value: [1, 2] },
           ];
           const test = qp.parseQuery(query);
           expect(test.filter[0]).toMatchObject(expected[0]);
         });
         it('should set array, 4', () => {
-          const query = { filter: ['foo||isnull'] };
-          const expected: QueryFilter[] = [
-            { field: 'foo', operator: 'isnull', value: '' },
+          const query = { filter: ['foo||$isnull'] };
+          const expected: QueryFilter<TestEntity>[] = [
+            { field: 'foo', operator: '$isnull', value: '' },
           ];
           const test = qp.parseQuery(query);
           expect(test.filter[0]).toMatchObject(expected[0]);
         });
         it('should set array, 5', () => {
-          const query = { filter: ['foo||eq||{"foo":true}'] };
-          const expected: QueryFilter[] = [
-            { field: 'foo', operator: 'eq', value: '{"foo":true}' },
+          const query = { filter: ['foo||$eq||{"foo":true}'] };
+          const expected: QueryFilter<TestEntity>[] = [
+            { field: 'foo', operator: '$eq', value: '{"foo":true}' },
           ];
           const test = qp.parseQuery(query);
           expect(test.filter[0]).toMatchObject(expected[0]);
         });
         it('should set array, 6', () => {
-          const query = { filter: ['foo||eq||1'] };
-          const expected: QueryFilter[] = [
-            { field: 'foo', operator: 'eq', value: 1 },
+          const query = { filter: ['foo||$eq||1'] };
+          const expected: QueryFilter<TestEntity>[] = [
+            { field: 'foo', operator: '$eq', value: 1 },
           ];
           const test = qp.parseQuery(query);
           expect(test.filter[0]).toMatchObject(expected[0]);
         });
         it('should set date, 7', () => {
           const now = new Date();
-          const query = { filter: [`foo||eq||${now.toJSON()}`] };
-          const expected: QueryFilter[] = [
-            { field: 'foo', operator: 'eq', value: now },
+          const query = { filter: [`foo||$eq||${now.toJSON()}`] };
+          const expected: QueryFilter<TestEntity>[] = [
+            { field: 'foo', operator: '$eq', value: now },
           ];
           const test = qp.parseQuery(query);
           expect(test.filter[0]).toMatchObject(expected[0]);
         });
         it('should set false, 8', () => {
-          const query = { filter: ['foo||eq||false'] };
-          const expected: QueryFilter[] = [
-            { field: 'foo', operator: 'eq', value: false },
+          const query = { filter: ['foo||$eq||false'] };
+          const expected: QueryFilter<TestEntity>[] = [
+            { field: 'foo', operator: '$eq', value: false },
           ];
           const test = qp.parseQuery(query);
           expect(test.filter[0]).toMatchObject(expected[0]);
         });
         it('should set true, 9', () => {
-          const query = { filter: ['foo||eq||true'] };
-          const expected: QueryFilter[] = [
-            { field: 'foo', operator: 'eq', value: true },
+          const query = { filter: ['foo||$eq||true'] };
+          const expected: QueryFilter<TestEntity>[] = [
+            { field: 'foo', operator: '$eq', value: true },
           ];
           const test = qp.parseQuery(query);
           expect(test.filter[0]).toMatchObject(expected[0]);
         });
         it('should set number, 10', () => {
-          const query = { filter: ['foo||eq||12345'] };
-          const expected: QueryFilter[] = [
-            { field: 'foo', operator: 'eq', value: 12345 },
+          const query = { filter: ['foo||$eq||12345'] };
+          const expected: QueryFilter<TestEntity>[] = [
+            { field: 'foo', operator: '$eq', value: 12345 },
           ];
           const test = qp.parseQuery(query);
           expect(test.filter[0]).toMatchObject(expected[0]);
         });
         it('should set string, 11', () => {
           const query = {
-            filter: ['foo||eq||4202140192612927005304000000236630'],
+            filter: ['foo||$eq||4202140192612927005304000000236630'],
           };
-          const expected: QueryFilter[] = [
+          const expected: QueryFilter<TestEntity>[] = [
             {
               field: 'foo',
-              operator: 'eq',
+              operator: '$eq',
               value: '4202140192612927005304000000236630',
             },
           ];
@@ -183,47 +190,47 @@ describe('#request-query', () => {
           expect(test.or).toMatchObject(expected);
         });
         it('should throw an error, 1', () => {
-          const query = { or: 'foo||invalid||bar' };
+          const query = { or: 'foo||$invalid||bar' };
           expect(qp.parseQuery.bind(qp, query)).toThrowError(
             CrudRequestQueryException,
           );
         });
         it('should throw an error, 2', () => {
-          const query = { or: 'foo||eq' };
+          const query = { or: 'foo||$eq' };
           expect(qp.parseQuery.bind(qp, query)).toThrowError(
             CrudRequestQueryException,
           );
         });
         it('should set array, 1', () => {
-          const query = { or: 'foo||eq||bar' };
-          const expected: QueryFilter[] = [
-            { field: 'foo', operator: 'eq', value: 'bar' },
+          const query = { or: 'foo||$eq||bar' };
+          const expected: QueryFilter<TestEntity>[] = [
+            { field: 'foo', operator: '$eq', value: 'bar' },
           ];
           const test = qp.parseQuery(query);
           expect(test.or[0]).toMatchObject(expected[0]);
         });
         it('should set array, 2', () => {
-          const query = { or: ['foo||eq||bar', 'baz||ne||boo'] };
-          const expected: QueryFilter[] = [
-            { field: 'foo', operator: 'eq', value: 'bar' },
-            { field: 'baz', operator: 'ne', value: 'boo' },
+          const query = { or: ['foo||$eq||bar', 'baz||$ne||boo'] };
+          const expected: QueryFilter<TestEntity>[] = [
+            { field: 'foo', operator: '$eq', value: 'bar' },
+            { field: 'baz', operator: '$ne', value: 'boo' },
           ];
           const test = qp.parseQuery(query);
           expect(test.or[0]).toMatchObject(expected[0]);
           expect(test.or[1]).toMatchObject(expected[1]);
         });
         it('should set array, 3', () => {
-          const query = { or: ['foo||in||1,2'] };
-          const expected: QueryFilter[] = [
-            { field: 'foo', operator: 'in', value: [1, 2] },
+          const query = { or: ['foo||$in||1,2'] };
+          const expected: QueryFilter<TestEntity>[] = [
+            { field: 'foo', operator: '$in', value: [1, 2] },
           ];
           const test = qp.parseQuery(query);
           expect(test.or[0]).toMatchObject(expected[0]);
         });
         it('should set array, 4', () => {
-          const query = { or: ['foo||isnull'] };
-          const expected: QueryFilter[] = [
-            { field: 'foo', operator: 'isnull', value: '' },
+          const query = { or: ['foo||$isnull'] };
+          const expected: QueryFilter<TestEntity>[] = [
+            { field: 'foo', operator: '$isnull', value: '' },
           ];
           const test = qp.parseQuery(query);
           expect(test.or[0]).toMatchObject(expected[0]);
@@ -257,7 +264,7 @@ describe('#request-query', () => {
         });
         it('should set array', () => {
           const query = { sort: ['foo,ASC', 'bar,DESC'] };
-          const expected: QuerySort[] = [
+          const expected: QuerySort<TestEntity>[] = [
             { field: 'foo', order: 'ASC' },
             { field: 'bar', order: 'DESC' },
           ];
@@ -400,7 +407,7 @@ describe('#request-query', () => {
       });
       it('should throw an error, 1', () => {
         const params = { foo: 'bar' };
-        const options: CrudRequestParamsOptionsInterface = {};
+        const options: CrudRequestParamsOptionsInterface<TestEntity> = {};
         expect(qp.parseParams.bind(qp, params, options)).toThrowError(
           CrudRequestQueryException,
         );
@@ -421,14 +428,16 @@ describe('#request-query', () => {
       });
       it('should throw an error, 4', () => {
         const params = { foo: 'bar' };
-        const options = { foo: { field: 'number' } };
+        const options = {
+          foo: { field: 'number' },
+        } as unknown as CrudRequestParamsOptionsInterface<TestEntity>;
         expect(qp.parseParams.bind(qp, params, options)).toThrowError(
           CrudRequestQueryException,
         );
       });
       it('should throw an error, 5', () => {
         const params = { foo: 'bar' };
-        const options: CrudRequestParamsOptionsInterface = {
+        const options: CrudRequestParamsOptionsInterface<TestEntity> = {
           foo: { field: 'foo', type: 'number' },
         };
         expect(qp.parseParams.bind(qp, params, options)).toThrowError(
@@ -437,7 +446,7 @@ describe('#request-query', () => {
       });
       it('should throw an error, 6', () => {
         const params = { foo: 'bar' };
-        const options: CrudRequestParamsOptionsInterface = {
+        const options: CrudRequestParamsOptionsInterface<TestEntity> = {
           foo: { field: 'foo', type: 'uuid' },
         };
         expect(qp.parseParams.bind(qp, params, options)).toThrowError(
@@ -448,13 +457,13 @@ describe('#request-query', () => {
         const params = {
           foo: 'cb1751fd-7fcf-4eb5-b38e-86428b1fd88d',
           bar: '1',
-          buz: 'string',
+          baz: 'string',
           bigInt: '9007199254740999', // Bigger than Number.MAX_SAFE_INTEGER
         };
-        const options: CrudRequestParamsOptionsInterface = {
+        const options: CrudRequestParamsOptionsInterface<TestEntity> = {
           foo: { field: 'foo', type: 'uuid' },
-          bar: { field: 'bb', type: 'number' },
-          buz: { field: 'buz', type: 'string' },
+          bar: { field: 'bar', type: 'number' },
+          baz: { field: 'baz', type: 'string' },
           bigInt: { field: 'bigInt', type: 'string' },
         };
         const test = qp.parseParams(params, options);
@@ -464,8 +473,8 @@ describe('#request-query', () => {
             operator: '$eq',
             value: 'cb1751fd-7fcf-4eb5-b38e-86428b1fd88d',
           },
-          { field: 'bb', operator: '$eq', value: 1 },
-          { field: 'buz', operator: '$eq', value: 'string' },
+          { field: 'bar', operator: '$eq', value: 1 },
+          { field: 'baz', operator: '$eq', value: 'string' },
           { field: 'bigInt', operator: '$eq', value: '9007199254740999' },
         ];
         expect(test.paramsFilter).toMatchObject(expected);
@@ -475,7 +484,7 @@ describe('#request-query', () => {
           foo: 'cb1751fd',
           bar: '123',
         };
-        const options: CrudRequestParamsOptionsInterface = {
+        const options: CrudRequestParamsOptionsInterface<TestEntity> = {
           foo: { disabled: true },
           bar: { field: 'bar', type: 'number' },
         };
@@ -500,7 +509,7 @@ describe('#request-query', () => {
 
     describe('#getParsed', () => {
       it('should return parsed params', () => {
-        const expected: CrudRequestParsedParamsInterface = {
+        const expected: CrudRequestParsedParamsInterface<TestEntity> = {
           fields: [],
           paramsFilter: [],
           search: undefined,

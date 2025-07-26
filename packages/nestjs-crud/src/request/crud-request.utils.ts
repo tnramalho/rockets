@@ -17,3 +17,11 @@ export function comparisonOperatorKeys(
     isComparisonOperator(key),
   );
 }
+
+export function splitSortString(sort: string, delim = ',') {
+  const [field, order] = sort.split(delim);
+  return {
+    field: field ? field.trim() : undefined,
+    order: order ? order.trim().toUpperCase() : undefined,
+  };
+}
