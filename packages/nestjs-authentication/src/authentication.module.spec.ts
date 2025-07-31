@@ -1,4 +1,10 @@
-import { DynamicModule, ModuleMetadata } from '@nestjs/common';
+import {
+  DynamicModule,
+  Inject,
+  Injectable,
+  Module,
+  ModuleMetadata,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { JwtModule } from '@concepta/nestjs-jwt';
@@ -88,6 +94,135 @@ describe(AuthenticationModule, () => {
     it('module should be loaded', async () => {
       commonVars();
       commonTests();
+    });
+  });
+
+  describe(AuthenticationModule.forRootAsync, () => {
+    class TestController {
+      constructor(
+        @Inject(IssueTokenService)
+        private readonly issueTokenService: IssueTokenService,
+      ) {
+        // TestController with injected IssueTokenService
+      }
+    }
+    @Injectable()
+    class TestService {
+      constructor(
+        @Inject(IssueTokenService)
+        private readonly issueTokenService: IssueTokenService,
+        @Inject(VerifyTokenService)
+        private readonly verifyTokenService: VerifyTokenService,
+      ) {}
+
+      // Method to issue tokens using TEMP secrets
+      async issueAccessToken(payload: { sub: string }) {
+        return this.issueTokenService.accessToken(payload);
+      }
+
+      async issueRefreshToken(payload: { sub: string }) {
+        return this.issueTokenService.refreshToken(payload);
+      }
+
+      // Method to verify tokens using TEMP secrets
+      async verifyAccessToken(token: string) {
+        return this.verifyTokenService.accessToken(token);
+      }
+
+      async verifyRefreshToken(token: string) {
+        return this.verifyTokenService.refreshToken(token);
+      }
+    }
+
+    @Module({
+      imports: [
+        AuthenticationModule.registerAsync({
+          imports: [
+            JwtModule.forRoot({
+              settings: {
+                access: {
+                  secret: 'TEMP',
+                  signOptions: {
+                    expiresIn: '1h',
+                  },
+                },
+                refresh: {
+                  secret: 'TEMP',
+                  signOptions: {
+                    expiresIn: '99y',
+                  },
+                },
+              },
+            }),
+          ],
+          inject: [],
+          useFactory: () => ({}),
+        }),
+      ],
+      controllers: [TestController],
+      providers: [TestService],
+    })
+    class TestModule {}
+
+    beforeEach(async () => {
+      testModule = await Test.createTestingModule(
+        testModuleFactory([
+          TestModule,
+          AuthenticationModule.forRootAsync({
+            inject: [],
+            useFactory: () => ({}),
+          }),
+        ]),
+      ).compile();
+    });
+
+    it('should isolate TEMP secrets from global secrets - cross-verification should fail', async () => {
+      commonVars();
+
+      // Get services from the main testModule (global JWT)
+      // These are the services from the testModuleFactory with 'global' secrets
+      const globalIssueService = issueTokenService;
+      const globalVerifyService = verifyTokenService;
+
+      // Get TestService from TestModule (which has TEMP JWT injected)
+      const testService = testModule.get(TestService);
+
+      const payload = { sub: 'test-user-id' };
+
+      // Create token with TEMP secret (via TestService)
+      const tempAccessToken = await testService.issueAccessToken(payload);
+      const tempRefreshToken = await testService.issueRefreshToken(payload);
+
+      // Create token with global secret (from main testModule)
+      const globalAccessToken = await globalIssueService.accessToken(payload);
+      const globalRefreshToken = await globalIssueService.refreshToken(payload);
+
+      // Test 1: TEMP token should NOT be verifiable by global service
+      await expect(
+        globalVerifyService.accessToken(tempAccessToken),
+      ).rejects.toThrow(); // Should fail due to wrong secret
+
+      await expect(
+        globalVerifyService.refreshToken(tempRefreshToken),
+      ).rejects.toThrow(); // Should fail due to wrong secret
+
+      // Test 2: Global token should NOT be verifiable by TEMP service (via TestService)
+      await expect(
+        testService.verifyAccessToken(globalAccessToken),
+      ).rejects.toThrow(); // Should fail due to wrong secret
+
+      await expect(
+        testService.verifyRefreshToken(globalRefreshToken),
+      ).rejects.toThrow(); // Should fail due to wrong secret
+
+      // Test 3: But tokens should be verifiable by their own services (sanity check)
+      const tempVerified = await testService.verifyAccessToken(tempAccessToken);
+      const globalVerified = await globalVerifyService.accessToken(
+        globalAccessToken,
+      );
+
+      expect(tempVerified).toBeDefined();
+      expect(globalVerified).toBeDefined();
     });
   });
 
