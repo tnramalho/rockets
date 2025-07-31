@@ -116,11 +116,11 @@ describe(AuthenticationModule, () => {
       ) {}
 
       // Method to issue tokens using TEMP secrets
-      async issueAccessToken(payload: string) {
+      async issueAccessToken(payload: { sub: string }) {
         return this.issueTokenService.accessToken(payload);
       }
 
-      async issueRefreshToken(payload: string) {
+      async issueRefreshToken(payload: { sub: string }) {
         return this.issueTokenService.refreshToken(payload);
       }
 
@@ -187,7 +187,7 @@ describe(AuthenticationModule, () => {
       // Get TestService from TestModule (which has TEMP JWT injected)
       const testService = testModule.get(TestService);
 
-      const payload = { sub: 'test-user-id', username: 'testuser' };
+      const payload = { sub: 'test-user-id' };
 
       // Create token with TEMP secret (via TestService)
       const tempAccessToken = await testService.issueAccessToken(payload);
