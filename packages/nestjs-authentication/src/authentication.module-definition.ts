@@ -54,13 +54,13 @@ function definitionTransform(
   definition: DynamicModule,
   extras: AuthenticationOptionsExtrasInterface,
 ): DynamicModule {
-  const { providers = [] } = definition;
+  const { imports = [], providers = [] } = definition;
   const { global = false } = extras;
 
   return {
     ...definition,
     global,
-    imports: createAuthenticationImports(),
+    imports: createAuthenticationImports({ imports }),
     providers: createAuthenticationProviders({ providers }),
     exports: [
       ConfigModule,
@@ -70,8 +70,14 @@ function definitionTransform(
   };
 }
 
-export function createAuthenticationImports(): DynamicModule['imports'] {
-  return [ConfigModule.forFeature(authenticationDefaultConfig)];
+export function createAuthenticationImports(options: {
+    imports: DynamicModule['imports'];
+  }): DynamicModule['imports']
+{
+  return [
+    ...(options.imports || []),
+    ConfigModule.forFeature(authenticationDefaultConfig)
+  ];
 }
 
 export function createAuthenticationExports(): DynamicModule['exports'] {
