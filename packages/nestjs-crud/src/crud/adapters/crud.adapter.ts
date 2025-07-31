@@ -171,7 +171,7 @@ export abstract class CrudAdapter<Entity extends PlainLiteralObject> {
     throw new BadRequestException(`Invalid column '${cond.field}' value`);
   }
 
-  protected prepareEntityBeforeSave(
+  prepareEntityBeforeSave(
     dto: Partial<Entity>,
     parsed: CrudRequestParsedParamsInterface<Entity>,
   ): Entity | undefined {
