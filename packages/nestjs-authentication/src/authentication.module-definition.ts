@@ -71,12 +71,11 @@ function definitionTransform(
 }
 
 export function createAuthenticationImports(options: {
-    imports: DynamicModule['imports'];
-  }): DynamicModule['imports']
-{
+  imports: DynamicModule['imports'];
+}): DynamicModule['imports'] {
   return [
     ...(options.imports || []),
-    ConfigModule.forFeature(authenticationDefaultConfig)
+    ConfigModule.forFeature(authenticationDefaultConfig),
   ];
 }
 

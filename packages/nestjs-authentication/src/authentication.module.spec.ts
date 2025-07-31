@@ -1,4 +1,10 @@
-import { DynamicModule, Inject, Injectable, Module, ModuleMetadata } from '@nestjs/common';
+import {
+  DynamicModule,
+  Inject,
+  Injectable,
+  Module,
+  ModuleMetadata,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { JwtModule } from '@concepta/nestjs-jwt';
@@ -95,7 +101,8 @@ describe(AuthenticationModule, () => {
     class TestController {
       constructor(
         @Inject(IssueTokenService)
-        private readonly issueTokenService: IssueTokenService) {
+        private readonly issueTokenService: IssueTokenService,
+      ) {
         // TestController with injected IssueTokenService
       }
     }
@@ -109,11 +116,11 @@ describe(AuthenticationModule, () => {
       ) {}
 
       // Method to issue tokens using TEMP secrets
-      async issueAccessToken(payload: any) {
+      async issueAccessToken(payload: string) {
         return this.issueTokenService.accessToken(payload);
       }
 
-      async issueRefreshToken(payload: any) {
+      async issueRefreshToken(payload: string) {
         return this.issueTokenService.refreshToken(payload);
       }
 
@@ -136,27 +143,27 @@ describe(AuthenticationModule, () => {
                 access: {
                   secret: 'TEMP',
                   signOptions: {
-                    expiresIn: '1h'
-                  }
+                    expiresIn: '1h',
+                  },
                 },
                 refresh: {
                   secret: 'TEMP',
                   signOptions: {
-                    expiresIn: '99y'
-                  }
-                }
-              }
-            })
+                    expiresIn: '99y',
+                  },
+                },
+              },
+            }),
           ],
           inject: [],
-          useFactory: () => ({})
+          useFactory: () => ({}),
         }),
       ],
       controllers: [TestController],
-      providers: [TestService]
+      providers: [TestService],
     })
     class TestModule {}
-    
+
     beforeEach(async () => {
       testModule = await Test.createTestingModule(
         testModuleFactory([
@@ -171,7 +178,7 @@ describe(AuthenticationModule, () => {
 
     it('should isolate TEMP secrets from global secrets - cross-verification should fail', async () => {
       commonVars();
-      
+
       // Get services from the main testModule (global JWT)
       // These are the services from the testModuleFactory with 'global' secrets
       const globalIssueService = issueTokenService;
@@ -181,33 +188,39 @@ describe(AuthenticationModule, () => {
       const testService = testModule.get(TestService);
 
       const payload = { sub: 'test-user-id', username: 'testuser' };
-      
+
       // Create token with TEMP secret (via TestService)
       const tempAccessToken = await testService.issueAccessToken(payload);
       const tempRefreshToken = await testService.issueRefreshToken(payload);
-      
+
       // Create token with global secret (from main testModule)
       const globalAccessToken = await globalIssueService.accessToken(payload);
       const globalRefreshToken = await globalIssueService.refreshToken(payload);
-      
+
       // Test 1: TEMP token should NOT be verifiable by global service
-      await expect(globalVerifyService.accessToken(tempAccessToken))
-        .rejects.toThrow(); // Should fail due to wrong secret
-        
-      await expect(globalVerifyService.refreshToken(tempRefreshToken))
-        .rejects.toThrow(); // Should fail due to wrong secret
-      
+      await expect(
+        globalVerifyService.accessToken(tempAccessToken),
+      ).rejects.toThrow(); // Should fail due to wrong secret
+
+      await expect(
+        globalVerifyService.refreshToken(tempRefreshToken),
+      ).rejects.toThrow(); // Should fail due to wrong secret
+
       // Test 2: Global token should NOT be verifiable by TEMP service (via TestService)
-      await expect(testService.verifyAccessToken(globalAccessToken))
-        .rejects.toThrow(); // Should fail due to wrong secret
-        
-      await expect(testService.verifyRefreshToken(globalRefreshToken))
-        .rejects.toThrow(); // Should fail due to wrong secret
-      
+      await expect(
+        testService.verifyAccessToken(globalAccessToken),
+      ).rejects.toThrow(); // Should fail due to wrong secret
+
+      await expect(
+        testService.verifyRefreshToken(globalRefreshToken),
+      ).rejects.toThrow(); // Should fail due to wrong secret
+
       // Test 3: But tokens should be verifiable by their own services (sanity check)
-      const tempVerified  = await testService.verifyAccessToken(tempAccessToken);
-      const globalVerified = await globalVerifyService.accessToken(globalAccessToken);
-      
+      const tempVerified = await testService.verifyAccessToken(tempAccessToken);
+      const globalVerified = await globalVerifyService.accessToken(
+        globalAccessToken,
+      );
+
       expect(tempVerified).toBeDefined();
       expect(globalVerified).toBeDefined();
     });
