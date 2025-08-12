@@ -16,6 +16,7 @@ import { UserProfileDtoFixture } from './dto/user-profile.dto.fixture';
 import { ormConfig } from './ormconfig.fixture';
 import { UserCrudModelServiceFixture } from './services/user-crud-model.service.fixture';
 import { UserProfileTypeOrmCrudAdapterFixture } from './services/user-profile-typeorm-crud.adapter.fixture';
+import { USER_PROFILE_CRUD_OPTIONS_DEFAULT } from './user-constants.fixtures';
 import { UserProfileEntityFixture } from './user-profile.entity.fixture';
 
 type UserProfileExtras = {
@@ -67,7 +68,7 @@ const userProfileCrudBuilder = new UserProfileCrudBuilder<
   UserProfileUpdateDtoFixture,
   UserProfileCreateDtoFixture,
   UserProfileExtras
->();
+>(USER_PROFILE_CRUD_OPTIONS_DEFAULT);
 userProfileCrudBuilder.setExtras(extras, myOptionsTransform);
 
 const { ConfigurableControllerClass, ConfigurableServiceProvider } =
