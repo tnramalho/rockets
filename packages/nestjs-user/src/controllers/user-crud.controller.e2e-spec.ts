@@ -79,7 +79,7 @@ describe('UserCrudController (e2e)', () => {
 
       // get one using that id
       await supertest(app.getHttpServer())
-        .get(`/user/${response.body[0].id}`)
+        .get(`/user/${response.body.data[0].id}`)
         .expect(200);
     });
 
@@ -112,7 +112,7 @@ describe('UserCrudController (e2e)', () => {
 
       // delete one using that id
       await supertest(app.getHttpServer())
-        .delete(`/user/${response.body[0].id}`)
+        .delete(`/user/${response.body.data[0].id}`)
         .expect(200);
     });
   });

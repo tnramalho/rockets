@@ -67,7 +67,7 @@ describe('CacheAssignmentController (e2e)', () => {
       .get('/cache/user?limit=2')
       .expect(200)
       .then((res) => {
-        assert.strictEqual(res.body.length, 2);
+        assert.strictEqual(res.body.data.length, 2);
       });
   });
 
@@ -107,7 +107,7 @@ describe('CacheAssignmentController (e2e)', () => {
       .get(url)
       .expect(200)
       .then((res) => {
-        const response = res.body[0];
+        const response = res.body.data[0];
         assert.strictEqual(response.assigneeId, user.id);
         assert.strictEqual(response.key, userCache.key);
         assert.strictEqual(response.type, userCache.type);
@@ -261,7 +261,7 @@ describe('CacheAssignmentController (e2e)', () => {
       .get(url)
       .expect(200)
       .then((res) => {
-        const response = res.body[0];
+        const response = res.body.data[0];
         assert.strictEqual(response.assigneeId, user.id);
         assert.strictEqual(response.key, payload.key);
         assert.strictEqual(response.type, payload.type);
@@ -314,7 +314,7 @@ describe('CacheAssignmentController (e2e)', () => {
       .get(url)
       .expect(200)
       .then((res) => {
-        const response = res.body[0];
+        const response = res.body.data[0];
         assert.strictEqual(response.assigneeId, user.id);
         assert.strictEqual(response.key, payload.key);
         assert.strictEqual(response.type, payload.type);

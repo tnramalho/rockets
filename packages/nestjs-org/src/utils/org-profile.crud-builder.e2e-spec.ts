@@ -145,7 +145,7 @@ describe('Org Profile Crud Builder (e2e)', () => {
     const response = await supertest(app.getHttpServer())
       .get('/org-profile?limit=10')
       .expect(200)
-      .expect((res) => res.body.length === 10);
+      .expect((res) => res.body.data.length === 10);
     expect(response);
   });
 
@@ -157,7 +157,7 @@ describe('Org Profile Crud Builder (e2e)', () => {
 
     // get one using that id
     await supertest(app.getHttpServer())
-      .get(`/org-profile/${response.body[0].id}`)
+      .get(`/org-profile/${response.body.data[0].id}`)
       .expect(200);
   });
 
@@ -200,7 +200,7 @@ describe('Org Profile Crud Builder (e2e)', () => {
 
     // delete one using that id
     await supertest(app.getHttpServer())
-      .delete(`/org-profile/${response.body[0].id}`)
+      .delete(`/org-profile/${response.body.data[0].id}`)
       .expect(200);
   });
 });

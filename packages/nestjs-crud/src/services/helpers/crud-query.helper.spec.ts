@@ -102,7 +102,7 @@ describe('CrudQueryHelper', () => {
       it('should add options', async () => {
         // the fake request
         const req = {
-          options: { query: { alwaysPaginate: true } },
+          options: {},
         } as CrudRequestInterface<TestEntity>;
 
         const options: CrudServiceQueryOptionsInterface<TestEntity> = {
@@ -114,7 +114,6 @@ describe('CrudQueryHelper', () => {
         expect(req.options.query).toEqual<
           CrudQueryOptionsInterface<TestEntity>
         >({
-          alwaysPaginate: true,
           cache: false,
         });
       });

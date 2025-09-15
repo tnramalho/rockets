@@ -11,7 +11,7 @@ export interface CrudFetchServiceInterface<
 > {
   getMany(
     req: CrudRequestInterface<Entity>,
-  ): Promise<Entity[] | CrudResponsePaginatedInterface<Entity>>;
+  ): Promise<CrudResponsePaginatedInterface<Entity>>;
 
   getOne(req: CrudRequestInterface<Entity>): Promise<Entity>;
 }

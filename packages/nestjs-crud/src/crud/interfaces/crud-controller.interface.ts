@@ -17,7 +17,7 @@ export interface CrudControllerInterface<
   getMany?(
     crudRequest: CrudRequestInterface<Entity>,
     ...rest: AdditionalCrudMethodArgs
-  ): Promise<CrudResponsePaginatedInterface<Entity> | Entity[]>;
+  ): Promise<CrudResponsePaginatedInterface<Entity>>;
 
   getOne?(
     crudRequest: CrudRequestInterface<Entity>,

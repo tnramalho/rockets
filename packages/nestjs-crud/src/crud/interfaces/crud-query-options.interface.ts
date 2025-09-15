@@ -20,7 +20,6 @@ export interface CrudQueryOptionsInterface<
   limit?: number;
   maxLimit?: number;
   cache?: number | false;
-  alwaysPaginate?: boolean;
   softDelete?: boolean;
   relations?: CrudRelationsInterface<T, Relations>;
 }

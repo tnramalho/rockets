@@ -163,9 +163,6 @@ const assertServiceRequest = <T extends PlainLiteralObject>(
 
   // Compare filtered parsed objects
   expect(actualFiltered).toEqual(expectedFiltered);
-
-  // Always verify alwaysPaginate is forced to true
-  expect(actualRequest.options?.query?.alwaysPaginate).toBe(true);
 };
 
 // Core helper function for asserting root service requests

@@ -46,23 +46,6 @@ export abstract class CrudAdapter<Entity extends PlainLiteralObject> {
   }
 
   /**
-   * Determine if need paging
-   *
-   * @param parsed - parsed request params
-   * @param options - crud request options
-   */
-  decidePagination(
-    parsed: CrudRequestParsedParamsInterface<Entity>,
-    options: CrudRequestOptionsInterface<Entity>,
-  ): boolean {
-    return (
-      options.query?.alwaysPaginate ||
-      ((Number.isFinite(parsed.page) || Number.isFinite(parsed.offset)) &&
-        !!this.getTake(parsed, options.query ?? {}))
-    );
-  }
-
-  /**
    * Get number of resources to be fetched
    *
    * @param query - parsed request params
@@ -206,7 +189,7 @@ export abstract class CrudAdapter<Entity extends PlainLiteralObject> {
 
   abstract getMany(
     req: CrudRequestInterface<Entity>,
-  ): Promise<CrudResponsePaginatedInterface<Entity> | Entity[]>;
+  ): Promise<CrudResponsePaginatedInterface<Entity>>;
 
   abstract getOne(req: CrudRequestInterface<Entity>): Promise<Entity>;
 

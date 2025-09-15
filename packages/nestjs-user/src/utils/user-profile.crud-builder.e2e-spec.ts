@@ -56,7 +56,7 @@ describe('User Profile Crud Builder (e2e)', () => {
     const response = await supertest(app.getHttpServer())
       .get('/user-profile?limit=10')
       .expect(200)
-      .expect((res) => res.body.length === 10);
+      .expect((res) => res.body.data.length === 10);
     expect(response);
   });
 
@@ -68,7 +68,7 @@ describe('User Profile Crud Builder (e2e)', () => {
 
     // get one using that id
     await supertest(app.getHttpServer())
-      .get(`/user-profile/${response.body[0].id}`)
+      .get(`/user-profile/${response.body.data[0].id}`)
       .expect(200);
   });
 
@@ -111,7 +111,7 @@ describe('User Profile Crud Builder (e2e)', () => {
 
     // delete one using that id
     await supertest(app.getHttpServer())
-      .delete(`/user-profile/${response.body[0].id}`)
+      .delete(`/user-profile/${response.body.data[0].id}`)
       .expect(200);
   });
 });

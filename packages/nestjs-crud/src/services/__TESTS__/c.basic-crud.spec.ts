@@ -36,7 +36,6 @@ import { CrudUpdateOne } from '../../crud/decorators/actions/crud-update-one.dec
 import { CrudController } from '../../crud/decorators/controller/crud-controller.decorator';
 import { CrudBody } from '../../crud/decorators/params/crud-body.decorator';
 import { CrudRequest } from '../../crud/decorators/params/crud-request.decorator';
-import { CrudAlwaysPaginate } from '../../crud/decorators/routes/crud-always-paginate.decorator';
 import { CrudLimit } from '../../crud/decorators/routes/crud-limit.decorator';
 import { CrudSoftDelete } from '../../crud/decorators/routes/crud-soft-delete.decorator';
 import { CrudRequestInterface } from '../../crud/interfaces/crud-request.interface';
@@ -47,7 +46,7 @@ const isMysql = process.env.TYPEORM_CONNECTION === 'mysql';
 
 // tslint:disable:max-classes-per-file no-shadowed-variable
 describe('#crud-typeorm', () => {
-  describe('#basic crud using alwaysPaginate default respects global limit', () => {
+  describe('#basic crud respects global limit', () => {
     let app: INestApplication;
     let server: ReturnType<INestApplication['getHttpServer']>;
 
@@ -59,7 +58,6 @@ describe('#crud-typeorm', () => {
       },
     })
     @CrudLimit(3)
-    @CrudAlwaysPaginate(true)
     class CompaniesController0 {
       constructor(public service: CompanyCrudService) {}
 
@@ -112,7 +110,7 @@ describe('#crud-typeorm', () => {
     });
   });
 
-  describe('#basic crud using alwaysPaginate default', () => {
+  describe('#basic crud default', () => {
     let app: INestApplication;
     let server: ReturnType<INestApplication['getHttpServer']>;
     let qb: CrudRequestQueryBuilder;
@@ -124,7 +122,6 @@ describe('#crud-typeorm', () => {
         paginatedType: CompanyPaginatedDto,
       },
     })
-    @CrudAlwaysPaginate(true)
     class CompaniesController {
       constructor(public service: CompanyCrudService) {}
 
@@ -359,7 +356,7 @@ describe('#crud-typeorm', () => {
           .get('/companies?include_deleted=1')
           .end((_, res) => {
             expect(res.status).toBe(200);
-            expect(res.body.length).toBe(10);
+            expect(res.body.data.length).toBe(10);
             done();
           });
       });
@@ -370,7 +367,7 @@ describe('#crud-typeorm', () => {
           .query(query)
           .end((_, res) => {
             expect(res.status).toBe(200);
-            expect(res.body.length).toBe(5);
+            expect(res.body.data.length).toBe(5);
             done();
           });
       });
@@ -408,7 +405,7 @@ describe('#crud-typeorm', () => {
               expect(res.body.count).toBe(6);
               expect(res.body.data.length).toBe(6);
             } else {
-              expect(res.body.length).toBe(6);
+              expect(res.body.data.length).toBe(6);
             }
             done();
           });

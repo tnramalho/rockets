@@ -33,7 +33,6 @@ export { CrudRecoverOne } from './crud/decorators/actions/crud-recover-one.decor
 // route option decorators
 export { CrudAction } from './crud/decorators/routes/crud-action.decorator';
 export { CrudAllow } from './crud/decorators/routes/crud-allow.decorator';
-export { CrudAlwaysPaginate } from './crud/decorators/routes/crud-always-paginate.decorator';
 export { CrudCache } from './crud/decorators/routes/crud-cache.decorator';
 export { CrudExclude } from './crud/decorators/routes/crud-exclude.decorator';
 export { CrudFilter } from './crud/decorators/routes/crud-filter.decorator';

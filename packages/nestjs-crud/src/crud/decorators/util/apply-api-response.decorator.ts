@@ -78,7 +78,6 @@ export function applyApiResponse(
           modelName: requestOptions.model.type.name,
           dto,
           paginatedDto,
-          alwaysPaginate: requestOptions.query?.alwaysPaginate ?? false,
         });
         break;
 
@@ -159,36 +158,12 @@ function createPaginatedResponse(options: {
   };
 }
 
-function createArrayOrPaginatedResponse(options: {
-  action: CrudActions;
-  modelName: string;
-  dto: Type;
-  paginatedDto: Type;
-}): ApiResponseSchemaHost {
-  return {
-    description: `${options.action} ${options.modelName} as array or paginated response.`,
-    schema: {
-      oneOf: [
-        createPaginatedSchema(options.paginatedDto),
-        createArraySchema(options.dto),
-      ],
-    },
-  };
-}
-
 function createReadAllResponse(options: {
   action: CrudActions;
   modelName: string;
   dto: Type;
   paginatedDto: Type;
-  alwaysPaginate: boolean;
 }): ApiResponseSchemaHost {
-  // is pagination forced?
-  if (options.alwaysPaginate) {
-    // yes, use paginated type
-    return createPaginatedResponse(options);
-  } else {
-    // no, could be pagination OR array
-    return createArrayOrPaginatedResponse(options);
-  }
+  // always use paginated type
+  return createPaginatedResponse(options);
 }

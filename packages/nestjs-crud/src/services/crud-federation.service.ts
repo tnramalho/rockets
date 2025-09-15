@@ -43,21 +43,6 @@ export class CrudFederationService<
     private readonly relationRegistry?: CrudRelationRegistry<Root, Relations>,
   ) {}
 
-  /** Helper: Create root request with alwaysPaginate forced to true */
-  private createPaginatedRootRequest(
-    req: CrudRequestInterface<Root>,
-  ): CrudRequestInterface<Root> {
-    return {
-      ...req,
-      options: {
-        ...req.options,
-        query: {
-          ...req.options?.query,
-          alwaysPaginate: true,
-        },
-      },
-    };
-  }
 
   /**
    * Get relation bindings for relation configurations.
@@ -199,8 +184,8 @@ export class CrudFederationService<
     // Analyze sort requirements to determine optimal strategy
     const sortAnalysis = this.analyzeSortRequirements(req, relations);
 
-    // Initialize rootReq with alwaysPaginate forced to true
-    const rootReq = this.createPaginatedRootRequest(req);
+    // Initialize rootReq
+    const rootReq = req;
 
     switch (sortAnalysis.type) {
       case SortStrategyType.RELATION_SORT:
@@ -220,7 +205,7 @@ export class CrudFederationService<
 
       case SortStrategyType.ROOT_SORT:
       default:
-        // Handle no relations case - use rootReq with alwaysPaginate
+        // Handle no relations case
         if (relations.length === CRUD_FEDERATION_INITIAL_TOTAL) {
           const noRelationResult = await this.handleNoRelationsCase(rootReq);
           resultRoots = noRelationResult.roots;
@@ -302,9 +287,9 @@ export class CrudFederationService<
               // LEFT JOIN: fetch all roots without constraints
               this.rootSearchHelper.buildSearch(rootReq, { isReadAll: true });
 
-              const rootResult = (await this.rootService.getMany(
+              const rootResult = await this.rootService.getMany(
                 rootReq,
-              )) as CrudResponsePaginatedInterface<Root>;
+              );
               resultRoots = rootResult.data;
               accurateTotal = rootResult.total || rootResult.count;
               fetchCalls += 1;
@@ -389,8 +374,8 @@ export class CrudFederationService<
     // extract relation configurations from relations
     const relations = this.getRelationBindings(req);
 
-    // ensure alwaysPaginate is set for consistent behavior
-    const rootReq = this.createPaginatedRootRequest(req);
+    // create root request
+    const rootReq = req;
 
     // fetch the root entity first
     const root = await this.rootService.getOne(rootReq);
@@ -765,7 +750,7 @@ export class CrudFederationService<
 
     // process each sort field and categorize as relation or root sort
     for (const sortConfig of allSorts) {
-      const sortField = sortConfig.field as string;
+      const sortField = sortConfig.field;
       const sortOrder = sortConfig.order;
 
       // check if sort field belongs to a relation relationship
@@ -827,17 +812,12 @@ export class CrudFederationService<
 
   /** Filter sorts to keep only those that belong to the root entity (no relation property) */
 
-  /** Helper: Create and configure a relation request with alwaysPaginate */
-  private createPaginatedRelationRequest(
+  /** Helper: Create and configure a relation request */
+  private createRelationRequest(
     effectiveLimit?: number,
     page?: number,
   ): CrudRequestInterface<Relations[number]> {
     const relationReq = this.relationQueryHelper.createRequest();
-    relationReq.options = {
-      query: {
-        alwaysPaginate: true,
-      },
-    };
 
     // set pagination parameters in a single pass
     const parsed = relationReq.parsed;
@@ -866,7 +846,7 @@ export class CrudFederationService<
       sorts,
       drivingRelation,
     } = options;
-    const relationReq = this.createPaginatedRelationRequest(limit, page);
+    const relationReq = this.createRelationRequest(limit, page);
 
     // apply relation sorts if provided
     if (sorts && sorts.length > CRUD_FEDERATION_INITIAL_TOTAL) {
@@ -925,9 +905,9 @@ export class CrudFederationService<
     // build search conditions from parsed request
     this.rootSearchHelper.buildSearch(rootReq, { isReadAll: true });
 
-    const rootResult = (await this.rootService.getMany(
+    const rootResult = await this.rootService.getMany(
       rootReq,
-    )) as CrudResponsePaginatedInterface<Root>;
+    );
 
     return {
       roots: rootResult.data,
@@ -957,9 +937,9 @@ export class CrudFederationService<
     // build search conditions from parsed request
     this.rootSearchHelper.buildSearch(rootReq, { isReadAll: true });
 
-    const rootResult = (await this.rootService.getMany(
+    const rootResult = await this.rootService.getMany(
       rootReq,
-    )) as CrudResponsePaginatedInterface<Root>;
+    );
     const fetchedRoots = rootResult.data;
 
     let fetchCalls = 1;
@@ -1056,9 +1036,9 @@ export class CrudFederationService<
     // build search conditions
     this.rootSearchHelper.buildSearch(rootReq, { isReadAll: true });
 
-    const rootResult = (await this.rootService.getMany(
+    const rootResult = await this.rootService.getMany(
       rootReq,
-    )) as CrudResponsePaginatedInterface<Root>;
+    );
     const fetchedRoots = rootResult.data;
 
     // re-order roots to match constraint order
@@ -1174,9 +1154,9 @@ export class CrudFederationService<
     });
 
     // Single relation fetch (guaranteed unique by distinctFilter)
-    const relationResult = (await drivingRelation.service.getMany(
+    const relationResult = await drivingRelation.service.getMany(
       sortingRelationReq,
-    )) as CrudResponsePaginatedInterface<Relations[number]>;
+    );
 
     const allSortingRelationData = relationResult.data;
     const sortingRelationTotal = relationResult.total;
@@ -1231,7 +1211,7 @@ export class CrudFederationService<
     // INNER JOIN: Only fetch roots that exist in the sorted relation results
     if (sortedRootIds.length > 0) {
       // Copy request and overwrite search conditions for INNER JOIN
-      const rootReq = this.createPaginatedRootRequest(req);
+      const rootReq = req;
       rootReq.parsed = {
         ...rootReq.parsed,
         sort: sortAnalysis.rootSorts.map((sort) => ({
@@ -1328,9 +1308,9 @@ export class CrudFederationService<
         relation: relationBinding.relation,
       });
 
-      const relationQueryResult = (await relationBinding.service.getMany(
+      const relationQueryResult = await relationBinding.service.getMany(
         relationReq,
-      )) as CrudResponsePaginatedInterface<Relations[number]>;
+      );
       const relationData = relationQueryResult.data;
       const relationTotal = relationQueryResult.total;
 
@@ -1388,9 +1368,9 @@ export class CrudFederationService<
         relation: relationBinding.relation,
       });
 
-      const relationResult = (await relationBinding.service.getMany(
+      const relationResult = await relationBinding.service.getMany(
         relationReq,
-      )) as CrudResponsePaginatedInterface<Relations[number]>;
+      );
       const relationData = relationResult.data;
       const relationTotal = relationResult.total;
 

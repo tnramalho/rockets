@@ -36,7 +36,6 @@ import {
   CRUD_MODULE_ROUTE_QUERY_LIMIT_METADATA,
   CRUD_MODULE_ROUTE_QUERY_MAX_LIMIT_METADATA,
   CRUD_MODULE_ROUTE_QUERY_CACHE_METADATA,
-  CRUD_MODULE_ROUTE_QUERY_ALWAYS_PAGINATE_METADATA,
   CRUD_MODULE_ROUTE_QUERY_SOFT_DELETE_METADATA,
   CRUD_MODULE_ROUTE_SERIALIZATION_METADATA,
   CRUD_MODULE_PARAM_BODY_METADATA,
@@ -142,10 +141,6 @@ export class CrudReflectionService<
         cache: this.reflector.getAllAndOverride<
           CrudServiceQueryOptionsInterface<Entity>['cache']
         >(CRUD_MODULE_ROUTE_QUERY_CACHE_METADATA, [handler, target]),
-
-        alwaysPaginate: this.reflector.getAllAndOverride<
-          CrudServiceQueryOptionsInterface<Entity>['alwaysPaginate']
-        >(CRUD_MODULE_ROUTE_QUERY_ALWAYS_PAGINATE_METADATA, [handler, target]),
 
         softDelete: this.reflector.getAllAndOverride<
           CrudServiceQueryOptionsInterface<Entity>['softDelete']

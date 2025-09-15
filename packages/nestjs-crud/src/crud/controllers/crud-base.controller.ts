@@ -22,7 +22,7 @@ export class CrudBaseController<
   getMany(
     _crudRequest: CrudRequestInterface<Entity>,
     ..._rest: AdditionalCrudMethodArgs
-  ): Promise<CrudResponsePaginatedInterface<Entity> | Entity[]> {
+  ): Promise<CrudResponsePaginatedInterface<Entity>> {
     throw new CrudMethodNotImplementedException(this, this.getMany);
   }
 

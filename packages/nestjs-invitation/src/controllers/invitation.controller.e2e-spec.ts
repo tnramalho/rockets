@@ -199,7 +199,7 @@ describe('InvitationController (e2e)', () => {
         .get('/invitation')
         .expect(200);
 
-      const invitationResponse = response.body as InvitationDto[];
+      const invitationResponse = response.body.data as InvitationDto[];
 
       expect(invitationResponse.length).toEqual(1);
     });

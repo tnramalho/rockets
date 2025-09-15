@@ -43,36 +43,24 @@ export class CrudService<
   async getMany(
     req: CrudRequestInterface<Entity>,
     queryOptions?: CrudServiceQueryOptionsInterface<Entity>,
-  ): Promise<Entity[] | CrudResponsePaginatedInterface<Entity>> {
+  ): Promise<CrudResponsePaginatedInterface<Entity>> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
-
-    // the result
-    let result;
 
     // get root result
     try {
       // Use federated service if relations are configured
       if (this.hasRelations(req)) {
-        result = await this.federationService.getMany(req);
+        return await this.federationService.getMany(req);
       } else {
         // build search conditions
         this.crudSearchHelper.buildSearch(req, { isReadAll: true });
-        result = await this.crudAdapter.getMany(req);
+        return await this.crudAdapter.getMany(req);
       }
     } catch (e) {
       throw new CrudQueryException(this.crudAdapter.entityName(), {
         originalError: e,
       });
-    }
-
-    // is an array?
-    if (Array.isArray(result)) {
-      // yes, just return
-      return result;
-    } else {
-      // not an array, return as is
-      return result;
     }
   }
 
