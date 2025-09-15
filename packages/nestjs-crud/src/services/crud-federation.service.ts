@@ -374,6 +374,9 @@ export class CrudFederationService<
     // create root request
     const rootReq = req;
 
+    // build search conditions before calling service
+    this.rootSearchHelper.buildSearch(rootReq);
+
     // fetch the root entity first
     const root = await this.rootService.getOne(rootReq);
 
@@ -1023,13 +1026,23 @@ export class CrudFederationService<
     fetchCalls: number;
     totalFetched: number;
   }> {
+    const constrainedReq = {
+      ...rootReq,
+      parsed: {
+        ...rootReq.parsed,
+        page: 1,
+        limit: constraintIds.length,
+        offset: undefined,
+      },
+    };
+
     // Apply INNER JOIN constraint
-    this.addConstraintFilter(rootReq, rootKey, constraintIds);
+    this.addConstraintFilter(constrainedReq, rootKey, constraintIds);
 
     // build search conditions
-    this.rootSearchHelper.buildSearch(rootReq);
+    this.rootSearchHelper.buildSearch(constrainedReq);
 
-    const rootResult = await this.rootService.getMany(rootReq);
+    const rootResult = await this.rootService.getMany(constrainedReq);
     const fetchedRoots = rootResult.data;
 
     // re-order roots to match constraint order
@@ -1202,13 +1215,15 @@ export class CrudFederationService<
     // INNER JOIN: Only fetch roots that exist in the sorted relation results
     if (sortedRootIds.length > 0) {
       // Copy request and overwrite search conditions for INNER JOIN
-      const rootReq = req;
-      rootReq.parsed = {
-        ...rootReq.parsed,
-        sort: sortAnalysis.rootSorts.map((sort) => ({
-          field: sort.field,
-          order: sort.order,
-        })), // Apply root sorts as secondary ordering
+      const rootReq = {
+        ...req,
+        parsed: {
+          ...req.parsed,
+          sort: sortAnalysis.rootSorts.map((sort) => ({
+            field: sort.field,
+            order: sort.order,
+          })),
+        },
       };
 
       // Apply INNER JOIN constraints and get ordered results

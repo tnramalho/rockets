@@ -268,6 +268,8 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
         search: {
           $and: [{ name: { $cont: 'Project' } }, { id: { $in: [1, 2] } }],
         },
+        page: 1,
+        limit: 2,
       });
       assertRelationFirst(mocks.mockRootService, [mocks.mockRelationService]);
       assertResultStructure(result, { count: 2, total: 2 });
@@ -334,7 +336,7 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
         assertRootGetManyRequest(mocks.mockRootService, {
           search: { id: { $in: [1, 2, 3, 5, 7] } },
           page: 1,
-          limit: 3,
+          limit: 5,
         });
 
         const rootCall = mocks.mockRootService.getMany.mock.calls[0][0];
@@ -407,12 +409,12 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
         // Verify root constraint from discovered IDs, with pagination
         assertRootGetManyRequest(mocks.mockRootService, {
           search: { id: { $in: [1, 2, 3, 5, 7] } },
-          page: 2,
-          limit: 3,
+          page: 1,
+          limit: 5,
         });
 
         const rootCall = mocks.mockRootService.getMany.mock.calls[0][0];
-        expect(rootCall.parsed.page).toBe(2);
+        expect(rootCall.parsed.page).toBe(1);
 
         // ASSERT - Result verification
         assertResultStructure(result, { count: 2, total: 5 });
@@ -475,8 +477,8 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
         // Verify root constraint from discovered IDs
         assertRootGetManyRequest(mocks.mockRootService, {
           search: { id: { $in: [1, 3] } },
-          limit: 5,
           page: 1,
+          limit: 2,
         });
 
         // ASSERT - Result verification (fewer results than requested page size)
@@ -599,6 +601,8 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
         // Verify root service called with discovered IDs from sorted relations
         assertRootGetManyRequest(mocks.mockRootService, {
           search: { id: { $in: [2, 1, 3] } }, // IDs in relation sort order
+          page: 1,
+          limit: 3,
         });
 
         // ASSERT - Result verification: roots should be in relation sort order [2, 1, 3]
@@ -713,6 +717,8 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
         // Verify root service called with deduped IDs in relation order [1, 2, 3]
         assertRootGetManyRequest(mocks.mockRootService, {
           search: { id: { $in: [1, 2, 3] } },
+          page: 1,
+          limit: 3,
         });
 
         // ASSERT - Result verification: roots should be ordered by first relation occurrence

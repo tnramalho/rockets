@@ -2,6 +2,7 @@ import { Entity, Column, DeleteDateColumn } from 'typeorm';
 
 import { BaseEntity } from '../base-entity';
 import { CompanyEntity } from '../company/company.entity';
+import { UserProfileEntity } from '../user-profile/user-profile.entity';
 
 export class NameEntity {
   @Column({ type: 'varchar', nullable: true })
@@ -28,6 +29,6 @@ export class UserEntity extends BaseEntity {
   @DeleteDateColumn({ nullable: true })
   deletedAt?: Date;
 
+  userProfile?: UserProfileEntity;
   company?: CompanyEntity[];
-  company2?: CompanyEntity[];
 }

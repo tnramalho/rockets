@@ -134,9 +134,9 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
       // Verify root request has discovered IDs
       assertRootGetManyRequest(mocks.mockRootService, {
         search: { id: { $in: [2, 1, 3] } }, // Root IDs discovered from sorted relations
-        limit: 10, // Preserves original user request limit
+        page: 1,
+        limit: 3,
         sort: [], // No root sorts (relation sort takes precedence)
-        page: 1, // Page is set from original request
       });
 
       // ASSERT - Result verification
@@ -245,8 +245,8 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
       // Verify root request has discovered IDs and correct pagination
       assertRootGetManyRequest(mocks.mockRootService, {
         search: { id: { $in: [1, 2, 3] } },
-        limit: 10, // Preserves original user request limit
         page: 1,
+        limit: 3,
         sort: [],
       });
 
@@ -338,8 +338,8 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
       // Verify root request has discovered IDs and correct pagination
       assertRootGetManyRequest(mocks.mockRootService, {
         search: { id: { $in: [1, 2, 3] } }, // Deduplicated root IDs
-        limit: 10, // Preserves original user request limit
         page: 1,
+        limit: 3,
         sort: [],
       });
 
@@ -567,8 +567,8 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
       // Verify root request has only paginated root IDs (page 2: second 5)
       assertRootGetManyRequest(mocks.mockRootService, {
         search: { id: { $in: [4, 7, 3, 6, 10] } }, // Only second page root IDs
-        limit: 5, // Page limit, not total discovered count
-        page: 2,
+        page: 1,
+        limit: 5,
         sort: [],
       });
 

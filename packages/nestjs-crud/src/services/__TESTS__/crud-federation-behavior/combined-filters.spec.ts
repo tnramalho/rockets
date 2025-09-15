@@ -168,12 +168,12 @@ describe('CrudFederationService - Behavior: Combined Root+Relation Filters', () 
         search: {
           $and: [{ name: { $cont: 'Task' } }, { id: { $in: [1, 2, 3, 5, 6] } }],
         },
-        page: 2,
-        limit: 2,
+        page: 1,
+        limit: 5,
       });
 
       const rootCall = mocks.mockRootService.getMany.mock.calls[0][0];
-      expect(rootCall.parsed.page).toBe(2);
+      expect(rootCall.parsed.page).toBe(1);
 
       // ASSERT - Result verification
       assertResultStructure(result, { count: 2, total: 5 });
@@ -271,7 +271,7 @@ describe('CrudFederationService - Behavior: Combined Root+Relation Filters', () 
           ],
         },
         page: 1,
-        limit: 5,
+        limit: 3,
       });
 
       // ASSERT - Result verification
@@ -366,7 +366,7 @@ describe('CrudFederationService - Behavior: Combined Root+Relation Filters', () 
           $and: [{ name: { $cont: 'Enterprise' } }, { id: { $in: [2, 5] } }],
         },
         page: 1,
-        limit: 10,
+        limit: 2,
       });
 
       // ASSERT - Result verification (fewer results than requested page size)
