@@ -43,7 +43,6 @@ export class CrudFederationService<
     private readonly relationRegistry?: CrudRelationRegistry<Root, Relations>,
   ) {}
 
-
   /**
    * Get relation bindings for relation configurations.
    * Throws error if relations are configured but no registry is available.
@@ -285,11 +284,9 @@ export class CrudFederationService<
               totalFetched += constrainedResult.totalFetched;
             } else {
               // LEFT JOIN: fetch all roots without constraints
-              this.rootSearchHelper.buildSearch(rootReq, { isReadAll: true });
+              this.rootSearchHelper.buildSearch(rootReq);
 
-              const rootResult = await this.rootService.getMany(
-                rootReq,
-              );
+              const rootResult = await this.rootService.getMany(rootReq);
               resultRoots = rootResult.data;
               accurateTotal = rootResult.total || rootResult.count;
               fetchCalls += 1;
@@ -903,11 +900,9 @@ export class CrudFederationService<
     totalFetched: number;
   }> {
     // build search conditions from parsed request
-    this.rootSearchHelper.buildSearch(rootReq, { isReadAll: true });
+    this.rootSearchHelper.buildSearch(rootReq);
 
-    const rootResult = await this.rootService.getMany(
-      rootReq,
-    );
+    const rootResult = await this.rootService.getMany(rootReq);
 
     return {
       roots: rootResult.data,
@@ -935,11 +930,9 @@ export class CrudFederationService<
   }> {
     // first fetch roots, then relations with root ID constraints
     // build search conditions from parsed request
-    this.rootSearchHelper.buildSearch(rootReq, { isReadAll: true });
+    this.rootSearchHelper.buildSearch(rootReq);
 
-    const rootResult = await this.rootService.getMany(
-      rootReq,
-    );
+    const rootResult = await this.rootService.getMany(rootReq);
     const fetchedRoots = rootResult.data;
 
     let fetchCalls = 1;
@@ -1034,11 +1027,9 @@ export class CrudFederationService<
     this.addConstraintFilter(rootReq, rootKey, constraintIds);
 
     // build search conditions
-    this.rootSearchHelper.buildSearch(rootReq, { isReadAll: true });
+    this.rootSearchHelper.buildSearch(rootReq);
 
-    const rootResult = await this.rootService.getMany(
-      rootReq,
-    );
+    const rootResult = await this.rootService.getMany(rootReq);
     const fetchedRoots = rootResult.data;
 
     // re-order roots to match constraint order
@@ -1368,9 +1359,7 @@ export class CrudFederationService<
         relation: relationBinding.relation,
       });
 
-      const relationResult = await relationBinding.service.getMany(
-        relationReq,
-      );
+      const relationResult = await relationBinding.service.getMany(relationReq);
       const relationData = relationResult.data;
       const relationTotal = relationResult.total;
 

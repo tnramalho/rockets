@@ -54,7 +54,7 @@ export class CrudService<
         return await this.federationService.getMany(req);
       } else {
         // build search conditions
-        this.crudSearchHelper.buildSearch(req, { isReadAll: true });
+        this.crudSearchHelper.buildSearch(req);
         return await this.crudAdapter.getMany(req);
       }
     } catch (e) {

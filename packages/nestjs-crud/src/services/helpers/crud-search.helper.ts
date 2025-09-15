@@ -1,5 +1,4 @@
 import { Injectable, PlainLiteralObject } from '@nestjs/common';
-import { isFunction } from '@nestjs/common/utils/shared.utils';
 
 import { CrudRequestInterface } from '../../crud/interfaces/crud-request.interface';
 import { convertFilterToSearch } from '../../request/crud-request.utils';
@@ -18,10 +17,10 @@ export class CrudSearchHelper<Entity extends PlainLiteralObject> {
    */
   buildSearch(
     req: CrudRequestInterface<Entity>,
-    options?: { isReadAll?: boolean; relation?: QueryRelation<Entity> },
+    options?: { relation?: QueryRelation<Entity> },
   ): void {
-    const { isReadAll = false, relation } = options || {};
-    const searchConditions = this.getSearchConditions(req, isReadAll, relation);
+    const { relation } = options || {};
+    const searchConditions = this.getSearchConditions(req, relation);
 
     req.parsed.search =
       searchConditions.length === 0
@@ -36,25 +35,12 @@ export class CrudSearchHelper<Entity extends PlainLiteralObject> {
    */
   private getSearchConditions(
     req: CrudRequestInterface<Entity>,
-    isReadAll: boolean,
     relation?: QueryRelation<Entity>,
   ): SCondition<Entity>[] {
     const { parsed, options } = req;
 
     // params condition
     const paramsSearch = this.getParamsSearch(req);
-
-    // if `CrudOptions.query.filter` is a function then return transformed query search conditions
-    if (
-      isFunction(options?.query?.filter) &&
-      typeof options?.query?.filter === 'function'
-    ) {
-      const filterCond =
-        options.query.filter(parsed.search, isReadAll) ||
-        /* istanbul ignore next */ {};
-
-      return [...paramsSearch, filterCond];
-    }
 
     // if `CrudOptions.query.filter` is array or search condition type
     const optionsFilter =
