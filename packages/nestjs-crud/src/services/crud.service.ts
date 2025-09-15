@@ -6,15 +6,39 @@ import { CrudResponsePaginatedInterface } from '../crud/interfaces/crud-response
 import { CrudServiceQueryOptionsInterface } from '../crud/interfaces/crud-service-query-options.interface';
 import { CrudQueryException } from '../exceptions/crud-query.exception';
 
+import { CrudFederationService } from './crud-federation.service';
+import { CrudRelationRegistry } from './crud-relation.registry';
 import { CrudQueryHelper } from './helpers/crud-query.helper';
+import { CrudSearchHelper } from './helpers/crud-search.helper';
+import { CrudFetchServiceInterface } from './interfaces/crud-fetch-service.interface';
 
-// TODO: TYPEORM - review what to do
 @Injectable()
-export class CrudService<Entity extends PlainLiteralObject> {
-  constructor(protected crudAdapter: CrudAdapter<Entity>) {}
+export class CrudService<
+  Entity extends PlainLiteralObject,
+  Relations extends PlainLiteralObject[] = PlainLiteralObject[],
+> implements CrudFetchServiceInterface<Entity>
+{
+  protected readonly federationService: CrudFederationService<
+    Entity,
+    Relations
+  >;
+
+  constructor(
+    protected crudAdapter: CrudAdapter<Entity>,
+    protected relationRegistry?: CrudRelationRegistry<Entity, Relations>,
+  ) {
+    // Create federation service with dependencies
+    this.federationService = new CrudFederationService<Entity, Relations>(
+      this.crudAdapter,
+      this.relationRegistry,
+    );
+  }
 
   protected readonly crudQueryHelper: CrudQueryHelper<Entity> =
     new CrudQueryHelper();
+
+  protected readonly crudSearchHelper: CrudSearchHelper<Entity> =
+    new CrudSearchHelper();
 
   async getMany(
     req: CrudRequestInterface<Entity>,
@@ -26,9 +50,16 @@ export class CrudService<Entity extends PlainLiteralObject> {
     // the result
     let result;
 
-    // get parent result
+    // get root result
     try {
-      result = await this.crudAdapter.getMany(req);
+      // Use federated service if relations are configured
+      if (this.hasRelations(req)) {
+        result = await this.federationService.getMany(req);
+      } else {
+        // build search conditions
+        this.crudSearchHelper.buildSearch(req, { isReadAll: true });
+        result = await this.crudAdapter.getMany(req);
+      }
     } catch (e) {
       throw new CrudQueryException(this.crudAdapter.entityName(), {
         originalError: e,
@@ -51,9 +82,17 @@ export class CrudService<Entity extends PlainLiteralObject> {
   ): ReturnType<CrudAdapter<Entity>['getOne']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
-    // return parent result
+
+    // return root result
     try {
-      return this.crudAdapter.getOne(req);
+      // check if relations are requested
+      if (this.hasRelations(req)) {
+        return this.federationService.getOne(req);
+      } else {
+        // build search conditions
+        this.crudSearchHelper.buildSearch(req);
+        return this.crudAdapter.getOne(req);
+      }
     } catch (e) {
       throw new CrudQueryException(this.crudAdapter.entityName(), {
         originalError: e,
@@ -68,7 +107,9 @@ export class CrudService<Entity extends PlainLiteralObject> {
   ): ReturnType<CrudAdapter<Entity>['createMany']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
-    // return parent result
+    // build search conditions
+    this.crudSearchHelper.buildSearch(req);
+    // return root result
     try {
       return this.crudAdapter.createMany(req, dto);
     } catch (e) {
@@ -85,7 +126,9 @@ export class CrudService<Entity extends PlainLiteralObject> {
   ): ReturnType<CrudAdapter<Entity>['createOne']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
-    // return parent result
+    // build search conditions
+    this.crudSearchHelper.buildSearch(req);
+    // return root result
     try {
       return this.crudAdapter.createOne(req, dto);
     } catch (e) {
@@ -102,7 +145,9 @@ export class CrudService<Entity extends PlainLiteralObject> {
   ): ReturnType<CrudAdapter<Entity>['updateOne']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
-    // return parent result
+    // build search conditions
+    this.crudSearchHelper.buildSearch(req);
+    // return root result
     try {
       return this.crudAdapter.updateOne(req, dto);
     } catch (e) {
@@ -119,7 +164,9 @@ export class CrudService<Entity extends PlainLiteralObject> {
   ): ReturnType<CrudAdapter<Entity>['replaceOne']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
-    // return parent result
+    // build search conditions
+    this.crudSearchHelper.buildSearch(req);
+    // return root result
     try {
       return this.crudAdapter.replaceOne(req, dto);
     } catch (e) {
@@ -135,7 +182,9 @@ export class CrudService<Entity extends PlainLiteralObject> {
   ): ReturnType<CrudAdapter<Entity>['deleteOne']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
-    // return parent result
+    // build search conditions
+    this.crudSearchHelper.buildSearch(req);
+    // return root result
     try {
       return this.crudAdapter.deleteOne(req);
     } catch (e) {
@@ -151,7 +200,9 @@ export class CrudService<Entity extends PlainLiteralObject> {
   ): ReturnType<CrudAdapter<Entity>['recoverOne']> {
     // apply options
     this.crudQueryHelper.modifyRequest(req, queryOptions);
-    // return parent result
+    // build search conditions
+    this.crudSearchHelper.buildSearch(req);
+    // return root result
     try {
       return this.crudAdapter.recoverOne(req);
     } catch (e) {
@@ -159,5 +210,11 @@ export class CrudService<Entity extends PlainLiteralObject> {
         originalError: e,
       });
     }
+  }
+
+  protected hasRelations(req: CrudRequestInterface<Entity>): boolean {
+    // check if relations are configured and present
+    const relations = req.options?.query?.relations?.relations ?? [];
+    return relations.length > 0;
   }
 }

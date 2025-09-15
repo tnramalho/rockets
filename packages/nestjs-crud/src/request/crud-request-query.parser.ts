@@ -13,7 +13,7 @@ import {
   validateSort,
   validateUUID,
 } from './crud-request-query.validator';
-import { splitSortString } from './crud-request.utils';
+import { convertFilterToSearch, splitSortString } from './crud-request.utils';
 import { CrudRequestQueryException } from './exceptions/crud-request-query.exception';
 import { CrudRequestParamsOptionsInterface } from './interfaces/crud-request-params-options.interface';
 import { CrudRequestParsedParamsInterface } from './interfaces/crud-request-parsed-params.interface';
@@ -167,17 +167,7 @@ export class CrudRequestQueryParser<Entity extends PlainLiteralObject>
   convertFilterToSearch(
     filter: QueryFilter<Entity>,
   ): SFields<Entity> | SConditionAND<Entity> {
-    return filter
-      ? {
-          [filter.field]: {
-            // [filter.operator]: isEmptyValue[filter.operator] ? isEmptyValue[filter.operator] : filter.value,
-            [filter.operator]:
-              filter.operator === '$isnull' || filter.operator === '$notnull'
-                ? true
-                : filter.value,
-          },
-        }
-      : {};
+    return convertFilterToSearch(filter);
   }
 
   private getParamNames(
@@ -414,7 +404,16 @@ export class CrudRequestQueryParser<Entity extends PlainLiteralObject>
     ];
     const isEmptyValue = ['isnull', 'notnull', '$isnull', '$notnull'];
     const param = data.split(this._options.delim);
-    const field = param[0];
+    let field: string;
+    let relation: string | undefined;
+
+    if (param[0].includes('.')) {
+      const parts = param[0].split('.');
+      [relation, field] = parts;
+    } else {
+      field = param[0];
+    }
+
     const operator = param[1] as ComparisonOperator;
     let value: string | string[] = param[2] || '';
 
@@ -428,7 +427,7 @@ export class CrudRequestQueryParser<Entity extends PlainLiteralObject>
       throw new CrudRequestQueryException({ message: `Invalid ${cond} value` });
     }
 
-    const condition: QueryFilter<Entity> = { field, operator, value };
+    const condition: QueryFilter<Entity> = { field, operator, value, relation };
     validateCondition(condition, cond);
 
     return condition;

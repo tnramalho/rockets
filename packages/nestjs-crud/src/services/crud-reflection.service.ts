@@ -43,6 +43,7 @@ import {
   CRUD_MODULE_API_PARAMS_METADATA,
   CRUD_MODULE_API_RESPONSE_METADATA,
   CRUD_MODULE_API_QUERY_METADATA,
+  CRUD_MODULE_ROUTE_RELATIONS_METADATA,
 } from '../crud.constants';
 import {
   CrudValidationOptions,
@@ -58,7 +59,7 @@ export class CrudReflectionService<
   public getRequestOptions(
     target: ReflectionTargetOrHandler,
     handler: ReflectionTargetOrHandler,
-  ): CrudOptionsInterface<Entity> & { model: CrudModelOptionsInterface } {
+  ): CrudOptionsInterface<Entity> {
     return {
       model: this.getAllModelOptions(target, handler),
 
@@ -149,6 +150,10 @@ export class CrudReflectionService<
         softDelete: this.reflector.getAllAndOverride<
           CrudServiceQueryOptionsInterface<Entity>['softDelete']
         >(CRUD_MODULE_ROUTE_QUERY_SOFT_DELETE_METADATA, [handler, target]),
+
+        relations: this.reflector.getAllAndOverride<
+          CrudServiceQueryOptionsInterface<Entity>['relations']
+        >(CRUD_MODULE_ROUTE_RELATIONS_METADATA, [handler, target]),
       },
     };
   }

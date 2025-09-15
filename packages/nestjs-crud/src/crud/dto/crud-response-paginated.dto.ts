@@ -20,6 +20,10 @@ export class CrudResponsePaginatedDto<T>
   data: T[] = [];
 
   @Expose()
+  @ApiProperty({ type: 'number', description: 'Limit number of items' })
+  limit = 0;
+
+  @Expose()
   @ApiProperty({ type: 'number', description: 'Count of all records' })
   count = 0;
 

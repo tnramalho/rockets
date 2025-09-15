@@ -37,6 +37,7 @@ export abstract class CrudAdapter<Entity extends PlainLiteralObject> {
   ): CrudResponsePaginatedInterface<Entity> {
     return {
       data,
+      limit: limit ?? 1,
       count: data.length,
       total: total ?? 0,
       page: limit ? Math.floor((offset ?? 0) / limit) + 1 : 1,

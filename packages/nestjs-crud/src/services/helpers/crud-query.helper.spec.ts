@@ -31,7 +31,7 @@ describe('CrudQueryHelper', () => {
 
   describe('modifyRequest', () => {
     describe('when adding search', () => {
-      it('should add search', async () => {
+      it('should add search to existing conditions', async () => {
         // the fake request
         const req = { parsed: {} } as CrudRequestInterface<TestEntity>;
 
@@ -56,6 +56,44 @@ describe('CrudQueryHelper', () => {
               name: 'pear',
             },
           ],
+        });
+      });
+
+      it('should directly assign search when rootSearch is empty', async () => {
+        // the fake request with undefined search
+        const req = { parsed: {} } as CrudRequestInterface<TestEntity>;
+
+        const options: CrudServiceQueryOptionsInterface<TestEntity> = {
+          filter: {
+            name: 'pear',
+          },
+        };
+
+        crudQueryService.modifyRequest(req, options);
+
+        // Should directly assign without creating empty $and array
+        expect(req.parsed.search).toEqual<SCondition<TestEntity>>({
+          name: 'pear',
+        });
+      });
+
+      it('should directly assign search when rootSearch is empty object', async () => {
+        // the fake request with empty search object
+        const req = {
+          parsed: { search: {} },
+        } as CrudRequestInterface<TestEntity>;
+
+        const options: CrudServiceQueryOptionsInterface<TestEntity> = {
+          filter: {
+            name: 'pear',
+          },
+        };
+
+        crudQueryService.modifyRequest(req, options);
+
+        // Should directly assign without creating empty $and array
+        expect(req.parsed.search).toEqual<SCondition<TestEntity>>({
+          name: 'pear',
         });
       });
     });

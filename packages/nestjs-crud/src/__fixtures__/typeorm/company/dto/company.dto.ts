@@ -1,6 +1,8 @@
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, Type } from 'class-transformer';
 
 import { ApiProperty } from '@nestjs/swagger';
+
+import { UserDto } from '../../users/dto/user.dto';
 
 export class CompanyDto {
   @Expose()
@@ -24,4 +26,8 @@ export class CompanyDto {
 
   @Exclude()
   updatedAt!: string;
+
+  @Expose()
+  @Type(() => UserDto)
+  users?: UserDto[];
 }

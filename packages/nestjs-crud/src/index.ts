@@ -4,7 +4,11 @@ export { CrudModule } from './crud.module';
 // interfaces
 export { CrudControllerInterface } from './crud/interfaces/crud-controller.interface';
 export { CrudRequestInterface } from './crud/interfaces/crud-request.interface';
+export { CrudFederationFetchOptionsInterface } from './services/interfaces/crud-federation-fetch-options.interface';
+export { CrudFetchServiceInterface } from './services/interfaces/crud-fetch-service.interface';
+export { CrudRelationBindingInterface } from './services/interfaces/crud-relation-binding.interface';
 export { CrudResponsePaginatedInterface } from './crud/interfaces/crud-response-paginated.interface';
+export { CrudResponseMetrics } from './crud/interfaces/crud-response-metrics.interface';
 export { CrudCreateManyInterface } from './crud/interfaces/crud-create-many.interface';
 
 export { CrudAdapter } from './crud/adapters/crud.adapter';
@@ -57,6 +61,8 @@ export { CrudApiResponse } from './crud/decorators/openapi/crud-api-response.dec
 // classes
 export { CrudQueryHelper } from './services/helpers/crud-query.helper';
 export { CrudService } from './services/crud.service';
+export { CrudFederationService } from './services/crud-federation.service';
+export { CrudRelationRegistry } from './services/crud-relation.registry';
 export { CrudBaseController } from './crud/controllers/crud-base.controller';
 
 // dto
@@ -65,6 +71,7 @@ export { CrudCreateManyDto } from './crud/dto/crud-create-many.dto';
 
 // exceptions
 export { CrudException } from './exceptions/crud.exception';
+export { CrudFederationException } from './exceptions/crud-federation.exception';
 export { CrudMethodNotImplementedException } from './exceptions/crud-method-not-implemented.exception';
 export { CrudRequestException } from './exceptions/crud-request.exception';
 export { CrudQueryException } from './exceptions/crud-query.exception';

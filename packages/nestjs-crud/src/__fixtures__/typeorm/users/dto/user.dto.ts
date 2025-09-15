@@ -1,5 +1,7 @@
 import { Expose, Type } from 'class-transformer';
 
+import { CompanyDto } from '../../company/dto/company.dto';
+
 export class NameDto {
   @Expose()
   first!: string | null;
@@ -27,4 +29,12 @@ export class UserDto {
   @Expose()
   @Type(() => NameDto)
   name!: NameDto;
+
+  @Expose()
+  @Type(() => CompanyDto)
+  company?: CompanyDto;
+
+  @Expose()
+  @Type(() => CompanyDto)
+  company2?: CompanyDto;
 }
