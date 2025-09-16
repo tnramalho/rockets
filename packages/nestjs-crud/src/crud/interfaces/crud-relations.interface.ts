@@ -8,5 +8,7 @@ export interface CrudRelationsInterface<
   Relations extends PlainLiteralObject[],
 > {
   rootKey: CrudEntityColumn<Entity>;
-  relations: QueryRelation<Entity, Relations[number]>[];
+  relations: {
+    [K in keyof Relations]: QueryRelation<Entity, Relations[K]>;
+  };
 }
