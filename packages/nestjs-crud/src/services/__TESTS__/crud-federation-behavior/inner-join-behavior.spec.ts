@@ -1,14 +1,12 @@
 import { createPaginatedResponse } from '../../__FIXTURES__/crud-federation-mock-helpers';
 import {
   assertServiceCallCounts,
-  assertInnerJoinBehavior,
   assertResultStructure,
-  assertEnrichment,
   assertEmptyResult,
   assertRelationRequest,
   assertRootGetManyRequest,
   assertRelationFirst,
-  assertSortOrder,
+  assertRootFirst,
 } from '../../__FIXTURES__/crud-federation-test-assertions';
 import {
   createMinimalRootRelationSet,
@@ -18,7 +16,6 @@ import {
 } from '../../__FIXTURES__/crud-federation-test-data';
 import {
   createOneToManyForwardRelation,
-  createOneToManyWithDistinctFilter,
   TestRelationService,
 } from '../../__FIXTURES__/crud-federation-test-entities';
 import {
@@ -56,44 +53,89 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
       const relation = createOneToManyForwardRelation(
         'relations',
         TestRelationService,
+        { distinctFilter: { field: 'isLatest', operator: '$eq', value: true } },
       );
+
       const req = mocks.createTestRequest(
-        { filter: ['relations.rootId||$notnull'] },
+        { filter: ['relations.rootId||$notnull'], page: 1, limit: 10 },
         [relation],
       );
+
       const data = createMinimalRootRelationSet();
 
-      mocks.mockRelationService.getMany.mockResolvedValue(
-        createPaginatedResponse(data.relations, { total: 3 }),
-      );
-      mocks.mockRootService.getMany.mockResolvedValue(
+      mocks.mockRootService.getMany.mockResolvedValueOnce(
         createPaginatedResponse(data.roots.slice(0, 2), {
           limit: 10,
           total: 2,
         }),
       );
 
+      mocks.mockRelationService.getMany
+        .mockResolvedValueOnce(
+          createPaginatedResponse(data.relations.slice(0, 2), { total: 2 }),
+        )
+        .mockResolvedValueOnce(
+          createPaginatedResponse(data.relations.slice(0, 3), { total: 3 }),
+        );
+
       // ACT
       const result = await mocks.service.getMany(req);
 
       // ASSERT
+      assertRelationRequest(mocks.mockRelationService, {
+        search: {
+          $and: [{ rootId: { $notnull: true } }, { isLatest: { $eq: true } }],
+        },
+        limit: 10,
+        offset: 0,
+      });
+
+      // Second relation call - enrichment with discovered root IDs
+      assertRelationRequest(
+        mocks.mockRelationService,
+        {
+          search: {
+            $and: [
+              { rootId: { $notnull: true } },
+              { isLatest: { $eq: true } },
+              { rootId: { $in: [1, 2] } },
+            ],
+          },
+        },
+        1,
+      );
+
+      assertRootGetManyRequest(mocks.mockRootService, {
+        search: {
+          id: { $in: [1, 2] },
+        },
+        page: 1,
+        limit: 10,
+      });
+
       assertServiceCallCounts([
         { service: mocks.mockRootService, count: 1 },
-        { service: mocks.mockRelationService, count: 1 },
+        { service: mocks.mockRelationService, count: 2 },
       ]);
-      assertInnerJoinBehavior(
-        mocks.mockRootService,
-        mocks.mockRelationService,
-        { rootId: { $notnull: true } },
-        [1, 2],
-      );
-      assertResultStructure(result, { count: 2, total: 2 });
-      assertEnrichment(result, 'relations', {
-        1: [{ id: 1, rootId: 1, title: 'Relation 1' }],
-        2: [
-          { id: 2, rootId: 2, title: 'Relation 2' },
-          { id: 3, rootId: 2, title: 'Relation 3' },
-        ],
+
+      const expectedData = [
+        {
+          ...data.roots[0],
+          relations: [data.relations[0]],
+        },
+        {
+          ...data.roots[1],
+          relations: [data.relations[1], data.relations[2]],
+        },
+      ];
+
+      assertResultStructure(result, {
+        count: 2,
+        total: 2,
+        pageCount: 1,
+        page: 1,
+        limit: 10,
+        data: expectedData,
       });
     });
 
@@ -102,6 +144,7 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
       const relation = createOneToManyForwardRelation(
         'relations',
         TestRelationService,
+        { distinctFilter: { field: 'isLatest', operator: '$eq', value: true } },
       );
       const req = mocks.createTestRequest(
         { filter: ['relations.status||$eq||active'] },
@@ -123,20 +166,62 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
       const result = await mocks.service.getMany(req);
 
       // ASSERT
+      assertRelationRequest(mocks.mockRelationService, {
+        search: {
+          $and: [{ status: { $eq: 'active' } }, { isLatest: { $eq: true } }],
+        },
+        limit: 10,
+        offset: 0,
+      });
+
+      // Second relation call - enrichment with discovered root IDs
+      assertRelationRequest(
+        mocks.mockRelationService,
+        {
+          search: {
+            $and: [
+              { status: { $eq: 'active' } },
+              { isLatest: { $eq: true } },
+              { rootId: { $in: [1, 2] } },
+            ],
+          },
+        },
+        1,
+      );
+
+      assertRootGetManyRequest(mocks.mockRootService, {
+        search: {
+          id: { $in: [1, 2] },
+        },
+        page: 1,
+        limit: 10,
+      });
+
       assertServiceCallCounts([
         { service: mocks.mockRootService, count: 1 },
-        { service: mocks.mockRelationService, count: 1 },
+        { service: mocks.mockRelationService, count: 2 },
       ]);
-      assertInnerJoinBehavior(
-        mocks.mockRootService,
-        mocks.mockRelationService,
-        { status: { $eq: 'active' } },
-        [1, 2],
-      );
-      assertResultStructure(result, { count: 2, total: 2 });
-      assertEnrichment(result, 'relations', {
-        1: [{ id: 1, rootId: 1, title: 'Active Task', status: 'active' }],
-        2: [{ id: 2, rootId: 2, title: 'Active Item', status: 'active' }],
+
+      assertRelationFirst(mocks.mockRootService, [mocks.mockRelationService]);
+
+      const expectedData = [
+        {
+          ...data.roots[0],
+          relations: [data.activeRelations[0]],
+        },
+        {
+          ...data.roots[1],
+          relations: [data.activeRelations[1]],
+        },
+      ];
+
+      assertResultStructure(result, {
+        count: 2,
+        total: 2,
+        page: 1,
+        pageCount: 1,
+        limit: 10,
+        data: expectedData,
       });
     });
 
@@ -145,6 +230,7 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
       const relation = createOneToManyForwardRelation(
         'relations',
         TestRelationService,
+        { distinctFilter: { field: 'isLatest', operator: '$eq', value: true } },
       );
       const req = mocks.createTestRequest(
         {
@@ -170,36 +256,67 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
       const result = await mocks.service.getMany(req);
 
       // ASSERT
-      assertServiceCallCounts([
-        { service: mocks.mockRootService, count: 1 },
-        { service: mocks.mockRelationService, count: 1 },
-      ]);
       assertRelationRequest(mocks.mockRelationService, {
         search: {
-          $and: [{ status: { $eq: 'active' } }, { priority: { $gte: 5 } }],
+          $and: [
+            { status: { $eq: 'active' } },
+            { priority: { $gte: 5 } },
+            { isLatest: { $eq: true } },
+          ],
         },
+        limit: 10,
+        offset: 0,
       });
+
+      // Second relation call - enrichment with discovered root IDs
+      assertRelationRequest(
+        mocks.mockRelationService,
+        {
+          search: {
+            $and: [
+              { status: { $eq: 'active' } },
+              { priority: { $gte: 5 } },
+              { isLatest: { $eq: true } },
+              { rootId: { $in: [1, 2] } },
+            ],
+          },
+        },
+        1,
+      );
+
+      assertRootGetManyRequest(mocks.mockRootService, {
+        search: {
+          id: { $in: [1, 2] },
+        },
+        page: 1,
+        limit: 10,
+      });
+
+      assertServiceCallCounts([
+        { service: mocks.mockRootService, count: 1 },
+        { service: mocks.mockRelationService, count: 2 },
+      ]);
+
       assertRelationFirst(mocks.mockRootService, [mocks.mockRelationService]);
-      assertResultStructure(result, { count: 2, total: 2 });
-      assertEnrichment(result, 'relations', {
-        1: [
-          {
-            id: 1,
-            rootId: 1,
-            title: 'Critical Bug',
-            status: 'active',
-            priority: 10,
-          },
-        ],
-        2: [
-          {
-            id: 2,
-            rootId: 2,
-            title: 'Important Feature',
-            status: 'active',
-            priority: 8,
-          },
-        ],
+
+      const expectedData = [
+        {
+          ...data.roots[0],
+          relations: [data.highPriorityActiveRelations[0]],
+        },
+        {
+          ...data.roots[1],
+          relations: [data.highPriorityActiveRelations[1]],
+        },
+      ];
+
+      assertResultStructure(result, {
+        count: 2,
+        total: 2,
+        page: 1,
+        pageCount: 1,
+        limit: 10,
+        data: expectedData,
       });
     });
 
@@ -208,6 +325,7 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
       const relation = createOneToManyForwardRelation(
         'relations',
         TestRelationService,
+        { distinctFilter: { field: 'isLatest', operator: '$eq', value: true } },
       );
       const req = mocks.createTestRequest(
         { filter: ['relations.status||$eq||archived'] },
@@ -227,7 +345,11 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
         { service: mocks.mockRelationService, count: 1 },
       ]);
       assertRelationRequest(mocks.mockRelationService, {
-        search: { status: { $eq: 'archived' } },
+        search: {
+          $and: [{ status: { $eq: 'archived' } }, { isLatest: { $eq: true } }],
+        },
+        limit: 10,
+        offset: 0,
       });
       assertEmptyResult(result);
     });
@@ -237,18 +359,24 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
       const relation = createOneToManyForwardRelation(
         'relations',
         TestRelationService,
+        { distinctFilter: { field: 'isLatest', operator: '$eq', value: true } },
       );
+
       const req = mocks.createTestRequest(
         {
           filter: ['name||$cont||Project', 'relations.status||$eq||active'],
+          page: 1,
+          limit: 10,
         },
         [relation],
       );
+
       const data = createCombinedFiltersSet();
 
       mocks.mockRelationService.getMany.mockResolvedValue(
         createPaginatedResponse(data.activeRelations, { total: 2 }),
       );
+
       mocks.mockRootService.getMany.mockResolvedValue(
         createPaginatedResponse(data.projectRoots, { limit: 10, total: 2 }),
       );
@@ -257,25 +385,74 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
       const result = await mocks.service.getMany(req);
 
       // ASSERT
-      assertServiceCallCounts([
-        { service: mocks.mockRootService, count: 1 },
-        { service: mocks.mockRelationService, count: 1 },
-      ]);
-      assertRelationRequest(mocks.mockRelationService, {
-        search: { status: { $eq: 'active' } },
-      });
       assertRootGetManyRequest(mocks.mockRootService, {
         search: {
-          $and: [{ name: { $cont: 'Project' } }, { id: { $in: [1, 2] } }],
+          name: { $cont: 'Project' },
         },
         page: 1,
-        limit: 2,
+        limit: 1,
       });
-      assertRelationFirst(mocks.mockRootService, [mocks.mockRelationService]);
-      assertResultStructure(result, { count: 2, total: 2 });
-      assertEnrichment(result, 'relations', {
-        1: [{ id: 1, rootId: 1, title: 'Feature A', status: 'active' }],
-        2: [{ id: 2, rootId: 2, title: 'Feature B', status: 'active' }],
+
+      assertRelationRequest(mocks.mockRelationService, {
+        search: {
+          $and: [{ status: { $eq: 'active' } }, { isLatest: { $eq: true } }],
+        },
+        limit: 10,
+        offset: 0,
+      });
+
+      // Second relation call - enrichment with discovered root IDs
+      assertRelationRequest(
+        mocks.mockRelationService,
+        {
+          search: {
+            $and: [
+              { status: { $eq: 'active' } },
+              { isLatest: { $eq: true } },
+              { rootId: { $in: [1, 2] } },
+            ],
+          },
+        },
+        1,
+      );
+
+      assertRootGetManyRequest(
+        mocks.mockRootService,
+        {
+          search: {
+            $and: [{ name: { $cont: 'Project' } }, { id: { $in: [1, 2] } }],
+          },
+          page: 1,
+          limit: 10,
+        },
+        1,
+      );
+
+      assertServiceCallCounts([
+        { service: mocks.mockRootService, count: 2 },
+        { service: mocks.mockRelationService, count: 2 },
+      ]);
+
+      assertRootFirst(mocks.mockRootService, [mocks.mockRelationService]);
+
+      const expectedData = [
+        {
+          ...data.projectRoots[0],
+          relations: [data.activeRelations[0]],
+        },
+        {
+          ...data.projectRoots[1],
+          relations: [data.activeRelations[1]],
+        },
+      ];
+
+      assertResultStructure(result, {
+        count: 2,
+        total: 2,
+        page: 1,
+        pageCount: 1,
+        limit: 10,
+        data: expectedData,
       });
     });
 
@@ -285,6 +462,9 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
         const relation = createOneToManyForwardRelation(
           'relations',
           TestRelationService,
+          {
+            distinctFilter: { field: 'isLatest', operator: '$eq', value: true },
+          },
         );
         const req = mocks.createTestRequest(
           {
@@ -311,7 +491,7 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
         ];
 
         mocks.mockRelationService.getMany.mockResolvedValue(
-          createPaginatedResponse(activeRelations, { total: 5 }),
+          createPaginatedResponse(activeRelations.slice(0, 3), { total: 5 }),
         );
         mocks.mockRootService.getMany.mockResolvedValue(
           createPaginatedResponse(page1Roots, { limit: 3, total: 5 }),
@@ -321,36 +501,54 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
         const result = await mocks.service.getMany(req);
 
         // ASSERT
+        assertRelationRequest(mocks.mockRelationService, {
+          search: {
+            $and: [{ status: { $eq: 'active' } }, { isLatest: { $eq: true } }],
+          },
+          limit: 3,
+          offset: 0,
+        });
+
+        // Second relation call - enrichment with discovered root IDs
+        assertRelationRequest(
+          mocks.mockRelationService,
+          {
+            search: {
+              $and: [
+                { status: { $eq: 'active' } },
+                { isLatest: { $eq: true } },
+                { rootId: { $in: [1, 2, 3] } },
+              ],
+            },
+          },
+          1,
+        );
+
+        assertRootGetManyRequest(mocks.mockRootService, {
+          search: { id: { $in: [1, 2, 3] } },
+          page: 1,
+          limit: 3,
+        });
+
         assertServiceCallCounts([
           { service: mocks.mockRootService, count: 1 },
-          { service: mocks.mockRelationService, count: 1 },
+          { service: mocks.mockRelationService, count: 2 },
         ]);
+
         assertRelationFirst(mocks.mockRootService, [mocks.mockRelationService]);
 
-        // Verify relation filter applied first
-        assertRelationRequest(mocks.mockRelationService, {
-          search: { status: { $eq: 'active' } },
-        });
+        const expectedData = page1Roots.map((root, index) => ({
+          ...root,
+          relations: [activeRelations[index]],
+        }));
 
-        // Verify root constraint from discovered IDs, with pagination
-        assertRootGetManyRequest(mocks.mockRootService, {
-          search: { id: { $in: [1, 2, 3, 5, 7] } },
+        assertResultStructure(result, {
+          count: 3,
+          total: 5,
           page: 1,
-          limit: 5,
-        });
-
-        const rootCall = mocks.mockRootService.getMany.mock.calls[0][0];
-        expect(rootCall.parsed.page).toBe(1);
-
-        // ASSERT - Result verification
-        assertResultStructure(result, { count: 3, total: 5 });
-        expect(result.page).toBe(1);
-        expect(result.pageCount).toBe(2);
-
-        assertEnrichment(result, 'relations', {
-          1: [{ id: 1, rootId: 1, title: 'Relation 1A', status: 'active' }],
-          2: [{ id: 2, rootId: 2, title: 'Relation 2A', status: 'active' }],
-          3: [{ id: 3, rootId: 3, title: 'Relation 3A', status: 'active' }],
+          pageCount: 2,
+          limit: 3,
+          data: expectedData,
         });
       });
 
@@ -359,6 +557,9 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
         const relation = createOneToManyForwardRelation(
           'relations',
           TestRelationService,
+          {
+            distinctFilter: { field: 'isLatest', operator: '$eq', value: true },
+          },
         );
         const req = mocks.createTestRequest(
           {
@@ -385,7 +586,7 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
         ];
 
         mocks.mockRelationService.getMany.mockResolvedValue(
-          createPaginatedResponse(activeRelations, { total: 5 }),
+          createPaginatedResponse(activeRelations.slice(3), { total: 5 }),
         );
         mocks.mockRootService.getMany.mockResolvedValue(
           createPaginatedResponse(page2Roots, { limit: 3, total: 5 }),
@@ -395,35 +596,54 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
         const result = await mocks.service.getMany(req);
 
         // ASSERT
+        assertRelationRequest(mocks.mockRelationService, {
+          search: {
+            $and: [{ status: { $eq: 'active' } }, { isLatest: { $eq: true } }],
+          },
+          limit: 3,
+          offset: 3, // Page 2: (2-1) * 3 = 3
+        });
+
+        // Second relation call - enrichment with discovered root IDs
+        assertRelationRequest(
+          mocks.mockRelationService,
+          {
+            search: {
+              $and: [
+                { status: { $eq: 'active' } },
+                { isLatest: { $eq: true } },
+                { rootId: { $in: [5, 7] } },
+              ],
+            },
+          },
+          1,
+        );
+
+        assertRootGetManyRequest(mocks.mockRootService, {
+          search: { id: { $in: [5, 7] } },
+          page: 1,
+          limit: 3,
+        });
+
         assertServiceCallCounts([
           { service: mocks.mockRootService, count: 1 },
-          { service: mocks.mockRelationService, count: 1 },
+          { service: mocks.mockRelationService, count: 2 },
         ]);
+
         assertRelationFirst(mocks.mockRootService, [mocks.mockRelationService]);
 
-        // Verify relation filter applied first
-        assertRelationRequest(mocks.mockRelationService, {
-          search: { status: { $eq: 'active' } },
-        });
+        const expectedData = page2Roots.map((root, index) => ({
+          ...root,
+          relations: [activeRelations.slice(3)[index]],
+        }));
 
-        // Verify root constraint from discovered IDs, with pagination
-        assertRootGetManyRequest(mocks.mockRootService, {
-          search: { id: { $in: [1, 2, 3, 5, 7] } },
-          page: 1,
-          limit: 5,
-        });
-
-        const rootCall = mocks.mockRootService.getMany.mock.calls[0][0];
-        expect(rootCall.parsed.page).toBe(1);
-
-        // ASSERT - Result verification
-        assertResultStructure(result, { count: 2, total: 5 });
-        expect(result.page).toBe(2);
-        expect(result.pageCount).toBe(2);
-
-        assertEnrichment(result, 'relations', {
-          5: [{ id: 4, rootId: 5, title: 'Relation 5A', status: 'active' }],
-          7: [{ id: 5, rootId: 7, title: 'Relation 7A', status: 'active' }],
+        assertResultStructure(result, {
+          count: 2,
+          total: 5,
+          page: 2,
+          pageCount: 2,
+          limit: 3,
+          data: expectedData,
         });
       });
 
@@ -432,6 +652,9 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
         const relation = createOneToManyForwardRelation(
           'relations',
           TestRelationService,
+          {
+            distinctFilter: { field: 'isLatest', operator: '$eq', value: true },
+          },
         );
         const req = mocks.createTestRequest(
           {
@@ -463,46 +686,57 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
         const result = await mocks.service.getMany(req);
 
         // ASSERT
-        assertServiceCallCounts([
-          { service: mocks.mockRootService, count: 1 },
-          { service: mocks.mockRelationService, count: 1 },
-        ]);
-        assertRelationFirst(mocks.mockRootService, [mocks.mockRelationService]);
-
-        // Verify relation filter applied first
         assertRelationRequest(mocks.mockRelationService, {
-          search: { status: { $eq: 'critical' } },
+          search: {
+            $and: [
+              { status: { $eq: 'critical' } },
+              { isLatest: { $eq: true } },
+            ],
+          },
+          limit: 5,
+          offset: 0,
         });
 
-        // Verify root constraint from discovered IDs
+        // Second relation call - enrichment with discovered root IDs
+        assertRelationRequest(
+          mocks.mockRelationService,
+          {
+            search: {
+              $and: [
+                { status: { $eq: 'critical' } },
+                { isLatest: { $eq: true } },
+                { rootId: { $in: [1, 3] } },
+              ],
+            },
+          },
+          1,
+        );
+
         assertRootGetManyRequest(mocks.mockRootService, {
           search: { id: { $in: [1, 3] } },
           page: 1,
-          limit: 2,
+          limit: 5,
         });
 
-        // ASSERT - Result verification (fewer results than requested page size)
-        assertResultStructure(result, { count: 2, total: 2 });
-        expect(result.page).toBe(1);
-        expect(result.pageCount).toBe(1);
+        assertServiceCallCounts([
+          { service: mocks.mockRootService, count: 1 },
+          { service: mocks.mockRelationService, count: 2 },
+        ]);
 
-        assertEnrichment(result, 'relations', {
-          1: [
-            {
-              id: 1,
-              rootId: 1,
-              title: 'Critical Task A',
-              status: 'critical',
-            },
-          ],
-          3: [
-            {
-              id: 2,
-              rootId: 3,
-              title: 'Critical Task B',
-              status: 'critical',
-            },
-          ],
+        assertRelationFirst(mocks.mockRootService, [mocks.mockRelationService]);
+
+        const expectedData = filteredRoots.map((root, index) => ({
+          ...root,
+          relations: [criticalRelations[index]],
+        }));
+
+        assertResultStructure(result, {
+          count: 2,
+          total: 2,
+          page: 1,
+          pageCount: 1,
+          limit: 5,
+          data: expectedData,
         });
       });
     });
@@ -510,10 +744,12 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
     describe('INNER JOIN with Relation Sorting', () => {
       it('should preserve relation sort order in INNER JOIN scenario', async () => {
         // ARRANGE
-        const relation = createOneToManyWithDistinctFilter(
+        const relation = createOneToManyForwardRelation(
           'relations',
           TestRelationService,
-          { isLatest: { $eq: true } }, // distinctFilter for uniqueness
+          {
+            distinctFilter: { field: 'isLatest', operator: '$eq', value: true },
+          }, // distinctFilter for uniqueness
         );
         const req = mocks.createTestRequest(
           {
@@ -562,7 +798,7 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
         // ASSERT - Service call verification
         assertServiceCallCounts([
           { service: mocks.mockRootService, count: 1 },
-          { service: mocks.mockRelationService, count: 2 }, // One for sorting, one for enrichment
+          { service: mocks.mockRelationService, count: 2 },
         ]);
         assertRelationFirst(mocks.mockRootService, [mocks.mockRelationService]);
 
@@ -570,12 +806,13 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
         assertRelationRequest(
           mocks.mockRelationService,
           {
-            page: 1,
             limit: 10,
+            offset: 0,
             search: {
               $and: [
                 { status: { $eq: 'active' } },
                 { rootId: { $notnull: true } },
+                { isLatest: { $eq: true } },
               ],
             },
             sort: [{ field: 'title', order: 'ASC' }],
@@ -591,6 +828,7 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
               $and: [
                 { status: { $eq: 'active' } },
                 { rootId: { $notnull: true } },
+                { isLatest: { $eq: true } },
                 { rootId: { $in: [2, 1, 3] } },
               ],
             },
@@ -602,26 +840,44 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
         assertRootGetManyRequest(mocks.mockRootService, {
           search: { id: { $in: [2, 1, 3] } }, // IDs in relation sort order
           page: 1,
-          limit: 3,
+          limit: 10,
         });
 
         // ASSERT - Result verification: roots should be in relation sort order [2, 1, 3]
-        assertResultStructure(result, { count: 3, total: 3 });
-        assertSortOrder(result, [2, 1, 3]); // Critical: verify parent order matches child sort
+        // Create expected data in sorted order based on relation title sorting
+        const expectedData = [
+          {
+            ...rootsInNaturalOrder[1], // Root 2 (Alpha Task)
+            relations: [sortedActiveRelations[0]],
+          },
+          {
+            ...rootsInNaturalOrder[0], // Root 1 (Beta Task)
+            relations: [sortedActiveRelations[1]],
+          },
+          {
+            ...rootsInNaturalOrder[2], // Root 3 (Charlie Task)
+            relations: [sortedActiveRelations[2]],
+          },
+        ];
 
-        assertEnrichment(result, 'relations', {
-          2: [{ id: 1, rootId: 2, title: 'Alpha Task', status: 'active' }],
-          1: [{ id: 2, rootId: 1, title: 'Beta Task', status: 'active' }],
-          3: [{ id: 3, rootId: 3, title: 'Charlie Task', status: 'active' }],
+        assertResultStructure(result, {
+          count: 3,
+          total: 3,
+          page: 1,
+          pageCount: 1,
+          limit: 10,
+          data: expectedData,
         });
       });
 
       it('should handle INNER JOIN with relation sort and multiple relations per root', async () => {
         // ARRANGE
-        const relation = createOneToManyWithDistinctFilter(
+        const relation = createOneToManyForwardRelation(
           'relations',
           TestRelationService,
-          { isLatest: { $eq: true } }, // distinctFilter for uniqueness
+          {
+            distinctFilter: { field: 'isLatest', operator: '$eq', value: true },
+          }, // distinctFilter for uniqueness
         );
         const req = mocks.createTestRequest(
           {
@@ -681,7 +937,7 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
         // ASSERT - Service call verification
         assertServiceCallCounts([
           { service: mocks.mockRootService, count: 1 },
-          { service: mocks.mockRelationService, count: 2 }, // One for sorting, one for enrichment
+          { service: mocks.mockRelationService, count: 2 },
         ]);
         assertRelationFirst(mocks.mockRootService, [mocks.mockRelationService]);
 
@@ -689,10 +945,14 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
         assertRelationRequest(
           mocks.mockRelationService,
           {
-            page: 1,
             limit: 10,
+            offset: 0,
             search: {
-              $and: [{ priority: { $gte: 5 } }, { rootId: { $notnull: true } }],
+              $and: [
+                { priority: { $gte: 5 } },
+                { rootId: { $notnull: true } },
+                { isLatest: { $eq: true } },
+              ],
             },
             sort: [{ field: 'priority', order: 'DESC' }],
           },
@@ -707,6 +967,7 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
               $and: [
                 { priority: { $gte: 5 } },
                 { rootId: { $notnull: true } },
+                { isLatest: { $eq: true } },
                 { rootId: { $in: [1, 2, 3] } },
               ],
             },
@@ -718,49 +979,39 @@ describe('CrudFederationService - Behavior: INNER JOIN via Filters', () => {
         assertRootGetManyRequest(mocks.mockRootService, {
           search: { id: { $in: [1, 2, 3] } },
           page: 1,
-          limit: 3,
+          limit: 10,
         });
 
         // ASSERT - Result verification: roots should be ordered by first relation occurrence
-        assertResultStructure(result, { count: 3, total: 3 });
-        assertSortOrder(result, [1, 2, 3]); // Order by first occurrence in sorted relations
+        // Create expected data ordered by first occurrence in priority-sorted relations
+        const expectedData = [
+          {
+            ...rootsInNaturalOrder[0], // Root 1 (has Critical + High A)
+            relations: sortedHighPriorityRelations.filter(
+              (r) => r.rootId === 1,
+            ),
+          },
+          {
+            ...rootsInNaturalOrder[1], // Root 2 (has High B)
+            relations: sortedHighPriorityRelations.filter(
+              (r) => r.rootId === 2,
+            ),
+          },
+          {
+            ...rootsInNaturalOrder[2], // Root 3 (has Medium)
+            relations: sortedHighPriorityRelations.filter(
+              (r) => r.rootId === 3,
+            ),
+          },
+        ];
 
-        // Verify all relations are properly attached
-        assertEnrichment(result, 'relations', {
-          1: [
-            {
-              id: 1,
-              rootId: 1,
-              title: 'Critical',
-              priority: 10,
-              status: 'active',
-            },
-            {
-              id: 2,
-              rootId: 1,
-              title: 'High A',
-              priority: 8,
-              status: 'active',
-            },
-          ],
-          2: [
-            {
-              id: 3,
-              rootId: 2,
-              title: 'High B',
-              priority: 7,
-              status: 'active',
-            },
-          ],
-          3: [
-            {
-              id: 4,
-              rootId: 3,
-              title: 'Medium',
-              priority: 5,
-              status: 'active',
-            },
-          ],
+        assertResultStructure(result, {
+          count: 3,
+          total: 3,
+          page: 1,
+          pageCount: 1,
+          limit: 10,
+          data: expectedData,
         });
       });
     });

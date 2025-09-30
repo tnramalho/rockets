@@ -5,7 +5,6 @@ import {
 } from '../../__FIXTURES__/crud-federation-test-assertions';
 import {
   createOneToManyForwardRelation,
-  createOneToManyWithDistinctFilter,
   TestRelationService,
 } from '../../__FIXTURES__/crud-federation-test-entities';
 import {
@@ -185,10 +184,10 @@ describe('CrudFederationService - Behavior: Relation Sort Validation', () => {
   describe('Valid configurations (should not throw)', () => {
     it('should not throw error when valid $notnull filter exists', async () => {
       // ARRANGE
-      const relation = createOneToManyWithDistinctFilter(
+      const relation = createOneToManyForwardRelation(
         'relations',
         TestRelationService,
-        { isLatest: { $eq: true } }, // distinctFilter configuration
+        { distinctFilter: { field: 'isLatest', operator: '$eq', value: true } }, // distinctFilter configuration
       );
       const req = mocks.createTestRequest(
         {
@@ -221,10 +220,10 @@ describe('CrudFederationService - Behavior: Relation Sort Validation', () => {
 
     it('should not throw error when valid $notnull filter exists with additional filters', async () => {
       // ARRANGE
-      const relation = createOneToManyWithDistinctFilter(
+      const relation = createOneToManyForwardRelation(
         'relations',
         TestRelationService,
-        { isLatest: { $eq: true } }, // distinctFilter configuration
+        { distinctFilter: { field: 'isLatest', operator: '$eq', value: true } }, // distinctFilter configuration
       );
       const req = mocks.createTestRequest(
         {

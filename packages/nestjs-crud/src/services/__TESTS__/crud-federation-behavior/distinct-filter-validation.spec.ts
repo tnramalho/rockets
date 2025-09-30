@@ -1,7 +1,7 @@
 import { CrudFederationException } from '../../../exceptions/crud-federation.exception';
+import { assertRelationRequest } from '../../__FIXTURES__/crud-federation-test-assertions';
 import {
   createOneToManyForwardRelation,
-  createOneToManyWithDistinctFilter,
   createOneToOneForwardRelation,
   TestRelationService,
 } from '../../__FIXTURES__/crud-federation-test-entities';
@@ -37,7 +37,6 @@ describe('CrudFederationService - Behavior: distinctFilter Validation', () => {
       // Remove distinctFilter to test validation
       const req = mocks.createTestRequest(
         {
-          filter: ['relations.rootId||$notnull'], // Has $notnull but no distinctFilter
           sort: ['relations.title,ASC'], // Trying to sort by relation field
         },
         [relation],
@@ -55,14 +54,13 @@ describe('CrudFederationService - Behavior: distinctFilter Validation', () => {
 
     it('should succeed when many-cardinality relation has distinctFilter and $notnull', async () => {
       // ARRANGE
-      const relation = createOneToManyWithDistinctFilter(
+      const relation = createOneToManyForwardRelation(
         'relations',
         TestRelationService,
-        { field: 'isLatest', operator: '$eq', value: true },
+        { distinctFilter: { field: 'isLatest', operator: '$eq', value: true } },
       );
       const req = mocks.createTestRequest(
         {
-          filter: ['relations.rootId||$notnull'], // Has required $notnull
           sort: ['relations.title,ASC'], // Sorting by relation field
           limit: '3',
         },
@@ -108,35 +106,64 @@ describe('CrudFederationService - Behavior: distinctFilter Validation', () => {
       expect(result.total).toBe(3);
 
       // Verify distinctFilter was applied
-      const relationCall = mocks.mockRelationService.getMany.mock.calls[0][0];
-      expect(relationCall.parsed.filter).toEqual(
-        expect.arrayContaining([
-          { field: 'isLatest', operator: '$eq', value: true },
-        ]),
-      );
+      assertRelationRequest(mocks.mockRelationService, {
+        filter: [
+          {
+            field: 'isLatest',
+            operator: '$eq',
+            value: true,
+            relation: 'relations',
+          },
+        ],
+        limit: 3,
+        offset: 0,
+        search: {
+          $and: [{ rootId: { $notnull: true } }, { isLatest: { $eq: true } }],
+        },
+        sort: [{ field: 'title', order: 'ASC' }],
+      });
     });
 
-    it('should still require $notnull filter even with distinctFilter (Option B)', async () => {
+    it('should automatically inject $notnull filter for relation sorting', async () => {
       // ARRANGE
-      const relation = createOneToManyWithDistinctFilter(
+      const relation = createOneToManyForwardRelation(
         'relations',
         TestRelationService,
-        { field: 'isLatest', operator: '$eq', value: true },
+        { distinctFilter: { field: 'isLatest', operator: '$eq', value: true } },
       );
       const req = mocks.createTestRequest(
         {
-          // Missing $notnull filter (testing Option B: both required)
+          // No $notnull filter provided - system should inject it automatically
           sort: ['relations.title,ASC'],
         },
         [relation],
       );
 
-      // ACT & ASSERT
-      const error = await mocks.service.getMany(req).catch((e) => e);
+      // Mock data
+      mocks.mockRelationService.getMany.mockResolvedValue({
+        data: [{ id: 1, rootId: 1, title: 'Test Relation', isLatest: true }],
+        count: 1,
+        total: 1,
+        page: 1,
+        pageCount: 1,
+        limit: 1,
+      });
 
-      expect(error).toBeInstanceOf(CrudFederationException);
-      expect(error.message).toContain('$notnull');
-      expect(error.message).toContain('join key');
+      mocks.mockRootService.getMany.mockResolvedValue({
+        data: [{ id: 1, name: 'Root 1' }],
+        count: 1,
+        total: 1,
+        page: 1,
+        pageCount: 1,
+        limit: 1,
+      });
+
+      // ACT
+      const result = await mocks.service.getMany(req);
+
+      // ASSERT - Should succeed because $notnull filter was automatically injected
+      expect(result).toBeDefined();
+      expect(result.data).toHaveLength(1);
     });
 
     it('should work fine with one-cardinality relations (no distinctFilter needed)', async () => {

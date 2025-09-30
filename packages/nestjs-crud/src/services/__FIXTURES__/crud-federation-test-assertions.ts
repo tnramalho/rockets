@@ -170,14 +170,15 @@ const assertRootServiceRequest = <R extends PlainLiteralObject>(
   rootService: jest.Mocked<CrudFetchServiceInterface<R>>,
   methodName: 'getOne' | 'getMany',
   expectedParsed: Partial<CrudRequestParsedParamsInterface<R>>,
+  callIndex: number = 0,
   options: { ignore?: Array<keyof CrudRequestParsedParamsInterface<R>> } = {
     ignore: ['filter', 'or', 'classTransformOptions'],
   },
 ) => {
   const actual: CrudRequestInterface<R> =
     methodName === 'getMany'
-      ? rootService.getMany.mock.calls[0][0]
-      : rootService.getOne.mock.calls[0][0];
+      ? rootService.getMany.mock.calls[callIndex][0]
+      : rootService.getOne.mock.calls[callIndex][0];
 
   assertServiceRequest(actual, expectedParsed, options);
 };
@@ -186,18 +187,32 @@ const assertRootServiceRequest = <R extends PlainLiteralObject>(
 export const assertRootGetManyRequest = <R extends PlainLiteralObject>(
   rootService: jest.Mocked<CrudFetchServiceInterface<R>>,
   expectedParsed: Partial<CrudRequestParsedParamsInterface<R>>,
+  callIndex: number = 0,
   options?: { ignore?: Array<keyof CrudRequestParsedParamsInterface<R>> },
 ) => {
-  assertRootServiceRequest(rootService, 'getMany', expectedParsed, options);
+  assertRootServiceRequest(
+    rootService,
+    'getMany',
+    expectedParsed,
+    callIndex,
+    options,
+  );
 };
 
 // Root service getOne request verification
 export const assertRootGetOneRequest = <R extends PlainLiteralObject>(
   rootService: jest.Mocked<CrudFetchServiceInterface<R>>,
   expectedParsed: Partial<CrudRequestParsedParamsInterface<R>>,
+  callIndex: number = 0,
   options?: { ignore?: Array<keyof CrudRequestParsedParamsInterface<R>> },
 ) => {
-  assertRootServiceRequest(rootService, 'getOne', expectedParsed, options);
+  assertRootServiceRequest(
+    rootService,
+    'getOne',
+    expectedParsed,
+    callIndex,
+    options,
+  );
 };
 
 // Relation service request verification - validates request matches expected exactly
@@ -217,14 +232,37 @@ export const assertRelationRequest = <L extends PlainLiteralObject>(
   });
 };
 
-// Result structure verification
+// Result structure verification - checks all response properties and data contents
 export const assertResultStructure = (
   result: CrudResponsePaginatedInterface<RootWithRelations>,
-  expected: { count: number; total: number },
+  expected: Partial<CrudResponsePaginatedInterface<RootWithRelations>> &
+    Pick<CrudResponsePaginatedInterface<RootWithRelations>, 'count' | 'total'>,
 ) => {
-  expect(result.data).toHaveLength(expected.count);
+  // Required properties - always checked
   expect(result.total).toBe(expected.total);
   expect(result.count).toBe(expected.count);
+
+  if (expected.data !== undefined) {
+    expect(result.data).toEqual(expected.data);
+  }
+
+  // Optional properties - checked only if provided for backward compatibility
+  if (expected.limit !== undefined) {
+    expect(result.limit).toBe(expected.limit);
+  }
+
+  if (expected.page !== undefined) {
+    expect(result.page).toBe(expected.page);
+  }
+
+  if (expected.pageCount !== undefined) {
+    expect(result.pageCount).toBe(expected.pageCount);
+  }
+
+  // Metrics - optional nested object
+  if (expected.metrics !== undefined) {
+    expect(result.metrics).toEqual(expected.metrics);
+  }
 };
 
 // Combined enrichment verification - property + mappings

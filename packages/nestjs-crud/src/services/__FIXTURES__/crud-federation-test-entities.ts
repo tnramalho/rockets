@@ -66,16 +66,21 @@ export const createTestRelations = (
 export const createOneToManyForwardRelation = (
   property: string,
   service: Type,
-  primaryKey: string = 'id',
-  foreignKey: string = 'rootId',
+  options?: {
+    primaryKey?: string;
+    foreignKey?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    distinctFilter?: QueryRelation<any>['distinctFilter'];
+  },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): QueryRelation<TestRoot, any> => ({
   property,
-  primaryKey,
-  foreignKey,
+  primaryKey: options?.primaryKey || 'id',
+  foreignKey: options?.foreignKey || 'rootId',
   cardinality: 'many',
   service,
   owner: false,
+  distinctFilter: options?.distinctFilter,
 });
 
 export const createOneToOneForwardRelation = (
@@ -91,22 +96,4 @@ export const createOneToOneForwardRelation = (
   cardinality: 'one',
   service,
   owner: false,
-});
-
-export const createOneToManyWithDistinctFilter = (
-  property: string,
-  service: Type,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  distinctFilter: any, // QueryFilter for the relation
-  primaryKey: string = 'id',
-  foreignKey: string = 'rootId',
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): QueryRelation<TestRoot, any> => ({
-  property,
-  primaryKey,
-  foreignKey,
-  cardinality: 'many',
-  service,
-  owner: false,
-  distinctFilter,
 });

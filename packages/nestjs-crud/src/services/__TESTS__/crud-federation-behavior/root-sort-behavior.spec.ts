@@ -7,6 +7,7 @@ import {
   assertResultStructure,
   assertEnrichment,
   assertSortOrder,
+  assertRelationRequest,
 } from '../../__FIXTURES__/crud-federation-test-assertions';
 import {
   createNameSortDataSet,
@@ -85,10 +86,10 @@ describe('CrudFederationService - Behavior: Root Sort Strategy', () => {
       });
 
       // Verify relation service called with all root IDs for enrichment
-      const relationRequest =
-        mocks.mockRelationService.getMany.mock.calls[0][0];
-      expect(relationRequest.parsed.search).toEqual({
-        rootId: { $in: [1, 3, 2] },
+      assertRelationRequest(mocks.mockRelationService, {
+        search: {
+          rootId: { $in: [1, 3, 2] },
+        },
       });
 
       // ASSERT - Result verification
@@ -144,10 +145,10 @@ describe('CrudFederationService - Behavior: Root Sort Strategy', () => {
       });
 
       // Verify relation service called with all root IDs for enrichment
-      const relationRequest =
-        mocks.mockRelationService.getMany.mock.calls[0][0];
-      expect(relationRequest.parsed.search).toEqual({
-        rootId: { $in: [3, 4, 5, 2, 1] },
+      assertRelationRequest(mocks.mockRelationService, {
+        search: {
+          rootId: { $in: [3, 4, 5, 2, 1] },
+        },
       });
 
       // ASSERT - Result verification
@@ -213,10 +214,10 @@ describe('CrudFederationService - Behavior: Root Sort Strategy', () => {
       });
 
       // Verify relation service called with all root IDs for enrichment
-      const relationRequest =
-        mocks.mockRelationService.getMany.mock.calls[0][0];
-      expect(relationRequest.parsed.search).toEqual({
-        rootId: { $in: [3, 1, 2] },
+      assertRelationRequest(mocks.mockRelationService, {
+        search: {
+          rootId: { $in: [3, 1, 2] },
+        },
       });
 
       // ASSERT - Result verification

@@ -5,6 +5,7 @@ import {
   assertLeftJoinBehavior,
   assertResultStructure,
   assertEnrichment,
+  assertRelationRequest,
 } from '../../__FIXTURES__/crud-federation-test-assertions';
 import { createMinimalRootRelationSet } from '../../__FIXTURES__/crud-federation-test-data';
 import {
@@ -68,10 +69,10 @@ describe('CrudFederationService - Behavior: Join Type (Forward Relations)', () =
       // Verify all roots returned (LEFT JOIN behavior)
       expect(result.data).toHaveLength(3);
       assertEnrichment(result, 'relations', {
-        1: [{ id: 1, rootId: 1, title: 'Relation 1' }],
+        1: [{ id: 1, rootId: 1, title: 'Relation 1', isLatest: true }],
         2: [
-          { id: 2, rootId: 2, title: 'Relation 2' },
-          { id: 3, rootId: 2, title: 'Relation 3' },
+          { id: 2, rootId: 2, title: 'Relation 2', isLatest: true },
+          { id: 3, rootId: 2, title: 'Relation 3', isLatest: false },
         ],
         3: [], // Root 3 has no relations (LEFT JOIN behavior)
       });
@@ -113,6 +114,7 @@ describe('CrudFederationService - Behavior: Join Type (Forward Relations)', () =
       const relation = createOneToManyForwardRelation(
         'relations',
         TestRelationService,
+        { distinctFilter: { field: 'isLatest', operator: '$eq', value: true } },
       );
       relation.join = 'INNER'; // Specify INNER JOIN
       const req = mocks.createTestRequest({ page: '1', limit: '10' }, [
@@ -135,17 +137,19 @@ describe('CrudFederationService - Behavior: Join Type (Forward Relations)', () =
       await mocks.service.getMany(req);
 
       // ASSERT - Should trigger INNER JOIN behavior with $notnull search condition
-      const relationRequest =
-        mocks.mockRelationService.getMany.mock.calls[0][0];
-      expect(relationRequest.parsed.search).toEqual({
-        rootId: { $notnull: true },
+      assertRelationRequest(mocks.mockRelationService, {
+        search: {
+          $and: [{ rootId: { $notnull: true } }, { isLatest: { $eq: true } }],
+        },
+        limit: 10,
+        offset: 0,
       });
 
       // Should trigger INNER JOIN behavior (relation-first)
       assertInnerJoinBehavior(
         mocks.mockRootService,
         mocks.mockRelationService,
-        { rootId: { $notnull: true } }, // Expected search condition
+        { $and: [{ rootId: { $notnull: true } }, { isLatest: { $eq: true } }] }, // Expected search condition
         [1, 2],
       );
     });
@@ -155,6 +159,7 @@ describe('CrudFederationService - Behavior: Join Type (Forward Relations)', () =
       const relation = createOneToManyForwardRelation(
         'relations',
         TestRelationService,
+        { distinctFilter: { field: 'isLatest', operator: '$eq', value: true } },
       );
       relation.join = 'INNER';
       const req = mocks.createTestRequest(
@@ -178,10 +183,16 @@ describe('CrudFederationService - Behavior: Join Type (Forward Relations)', () =
       await mocks.service.getMany(req);
 
       // ASSERT - Should have both existing filter and injected $notnull in search conditions
-      const relationRequest =
-        mocks.mockRelationService.getMany.mock.calls[0][0];
-      expect(relationRequest.parsed.search).toEqual({
-        $and: [{ status: { $eq: 'active' } }, { rootId: { $notnull: true } }],
+      assertRelationRequest(mocks.mockRelationService, {
+        search: {
+          $and: [
+            { status: { $eq: 'active' } },
+            { rootId: { $notnull: true } },
+            { isLatest: { $eq: true } },
+          ],
+        },
+        limit: 10,
+        offset: 0,
       });
     });
 
@@ -190,6 +201,7 @@ describe('CrudFederationService - Behavior: Join Type (Forward Relations)', () =
       const relation = createOneToManyForwardRelation(
         'relations',
         TestRelationService,
+        { distinctFilter: { field: 'isLatest', operator: '$eq', value: true } },
       );
       relation.join = 'INNER';
       const req = mocks.createTestRequest(
@@ -213,10 +225,12 @@ describe('CrudFederationService - Behavior: Join Type (Forward Relations)', () =
       await mocks.service.getMany(req);
 
       // ASSERT - Should have only one $notnull search condition (not duplicated)
-      const relationRequest =
-        mocks.mockRelationService.getMany.mock.calls[0][0];
-      expect(relationRequest.parsed.search).toEqual({
-        rootId: { $notnull: true },
+      assertRelationRequest(mocks.mockRelationService, {
+        search: {
+          $and: [{ rootId: { $notnull: true } }, { isLatest: { $eq: true } }],
+        },
+        limit: 10,
+        offset: 0,
       });
     });
   });

@@ -6,6 +6,7 @@ import {
   assertRootFirst,
   assertLeftJoinBehavior,
   assertRootGetManyRequest,
+  assertRelationRequest,
 } from '../../__FIXTURES__/crud-federation-test-assertions';
 import { createMultiRelationSet } from '../../__FIXTURES__/crud-federation-test-data';
 import {
@@ -81,9 +82,10 @@ describe('CrudFederationService - Integration: One-to-One Forward Relationships'
       });
 
       // Verify profile service called with root IDs
-      const profileRequest = mocks.mockProfileService.getMany.mock.calls[0][0];
-      expect(profileRequest.parsed.search).toEqual({
-        rootId: { $in: [1, 2] },
+      assertRelationRequest(mocks.mockProfileService, {
+        search: {
+          rootId: { $in: [1, 2] },
+        },
       });
 
       // ASSERT - Result verification
@@ -141,9 +143,10 @@ describe('CrudFederationService - Integration: One-to-One Forward Relationships'
       });
 
       // Verify profile service called with root IDs
-      const profileRequest = mocks.mockProfileService.getMany.mock.calls[0][0];
-      expect(profileRequest.parsed.search).toEqual({
-        rootId: { $in: [1, 2] },
+      assertRelationRequest(mocks.mockProfileService, {
+        search: {
+          rootId: { $in: [1, 2] },
+        },
       });
 
       // ASSERT - Result verification (LEFT JOIN: all roots returned with null profiles)
@@ -233,16 +236,17 @@ describe('CrudFederationService - Integration: One-to-One Forward Relationships'
       });
 
       // Verify profile service called with all root IDs
-      const profileRequest = mocks.mockProfileService.getMany.mock.calls[0][0];
-      expect(profileRequest.parsed.search).toEqual({
-        rootId: { $in: [1, 2, 3, 4, 5] },
+      assertRelationRequest(mocks.mockProfileService, {
+        search: {
+          rootId: { $in: [1, 2, 3, 4, 5] },
+        },
       });
 
       // Verify settings service called with all root IDs
-      const settingsRequest =
-        mocks.mockSettingsService.getMany.mock.calls[0][0];
-      expect(settingsRequest.parsed.search).toEqual({
-        rootId: { $in: [1, 2, 3, 4, 5] },
+      assertRelationRequest(mocks.mockSettingsService, {
+        search: {
+          rootId: { $in: [1, 2, 3, 4, 5] },
+        },
       });
 
       // ASSERT - Result verification
@@ -335,14 +339,16 @@ describe('CrudFederationService - Integration: One-to-One Forward Relationships'
       });
 
       // Verify root pagination parameters
-      const rootCall = mocks.mockRootService.getMany.mock.calls[0][0];
-      expect(rootCall.parsed.page).toBe(1);
-      expect(rootCall.parsed.limit).toBe(5);
+      assertRootGetManyRequest(mocks.mockRootService, {
+        page: 1,
+        limit: 5,
+      });
 
       // Verify profile service called with page 1 root IDs
-      const profileRequest = mocks.mockProfileService.getMany.mock.calls[0][0];
-      expect(profileRequest.parsed.search).toEqual({
-        rootId: { $in: [1, 2, 3, 4, 5] },
+      assertRelationRequest(mocks.mockProfileService, {
+        search: {
+          rootId: { $in: [1, 2, 3, 4, 5] },
+        },
       });
 
       // ASSERT - Result verification
@@ -431,14 +437,16 @@ describe('CrudFederationService - Integration: One-to-One Forward Relationships'
       });
 
       // Verify root pagination parameters
-      const rootCall = mocks.mockRootService.getMany.mock.calls[0][0];
-      expect(rootCall.parsed.page).toBe(2);
-      expect(rootCall.parsed.limit).toBe(5);
+      assertRootGetManyRequest(mocks.mockRootService, {
+        page: 2,
+        limit: 5,
+      });
 
       // Verify profile service called with page 2 root IDs
-      const profileRequest = mocks.mockProfileService.getMany.mock.calls[0][0];
-      expect(profileRequest.parsed.search).toEqual({
-        rootId: { $in: [6, 7, 8, 9, 10] },
+      assertRelationRequest(mocks.mockProfileService, {
+        search: {
+          rootId: { $in: [6, 7, 8, 9, 10] },
+        },
       });
 
       // ASSERT - Result verification

@@ -254,19 +254,6 @@ describe('CrudFederationService - Integration: Forward Relationships', () => {
         limit: 10,
       });
 
-      // Verify relation metadata
-      const rootCall = mocks.mockRootService.getMany.mock.calls[0][0];
-      expect(rootCall.options?.query?.relations).toBeDefined();
-      expect(rootCall.options?.query?.relations?.relations).toHaveLength(1);
-
-      const relationMeta = rootCall.options?.query?.relations?.relations?.[0];
-      expect(relationMeta?.property).toBe('relations');
-      expect(relationMeta?.primaryKey).toBe('id');
-      expect(relationMeta?.foreignKey).toBe('rootId');
-      expect(relationMeta?.cardinality).toBe('many');
-      expect(relationMeta?.owner).toBe(false);
-      expect(relationMeta?.service).toBeDefined();
-
       // Verify relation service called with root IDs
       assertRelationRequest(mocks.mockRelationService, {
         search: { rootId: { $in: [5, 8] } },
@@ -330,10 +317,15 @@ describe('CrudFederationService - Integration: Forward Relationships', () => {
       });
 
       // Verify filter delegation - original filter array still present
-      const rootCall = mocks.mockRootService.getMany.mock.calls[0][0];
-      expect(rootCall.parsed.filter).toEqual([
-        { field: 'name', operator: '$eq', value: 'root-filter' },
-      ]);
+      assertRootGetManyRequest(mocks.mockRootService, {
+        filter: [{ field: 'name', operator: '$eq', value: 'root-filter' }],
+        limit: 10,
+        offset: undefined,
+        page: 1,
+        search: {
+          name: { $eq: 'root-filter' },
+        },
+      });
 
       // Verify relation service called with root IDs
       assertRelationRequest(mocks.mockRelationService, {
@@ -525,8 +517,6 @@ describe('CrudFederationService - Integration: Forward Relationships', () => {
         page: 2,
         limit: 5,
       });
-      const rootCall = mocks.mockRootService.getMany.mock.calls[0][0];
-      expect(rootCall.parsed.page).toBe(2);
 
       // Verify relation service called with root IDs
       assertRelationRequest(mocks.mockRelationService, {
@@ -599,10 +589,10 @@ describe('CrudFederationService - Integration: Forward Relationships', () => {
       assertRelationRequest(mocks.mockRelationService, {
         search: { rootId: { $in: [1, 2, 3, 4, 5] } },
       });
-      const settingsRequest =
-        mocks.mockSettingsService.getMany.mock.calls[0][0];
-      expect(settingsRequest.parsed.search).toEqual({
-        rootId: { $in: [1, 2, 3, 4, 5] },
+      assertRelationRequest(mocks.mockSettingsService, {
+        search: {
+          rootId: { $in: [1, 2, 3, 4, 5] },
+        },
       });
 
       // ASSERT - Result verification
@@ -679,9 +669,10 @@ describe('CrudFederationService - Integration: Forward Relationships', () => {
       assertLeftJoinBehavior(mocks.mockRootService);
 
       // Verify root pagination parameters
-      const rootCall = mocks.mockRootService.getMany.mock.calls[0][0];
-      expect(rootCall.parsed.page).toBe(3);
-      expect(rootCall.parsed.limit).toBe(5);
+      assertRootGetManyRequest(mocks.mockRootService, {
+        page: 3,
+        limit: 5,
+      });
 
       // ASSERT - Result verification (empty page)
       assertResultStructure(result, { count: 0, total: 10 });
@@ -814,9 +805,10 @@ describe('CrudFederationService - Integration: Forward Relationships', () => {
       assertLeftJoinBehavior(mocks.mockRootService);
 
       // Verify root pagination parameters
-      const rootCall = mocks.mockRootService.getMany.mock.calls[0][0];
-      expect(rootCall.parsed.page).toBe(3);
-      expect(rootCall.parsed.limit).toBe(5);
+      assertRootGetManyRequest(mocks.mockRootService, {
+        page: 3,
+        limit: 5,
+      });
 
       // Verify relation service called with last page root IDs
       assertRelationRequest(mocks.mockRelationService, {

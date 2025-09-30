@@ -3,9 +3,9 @@ import {
   assertServiceCallCounts,
   assertResultStructure,
   assertEnrichment,
-  assertRelationFirst,
   assertRelationRequest,
   assertRootGetManyRequest,
+  assertRootFirst,
 } from '../../__FIXTURES__/crud-federation-test-assertions';
 import {
   createOneToManyForwardRelation,
@@ -41,6 +41,7 @@ describe('CrudFederationService - Behavior: Combined Root+Relation Filters', () 
       const relation = createOneToManyForwardRelation(
         'relations',
         TestRelationService,
+        { distinctFilter: { field: 'isLatest', operator: '$eq', value: true } },
       );
       const req = mocks.createTestRequest(
         {
@@ -53,9 +54,27 @@ describe('CrudFederationService - Behavior: Combined Root+Relation Filters', () 
 
       // Test data - 5 roots match name filter, but only 3 have active relations
       const activeRelations = [
-        { id: 1, rootId: 1, title: 'Feature A', status: 'active' },
-        { id: 2, rootId: 2, title: 'Feature B', status: 'active' },
-        { id: 3, rootId: 4, title: 'Feature C', status: 'active' },
+        {
+          id: 1,
+          rootId: 1,
+          title: 'Feature A',
+          status: 'active',
+          isLatest: true,
+        },
+        {
+          id: 2,
+          rootId: 2,
+          title: 'Feature B',
+          status: 'active',
+          isLatest: true,
+        },
+        {
+          id: 3,
+          rootId: 4,
+          title: 'Feature C',
+          status: 'active',
+          isLatest: true,
+        },
         // Root 3 and 5 have inactive relations or no relations
       ];
 
@@ -77,27 +96,62 @@ describe('CrudFederationService - Behavior: Combined Root+Relation Filters', () 
 
       // ASSERT
       assertServiceCallCounts([
-        { service: mocks.mockRootService, count: 1 },
-        { service: mocks.mockRelationService, count: 1 },
+        { service: mocks.mockRootService, count: 2 }, // 1 total count + 1 data retrieval
+        { service: mocks.mockRelationService, count: 2 }, // 1 constraint discovery + 1 enrichment
       ]);
-      assertRelationFirst(mocks.mockRootService, [mocks.mockRelationService]);
+      assertRootFirst(mocks.mockRootService, [mocks.mockRelationService]);
 
-      // Verify relation filter applied first
-      assertRelationRequest(mocks.mockRelationService, {
-        search: { status: { $eq: 'active' } },
-      });
-
-      // Verify root filter + discovered root IDs constraint
-      assertRootGetManyRequest(mocks.mockRootService, {
-        search: {
-          $and: [{ name: { $cont: 'Project' } }, { id: { $in: [1, 2, 4] } }],
+      // Verify relation filter applied first (constraint discovery call)
+      assertRelationRequest(
+        mocks.mockRelationService,
+        {
+          search: {
+            $and: [{ status: { $eq: 'active' } }, { isLatest: { $eq: true } }],
+          },
+          limit: 3,
+          offset: 0,
         },
-        page: 1,
-        limit: 3,
-      });
+        0,
+      );
 
-      const rootCall = mocks.mockRootService.getMany.mock.calls[0][0];
-      expect(rootCall.parsed.page).toBe(1);
+      // Verify enrichment call (relation filter + root ID constraints)
+      assertRelationRequest(
+        mocks.mockRelationService,
+        {
+          search: {
+            $and: [
+              { status: { $eq: 'active' } },
+              { isLatest: { $eq: true } },
+              { rootId: { $in: [1, 2, 4] } },
+            ],
+          },
+        },
+        1,
+      );
+
+      // Verify root total count call (first call - index 0) - only has original root filters
+      assertRootGetManyRequest(
+        mocks.mockRootService,
+        {
+          search: { name: { $cont: 'Project' } },
+          page: 1,
+          limit: 1,
+        },
+        0,
+      );
+
+      // Verify root filter + discovered root IDs constraint (data retrieval call - index 1)
+      assertRootGetManyRequest(
+        mocks.mockRootService,
+        {
+          search: {
+            $and: [{ name: { $cont: 'Project' } }, { id: { $in: [1, 2, 4] } }],
+          },
+          page: 1,
+          limit: 3,
+        },
+        1,
+      );
 
       // ASSERT - Result verification
       assertResultStructure(result, { count: 3, total: 3 });
@@ -105,9 +159,33 @@ describe('CrudFederationService - Behavior: Combined Root+Relation Filters', () 
       expect(result.pageCount).toBe(1);
 
       assertEnrichment(result, 'relations', {
-        1: [{ id: 1, rootId: 1, title: 'Feature A', status: 'active' }],
-        2: [{ id: 2, rootId: 2, title: 'Feature B', status: 'active' }],
-        4: [{ id: 3, rootId: 4, title: 'Feature C', status: 'active' }],
+        1: [
+          {
+            id: 1,
+            rootId: 1,
+            title: 'Feature A',
+            status: 'active',
+            isLatest: true,
+          },
+        ],
+        2: [
+          {
+            id: 2,
+            rootId: 2,
+            title: 'Feature B',
+            status: 'active',
+            isLatest: true,
+          },
+        ],
+        4: [
+          {
+            id: 3,
+            rootId: 4,
+            title: 'Feature C',
+            status: 'active',
+            isLatest: true,
+          },
+        ],
       });
     });
 
@@ -116,6 +194,7 @@ describe('CrudFederationService - Behavior: Combined Root+Relation Filters', () 
       const relation = createOneToManyForwardRelation(
         'relations',
         TestRelationService,
+        { distinctFilter: { field: 'isLatest', operator: '$eq', value: true } },
       );
       const req = mocks.createTestRequest(
         {
@@ -153,27 +232,46 @@ describe('CrudFederationService - Behavior: Combined Root+Relation Filters', () 
 
       // ASSERT
       assertServiceCallCounts([
-        { service: mocks.mockRootService, count: 1 },
-        { service: mocks.mockRelationService, count: 1 },
+        { service: mocks.mockRootService, count: 2 }, // 1 total count + 1 data retrieval
+        { service: mocks.mockRelationService, count: 2 }, // 1 constraint discovery + 1 enrichment
       ]);
-      assertRelationFirst(mocks.mockRootService, [mocks.mockRelationService]);
+      assertRootFirst(mocks.mockRootService, [mocks.mockRelationService]);
 
-      // Verify relation filter applied first
+      // Verify relation filter applied first (constraint discovery with proper pagination offset for page 2)
       assertRelationRequest(mocks.mockRelationService, {
-        search: { priority: { $gte: 5 } },
-      });
-
-      // Verify root filter + discovered root IDs constraint
-      assertRootGetManyRequest(mocks.mockRootService, {
         search: {
-          $and: [{ name: { $cont: 'Task' } }, { id: { $in: [1, 2, 3, 5, 6] } }],
+          $and: [{ priority: { $gte: 5 } }, { isLatest: { $eq: true } }],
         },
-        page: 1,
-        limit: 5,
+        limit: 2,
+        offset: 2, // Page 2: (2-1) * 2 = 2
       });
 
-      const rootCall = mocks.mockRootService.getMany.mock.calls[0][0];
-      expect(rootCall.parsed.page).toBe(1);
+      // Verify root total count call (first call - index 0) - only has original root filters
+      assertRootGetManyRequest(
+        mocks.mockRootService,
+        {
+          search: { name: { $cont: 'Task' } },
+          page: 1,
+          limit: 1,
+        },
+        0,
+      );
+
+      // Verify root filter + discovered root IDs constraint (data retrieval call - index 1)
+      assertRootGetManyRequest(
+        mocks.mockRootService,
+        {
+          search: {
+            $and: [
+              { name: { $cont: 'Task' } },
+              { id: { $in: [1, 2, 3, 5, 6] } },
+            ],
+          },
+          page: 1,
+          limit: 2,
+        },
+        1,
+      );
 
       // ASSERT - Result verification
       assertResultStructure(result, { count: 2, total: 5 });
@@ -191,6 +289,7 @@ describe('CrudFederationService - Behavior: Combined Root+Relation Filters', () 
       const relation = createOneToManyForwardRelation(
         'relations',
         TestRelationService,
+        { distinctFilter: { field: 'isLatest', operator: '$eq', value: true } },
       );
       const req = mocks.createTestRequest(
         {
@@ -249,30 +348,53 @@ describe('CrudFederationService - Behavior: Combined Root+Relation Filters', () 
 
       // ASSERT
       assertServiceCallCounts([
-        { service: mocks.mockRootService, count: 1 },
-        { service: mocks.mockRelationService, count: 1 },
+        { service: mocks.mockRootService, count: 2 }, // 1 total count + 1 data retrieval
+        { service: mocks.mockRelationService, count: 2 }, // 1 constraint discovery + 1 enrichment
       ]);
-      assertRelationFirst(mocks.mockRootService, [mocks.mockRelationService]);
+      assertRootFirst(mocks.mockRootService, [mocks.mockRelationService]);
 
-      // Verify relation filters applied first (AND condition)
+      // Verify relation filters applied first (AND condition, constraint discovery with limit)
       assertRelationRequest(mocks.mockRelationService, {
         search: {
-          $and: [{ status: { $eq: 'active' } }, { priority: { $gte: 7 } }],
-        },
-      });
-
-      // Verify multiple root filters + discovered root IDs constraint
-      assertRootGetManyRequest(mocks.mockRootService, {
-        search: {
           $and: [
-            { name: { $cont: 'Project' } },
-            { companyId: { $eq: 1 } },
-            { id: { $in: [1, 3, 4] } },
+            { status: { $eq: 'active' } },
+            { priority: { $gte: 7 } },
+            { isLatest: { $eq: true } },
           ],
         },
-        page: 1,
-        limit: 3,
+        limit: 5,
+        offset: 0,
       });
+
+      // Verify root total count call (first call - index 0) - only has original root filters
+      assertRootGetManyRequest(
+        mocks.mockRootService,
+        {
+          search: {
+            $and: [{ name: { $cont: 'Project' } }, { companyId: { $eq: 1 } }],
+          },
+          page: 1,
+          limit: 1,
+        },
+        0,
+      );
+
+      // Verify multiple root filters + discovered root IDs constraint (data retrieval call - index 1)
+      assertRootGetManyRequest(
+        mocks.mockRootService,
+        {
+          search: {
+            $and: [
+              { name: { $cont: 'Project' } },
+              { companyId: { $eq: 1 } },
+              { id: { $in: [1, 3, 4] } },
+            ],
+          },
+          page: 1,
+          limit: 5, // Should match user-requested limit
+        },
+        1,
+      );
 
       // ASSERT - Result verification
       assertResultStructure(result, { count: 3, total: 3 });
@@ -315,6 +437,7 @@ describe('CrudFederationService - Behavior: Combined Root+Relation Filters', () 
       const relation = createOneToManyForwardRelation(
         'relations',
         TestRelationService,
+        { distinctFilter: { field: 'isLatest', operator: '$eq', value: true } },
       );
       const req = mocks.createTestRequest(
         {
@@ -350,24 +473,43 @@ describe('CrudFederationService - Behavior: Combined Root+Relation Filters', () 
 
       // ASSERT
       assertServiceCallCounts([
-        { service: mocks.mockRootService, count: 1 },
-        { service: mocks.mockRelationService, count: 1 },
+        { service: mocks.mockRootService, count: 2 }, // 1 total count + 1 data retrieval
+        { service: mocks.mockRelationService, count: 2 }, // 1 constraint discovery + 1 enrichment
       ]);
-      assertRelationFirst(mocks.mockRootService, [mocks.mockRelationService]);
+      assertRootFirst(mocks.mockRootService, [mocks.mockRelationService]);
 
-      // Verify relation filter applied first
+      // Verify relation filter applied first (constraint discovery with limit)
       assertRelationRequest(mocks.mockRelationService, {
-        search: { status: { $eq: 'critical' } },
+        search: {
+          $and: [{ status: { $eq: 'critical' } }, { isLatest: { $eq: true } }],
+        },
+        limit: 10,
+        offset: 0,
       });
 
-      // Verify root filter + discovered root IDs constraint
-      assertRootGetManyRequest(mocks.mockRootService, {
-        search: {
-          $and: [{ name: { $cont: 'Enterprise' } }, { id: { $in: [2, 5] } }],
+      // Verify root total count call (first call - index 0) - only has original root filters
+      assertRootGetManyRequest(
+        mocks.mockRootService,
+        {
+          search: { name: { $cont: 'Enterprise' } },
+          page: 1,
+          limit: 1,
         },
-        page: 1,
-        limit: 2,
-      });
+        0,
+      );
+
+      // Verify root filter + discovered root IDs constraint (data retrieval call - index 1)
+      assertRootGetManyRequest(
+        mocks.mockRootService,
+        {
+          search: {
+            $and: [{ name: { $cont: 'Enterprise' } }, { id: { $in: [2, 5] } }],
+          },
+          page: 1,
+          limit: 10, // Should match user-requested limit
+        },
+        1,
+      );
 
       // ASSERT - Result verification (fewer results than requested page size)
       assertResultStructure(result, { count: 2, total: 2 });

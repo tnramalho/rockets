@@ -17,7 +17,7 @@ import {
   createRelationSortEmptySet,
 } from '../../__FIXTURES__/crud-federation-test-data';
 import {
-  createOneToManyWithDistinctFilter,
+  createOneToManyForwardRelation,
   TestRelationService,
 } from '../../__FIXTURES__/crud-federation-test-entities';
 import {
@@ -47,14 +47,13 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
   describe('Forward relationship relation sort', () => {
     it('should sort roots by relation field with distinctFilter and $notnull filter', async () => {
       // ARRANGE
-      const relation = createOneToManyWithDistinctFilter(
+      const relation = createOneToManyForwardRelation(
         'relations',
         TestRelationService,
-        { field: 'isLatest', operator: '$eq', value: true }, // distinctFilter for uniqueness
+        { distinctFilter: { field: 'isLatest', operator: '$eq', value: true } }, // distinctFilter for uniqueness
       );
       const req = mocks.createTestRequest(
         {
-          filter: ['relations.rootId||$notnull'], // Required for relation sort!
           sort: ['relations.title,ASC'],
           page: '1',
           limit: '10',
@@ -64,8 +63,7 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
 
       const data = createRelationSortByTitleSet();
 
-      // First call: distinctFilter applied for sorting (3 unique relations)
-      // Second call: all relations for enrichment (4 total relations)
+      // Sequential approach: constraint call + enrichment call
       mocks.mockRelationService.getMany
         .mockResolvedValueOnce(
           createPaginatedResponse(data.relationsByTitle.slice(0, 3), {
@@ -73,7 +71,9 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
           }),
         )
         .mockResolvedValueOnce(
-          createPaginatedResponse(data.relationsByTitle, { total: 4 }),
+          createPaginatedResponse(data.relationsByTitle, {
+            total: 4,
+          }),
         );
       mocks.mockRootService.getMany.mockResolvedValue(
         createPaginatedResponse(data.rootsInNaturalOrder, {
@@ -88,34 +88,50 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
       // ASSERT - Service call verification
       assertServiceCallCounts([
         { service: mocks.mockRootService, count: 1 },
-        { service: mocks.mockRelationService, count: 2 }, // One for sorting, one for enrichment
+        { service: mocks.mockRelationService, count: 2 }, // constraint + enrichment
       ]);
 
       // Verify first call: relation service called with user pagination and distinctFilter applied
       assertRelationRequest(
         mocks.mockRelationService,
         {
-          page: 1,
           limit: 10,
+          offset: 0,
+          page: undefined,
           sort: [{ field: 'title', order: 'ASC' }],
-          search: { rootId: { [CondOperator.NOT_NULL]: true } },
+          search: {
+            $and: [
+              { rootId: { [CondOperator.NOT_NULL]: true } },
+              { isLatest: { $eq: true } },
+            ],
+          },
         },
         0,
       );
 
       // Verify distinctFilter was applied to first call
-      const relationCall = mocks.mockRelationService.getMany.mock.calls[0][0];
-      expect(relationCall.parsed.filter).toEqual(
-        expect.arrayContaining([
-          { field: 'isLatest', operator: '$eq', value: true },
+      assertRelationRequest(mocks.mockRelationService, {
+        filter: [
+          {
+            field: 'isLatest',
+            operator: '$eq',
+            value: true,
+            relation: 'relations',
+          },
           {
             field: 'rootId',
             operator: '$notnull',
             relation: 'relations',
             value: '',
           },
-        ]),
-      );
+        ],
+        limit: 10,
+        offset: 0,
+        search: {
+          $and: [{ rootId: { $notnull: true } }, { isLatest: { $eq: true } }],
+        },
+        sort: [{ field: 'title', order: 'ASC' }],
+      });
 
       // Verify second call: enrichment call for discovered root IDs
       assertRelationRequest(
@@ -124,6 +140,7 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
           search: {
             $and: [
               { rootId: { $notnull: true } },
+              { isLatest: { $eq: true } },
               { rootId: { $in: [2, 1, 3] } },
             ],
           },
@@ -135,7 +152,7 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
       assertRootGetManyRequest(mocks.mockRootService, {
         search: { id: { $in: [2, 1, 3] } }, // Root IDs discovered from sorted relations
         page: 1,
-        limit: 3,
+        limit: 10,
         sort: [], // No root sorts (relation sort takes precedence)
       });
 
@@ -158,14 +175,14 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
 
     it('should handle relation sort with additional AND filters', async () => {
       // ARRANGE
-      const relation = createOneToManyWithDistinctFilter(
+      const relation = createOneToManyForwardRelation(
         'relations',
         TestRelationService,
-        { field: 'isLatest', operator: '$eq', value: true }, // distinctFilter for uniqueness
+        { distinctFilter: { field: 'isLatest', operator: '$eq', value: true } }, // distinctFilter for uniqueness
       );
       const req = mocks.createTestRequest(
         {
-          filter: ['relations.rootId||$notnull', 'relations.priority||$gte||5'],
+          filter: ['relations.priority||$gte||5'],
           sort: ['relations.priority,DESC'],
           page: '1',
           limit: '10',
@@ -207,7 +224,7 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
       // ASSERT - Service call verification
       assertServiceCallCounts([
         { service: mocks.mockRootService, count: 1 },
-        { service: mocks.mockRelationService, count: 2 }, // One for sorting, one for enrichment
+        { service: mocks.mockRelationService, count: 2 }, // constraint + enrichment
       ]);
 
       // Verify relation called first (relation-sort pattern)
@@ -217,10 +234,15 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
       assertRelationRequest(
         mocks.mockRelationService,
         {
-          page: 1,
           limit: 10,
+          offset: 0,
+          page: undefined,
           search: {
-            $and: [{ rootId: { $notnull: true } }, { priority: { $gte: 5 } }],
+            $and: [
+              { priority: { $gte: 5 } },
+              { rootId: { $notnull: true } },
+              { isLatest: { $eq: true } },
+            ],
           },
           sort: [{ field: 'priority', order: 'DESC' }],
         },
@@ -233,8 +255,9 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
         {
           search: {
             $and: [
-              { rootId: { $notnull: true } },
               { priority: { $gte: 5 } },
+              { rootId: { $notnull: true } },
+              { isLatest: { $eq: true } },
               { rootId: { $in: [1, 2, 3] } },
             ],
           },
@@ -246,7 +269,7 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
       assertRootGetManyRequest(mocks.mockRootService, {
         search: { id: { $in: [1, 2, 3] } },
         page: 1,
-        limit: 3,
+        limit: 10,
         sort: [],
       });
 
@@ -257,14 +280,13 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
 
     it('should deduplicate roots when multiple relations match', async () => {
       // ARRANGE
-      const relation = createOneToManyWithDistinctFilter(
+      const relation = createOneToManyForwardRelation(
         'relations',
         TestRelationService,
-        { field: 'isLatest', operator: '$eq', value: true }, // distinctFilter for uniqueness
+        { distinctFilter: { field: 'isLatest', operator: '$eq', value: true } }, // distinctFilter for uniqueness
       );
       const req = mocks.createTestRequest(
         {
-          filter: ['relations.rootId||$notnull'],
           sort: ['relations.priority,DESC'],
           page: '1',
           limit: '10',
@@ -303,7 +325,7 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
       // ASSERT - Service call verification
       assertServiceCallCounts([
         { service: mocks.mockRootService, count: 1 },
-        { service: mocks.mockRelationService, count: 2 }, // One for sorting, one for enrichment
+        { service: mocks.mockRelationService, count: 2 }, // constraint + enrichment
       ]);
 
       // Verify relation called first (relation-sort pattern)
@@ -313,9 +335,12 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
       assertRelationRequest(
         mocks.mockRelationService,
         {
-          page: 1,
           limit: 10,
-          search: { rootId: { $notnull: true } },
+          offset: 0,
+          page: undefined,
+          search: {
+            $and: [{ rootId: { $notnull: true } }, { isLatest: { $eq: true } }],
+          },
           sort: [{ field: 'priority', order: 'DESC' }],
         },
         0,
@@ -328,6 +353,7 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
           search: {
             $and: [
               { rootId: { $notnull: true } },
+              { isLatest: { $eq: true } },
               { rootId: { $in: [1, 2, 3] } },
             ],
           },
@@ -339,7 +365,7 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
       assertRootGetManyRequest(mocks.mockRootService, {
         search: { id: { $in: [1, 2, 3] } }, // Deduplicated root IDs
         page: 1,
-        limit: 3,
+        limit: 10,
         sort: [],
       });
 
@@ -350,17 +376,14 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
 
     it('should return empty result when no relations match with sort', async () => {
       // ARRANGE
-      const relation = createOneToManyWithDistinctFilter(
+      const relation = createOneToManyForwardRelation(
         'relations',
         TestRelationService,
-        { field: 'isLatest', operator: '$eq', value: true }, // distinctFilter for uniqueness
+        { distinctFilter: { field: 'isLatest', operator: '$eq', value: true } }, // distinctFilter for uniqueness
       );
       const req = mocks.createTestRequest(
         {
-          filter: [
-            'relations.rootId||$notnull',
-            'relations.status||$eq||archived',
-          ],
+          filter: ['relations.status||$eq||archived'],
           sort: ['relations.title,ASC'],
         },
         [relation],
@@ -385,12 +408,14 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
       assertRelationRequest(
         mocks.mockRelationService,
         {
-          page: 1,
           limit: 10,
+          offset: 0,
+          page: undefined,
           search: {
             $and: [
-              { rootId: { $notnull: true } },
               { status: { $eq: 'archived' } },
+              { rootId: { $notnull: true } },
+              { isLatest: { $eq: true } }, // distinctFilter
             ],
           },
           sort: [{ field: 'title', order: 'ASC' }],
@@ -403,14 +428,13 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
 
     it('should apply relation sort with pagination correctly', async () => {
       // ARRANGE
-      const relation = createOneToManyWithDistinctFilter(
+      const relation = createOneToManyForwardRelation(
         'relations',
         TestRelationService,
-        { field: 'isLatest', operator: '$eq', value: true }, // distinctFilter for uniqueness
+        { distinctFilter: { field: 'isLatest', operator: '$eq', value: true } }, // distinctFilter for uniqueness
       );
       const req = mocks.createTestRequest(
         {
-          filter: ['relations.rootId||$notnull'],
           sort: ['relations.title,ASC'],
           page: '1',
           limit: '5', // First page, 5 roots
@@ -440,7 +464,7 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
       // ASSERT - Service call verification
       assertServiceCallCounts([
         { service: mocks.mockRootService, count: 1 },
-        { service: mocks.mockRelationService, count: 2 }, // One for sorting, one for enrichment
+        { service: mocks.mockRelationService, count: 2 }, // constraint + enrichment
       ]);
 
       // Verify relation called first (relation-sort pattern)
@@ -450,9 +474,12 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
       assertRelationRequest(
         mocks.mockRelationService,
         {
-          page: 1,
           limit: 5,
-          search: { rootId: { $notnull: true } },
+          offset: 0,
+          page: undefined,
+          search: {
+            $and: [{ rootId: { $notnull: true } }, { isLatest: { $eq: true } }],
+          },
           sort: [{ field: 'title', order: 'ASC' }],
         },
         0,
@@ -465,6 +492,7 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
           search: {
             $and: [
               { rootId: { $notnull: true } },
+              { isLatest: { $eq: true } }, // distinctFilter
               { rootId: { $in: [5, 2, 8, 1, 9] } }, // Only first page root IDs
             ],
           },
@@ -492,14 +520,13 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
 
     it('should apply relation sort with pagination correctly for page 2', async () => {
       // ARRANGE
-      const relation = createOneToManyWithDistinctFilter(
+      const relation = createOneToManyForwardRelation(
         'relations',
         TestRelationService,
-        { field: 'isLatest', operator: '$eq', value: true }, // distinctFilter for uniqueness
+        { distinctFilter: { field: 'isLatest', operator: '$eq', value: true } }, // distinctFilter for uniqueness
       );
       const req = mocks.createTestRequest(
         {
-          filter: ['relations.rootId||$notnull'],
           sort: ['relations.title,ASC'],
           page: '2',
           limit: '5', // Second page, 5 roots
@@ -532,7 +559,7 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
       // ASSERT - Service call verification
       assertServiceCallCounts([
         { service: mocks.mockRootService, count: 1 },
-        { service: mocks.mockRelationService, count: 2 }, // One for sorting, one for enrichment
+        { service: mocks.mockRelationService, count: 2 }, // constraint + enrichment
       ]);
 
       // Verify relation called first (relation-sort pattern)
@@ -542,9 +569,12 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
       assertRelationRequest(
         mocks.mockRelationService,
         {
-          page: 2,
           limit: 5,
-          search: { rootId: { $notnull: true } },
+          offset: 5,
+          page: undefined,
+          search: {
+            $and: [{ rootId: { $notnull: true } }, { isLatest: { $eq: true } }],
+          },
           sort: [{ field: 'title', order: 'ASC' }],
         },
         0,
@@ -557,6 +587,7 @@ describe('CrudFederationService - Behavior: Relation Sort Strategy', () => {
           search: {
             $and: [
               { rootId: { $notnull: true } },
+              { isLatest: { $eq: true } }, // distinctFilter
               { rootId: { $in: [4, 7, 3, 6, 10] } }, // Only second page root IDs
             ],
           },

@@ -19,9 +19,9 @@ export const createMinimalRootRelationSet = () => ({
   ] as TestRoot[],
 
   relations: [
-    { id: 1, rootId: 1, title: 'Relation 1' },
-    { id: 2, rootId: 2, title: 'Relation 2' },
-    { id: 3, rootId: 2, title: 'Relation 3' },
+    { id: 1, rootId: 1, title: 'Relation 1', isLatest: true },
+    { id: 2, rootId: 2, title: 'Relation 2', isLatest: true },
+    { id: 3, rootId: 2, title: 'Relation 3', isLatest: false },
     // Root 3 has no relations - useful for LEFT JOIN tests
   ] as TestRelation[],
 });

@@ -7,8 +7,8 @@ import {
   CRUD_FEDERATION_DEFAULT_PAGE,
   CRUD_RELATION_CARDINALITY_ONE,
   CRUD_RELATION_CARDINALITY_MANY,
-  CRUD_FEDERATION_INITIAL_TOTAL,
-  CRUD_FEDERATION_INITIAL_FETCH_COUNT,
+  CRUD_FEDERATION_MAX_ITERATIONS,
+  CRUD_FEDERATION_MAX_BUFFER_SIZE,
 } from '../crud.constants';
 import { CrudFederationException } from '../exceptions/crud-federation.exception';
 import {
@@ -20,19 +20,671 @@ import {
 } from '../request/types/crud-request-query.types';
 
 import { CrudRelationRegistry } from './crud-relation.registry';
-import { CrudQueryHelper } from './helpers/crud-query.helper';
 import { CrudSearchHelper } from './helpers/crud-search.helper';
 import { CrudFederationFetchOptionsInterface } from './interfaces/crud-federation-fetch-options.interface';
 import { CrudFetchServiceInterface } from './interfaces/crud-fetch-service.interface';
 import { CrudRelationBindingInterface } from './interfaces/crud-relation-binding.interface';
 
+/**
+ * Utility function to find the relation binding that matches a QueryRelation
+ */
+function findRelationBinding<
+  T extends PlainLiteralObject,
+  Relations extends PlainLiteralObject[],
+>(
+  relation: QueryRelation<T, PlainLiteralObject> | null,
+  bindings: CrudRelationBindingInterface<T, Relations[number]>[],
+): CrudRelationBindingInterface<T, Relations[number]> | null {
+  if (!relation) return null;
+  return (
+    bindings.find((b) => b.relation.property === relation.property) || null
+  );
+}
+
+/**
+ * Utility function to validate that many-cardinality relations require distinctFilter
+ */
+function validateManyCardinalityDistinctFilter<T extends PlainLiteralObject>(
+  relation: QueryRelation<T, PlainLiteralObject>,
+  errorContext: string,
+): void {
+  // One-to-one relationships are always supported
+  if (relation.cardinality === CRUD_RELATION_CARDINALITY_ONE) {
+    return;
+  }
+
+  // Many relationships require distinctFilter
+  if (!relation.distinctFilter) {
+    throw new CrudFederationException({
+      message:
+        `${errorContext} on many-cardinality relationship '%s' requires a distinctFilter configuration. ` +
+        "Add distinctFilter: { fieldName: { [CondOperator.EQUALS]: 'value' } } to the relation configuration. " +
+        'This is required because many-cardinality relationships can have multiple related entities per root, ' +
+        'which would result in ambiguous sort ordering and inaccurate pagination totals. ' +
+        'The distinctFilter ensures exactly one relation entity per root, making operations deterministic.',
+      messageParams: [relation.property],
+    });
+  }
+}
+
+/**
+ * Cache entry for filters organized by relation property
+ */
+type RelationFilterCache<T extends PlainLiteralObject> = {
+  relationAndFilters: QueryFilter<T>[];
+  relationOrFilters: QueryFilter<T>[];
+};
+
+/**
+ * Instance-based filter analyzer with caching to avoid repeated processing
+ */
+class FilterAnalyzer<T extends PlainLiteralObject> {
+  private readonly rootAndFilters: QueryFilter<T>[];
+  private readonly rootOrFilters: QueryFilter<T>[];
+  private readonly filtersByRelation: Map<string, RelationFilterCache<T>>;
+  private readonly relations: QueryRelation<T, PlainLiteralObject>[];
+
+  constructor(req: CrudRequestInterface<T>) {
+    // Single-pass processing - build cache and separate root filters
+    this.rootAndFilters = [];
+    this.rootOrFilters = [];
+    this.filtersByRelation = new Map();
+
+    // Store relations for later use
+    this.relations = req.options?.query?.relations?.relations || [];
+
+    const andFilters = req.parsed.filter || [];
+    const orFilters = req.parsed.or || [];
+    this.processFilters(andFilters, orFilters);
+
+    // Process additional filters if relations exist
+    if (this.relations.length > 0) {
+      this.injectInnerJoinFilters(req, this.relations);
+      this.processDistinctFilters(this.relations);
+    }
+  }
+
+  /**
+   * Get root AND filters only
+   */
+  getRootAndFilters(): QueryFilter<T>[] {
+    return this.rootAndFilters;
+  }
+
+  /**
+   * Get root OR filters only
+   */
+  getRootOrFilters(): QueryFilter<T>[] {
+    return this.rootOrFilters;
+  }
+
+  /**
+   * Check if there are any root filters (AND or OR)
+   */
+  hasRootFilters(): boolean {
+    return this.rootAndFilters.length > 0 || this.rootOrFilters.length > 0;
+  }
+
+  /**
+   * Check if a specific relation has any filters
+   */
+  hasFiltersForRelation<R extends PlainLiteralObject>(
+    relation: QueryRelation<T, R>,
+  ): boolean {
+    const cached = this.filtersByRelation.get(relation.property);
+    return cached
+      ? cached.relationAndFilters.length > 0 ||
+          cached.relationOrFilters.length > 0
+      : false;
+  }
+
+  /**
+   * Get AND filters for a specific relation
+   */
+  private getRelationAndFilters<R extends PlainLiteralObject>(
+    relation: QueryRelation<T, R>,
+  ): QueryFilter<T>[] {
+    const cached = this.filtersByRelation.get(relation.property);
+    return cached ? cached.relationAndFilters : [];
+  }
+
+  /**
+   * Get OR filters for a specific relation
+   */
+  private getRelationOrFilters<R extends PlainLiteralObject>(
+    relation: QueryRelation<T, R>,
+  ): QueryFilter<T>[] {
+    const cached = this.filtersByRelation.get(relation.property);
+    return cached ? cached.relationOrFilters : [];
+  }
+
+  /**
+   * Apply filters for a specific relation directly to a relation request
+   */
+  applyRelationFilters<R extends PlainLiteralObject>(
+    relationReq: CrudRequestInterface<R>,
+    relation: QueryRelation<T, R>,
+  ): void {
+    // Apply AND filters
+    const relationAndFilters = this.getRelationAndFilters(relation);
+    for (const filter of relationAndFilters) {
+      const relationFilter: QueryFilter<R> = { ...filter };
+      relationReq.parsed.filter.push(relationFilter);
+    }
+
+    // Apply OR filters
+    const relationOrFilters = this.getRelationOrFilters(relation);
+    for (const filter of relationOrFilters) {
+      const relationFilter: QueryFilter<R> = { ...filter };
+      relationReq.parsed.or.push(relationFilter);
+    }
+  }
+
+  /**
+   * Add constraint filter directly to a request (for ephemeral ID constraints)
+   */
+  static addConstraintFilter<Entity extends PlainLiteralObject>(
+    req: CrudRequestInterface<Entity>,
+    field: string,
+    values: unknown[],
+    relation?: string,
+  ): void {
+    if (values.length === 0) {
+      return; // No constraints to add
+    }
+
+    if (values.length === 1) {
+      // single value: use CondOperator.EQUALS operator
+      req.parsed.filter.push({
+        field,
+        operator: CondOperator.EQUALS,
+        value: values[0],
+        relation,
+      });
+    } else {
+      // multiple values: use CondOperator.IN operator
+      req.parsed.filter.push({
+        field,
+        operator: CondOperator.IN,
+        value: values,
+        relation,
+      });
+    }
+  }
+
+  /**
+   * Check if any filters exist for the given relations
+   */
+  hasRelationFilters(
+    relations: CrudRelationBindingInterface<T, PlainLiteralObject>[],
+  ): boolean {
+    if (this.filtersByRelation.size === 0) {
+      return false;
+    }
+
+    // Check each relation directly
+    for (const relationBinding of relations) {
+      if (this.hasFiltersForRelation(relationBinding.relation)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Single-pass filter processing - simpler approach without duplication
+   */
+  private processFilters(
+    andFilters: QueryFilter<T>[],
+    orFilters: QueryFilter<T>[],
+  ): void {
+    this.processFilterArray(andFilters, true);
+    this.processFilterArray(orFilters, false);
+  }
+
+  /**
+   * Process a single filter array
+   */
+  private processFilterArray(
+    filters: QueryFilter<T>[],
+    isAndFilter: boolean,
+  ): void {
+    for (const filter of filters) {
+      if (filter.relation) {
+        this.addRelationFilter(filter, isAndFilter);
+      } else {
+        (isAndFilter ? this.rootAndFilters : this.rootOrFilters).push(filter);
+      }
+    }
+  }
+
+  /**
+   * Helper to add a relation filter to the cache
+   */
+  private addRelationFilter(
+    filter: QueryFilter<T>,
+    isAndFilter: boolean,
+  ): void {
+    let cached = this.filtersByRelation.get(filter.relation!);
+
+    if (!cached) {
+      cached = {
+        relationAndFilters: [],
+        relationOrFilters: [],
+      };
+      this.filtersByRelation.set(filter.relation!, cached);
+    }
+
+    if (isAndFilter) {
+      cached.relationAndFilters.push(filter);
+    } else {
+      cached.relationOrFilters.push(filter);
+    }
+  }
+
+  /**
+   * Inject CondOperator.NOT_NULL filters for relations requiring INNER JOIN semantics
+   */
+  private injectInnerJoinFilters(
+    req: CrudRequestInterface<T>,
+    relations: QueryRelation<T, PlainLiteralObject>[],
+  ): void {
+    const relationsSortedOn = new Set<string>();
+    const allSorts = req.parsed.sort || [];
+
+    for (const sortConfig of allSorts) {
+      const drivingRelation = this.findRelationForSortField(sortConfig);
+      if (drivingRelation) {
+        relationsSortedOn.add(drivingRelation.property);
+      }
+    }
+
+    const innerJoinRelations = relations.filter(
+      (relation) =>
+        relation.join === 'INNER' || relationsSortedOn.has(relation.property),
+    );
+
+    for (const relation of innerJoinRelations) {
+      const foreignKeyField = relation.foreignKey;
+
+      // Check if NOT_NULL filter already exists in root filters or relation filters
+      const existingInRoot = this.rootAndFilters.find(
+        (filter) =>
+          filter.field === foreignKeyField &&
+          filter.operator === CondOperator.NOT_NULL,
+      );
+
+      // Check if it exists in relation filters for this relation
+      const relationCache = this.filtersByRelation.get(relation.property);
+      const existingInRelation = relationCache?.relationAndFilters.find(
+        (filter) =>
+          filter.field === foreignKeyField &&
+          filter.operator === CondOperator.NOT_NULL,
+      );
+
+      if (!existingInRoot && !existingInRelation) {
+        // Push directly onto our internal arrays
+        const innerJoinFilter: QueryFilter<T> = {
+          field: foreignKeyField,
+          operator: CondOperator.NOT_NULL,
+          relation: relation.owner ? undefined : relation.property,
+        };
+
+        if (innerJoinFilter.relation) {
+          // It's a relation filter
+          this.addRelationFilter(innerJoinFilter, true);
+        } else {
+          // It's a root filter
+          this.rootAndFilters.push(innerJoinFilter);
+        }
+      }
+    }
+  }
+
+  findRelationForSortField(
+    sortConfig: QuerySort<T>,
+  ): QueryRelation<T, PlainLiteralObject> | null {
+    if (sortConfig.relation) {
+      return (
+        this.relations.find(
+          (relation) => relation.property === sortConfig.relation,
+        ) || null
+      );
+    }
+    return null;
+  }
+
+  /**
+   * Process distinct filters from relations that have them defined
+   */
+  private processDistinctFilters(
+    relations: QueryRelation<T, PlainLiteralObject>[],
+  ): void {
+    for (const relation of relations) {
+      if (relation.distinctFilter) {
+        // Add the distinct filter for this relation
+        const distinctFilter: QueryFilter<T> = {
+          field: relation.distinctFilter.field,
+          operator: relation.distinctFilter.operator,
+          value: relation.distinctFilter.value,
+          relation: relation.property,
+        };
+
+        this.addRelationFilter(distinctFilter, true);
+      }
+    }
+  }
+}
+
+/**
+ * Analyzes and categorizes sort configurations for CRUD federation queries.
+ * Separates sorts into root vs relation sorts and validates relation sort requirements.
+ */
+class SortAnalyzer<
+  T extends PlainLiteralObject,
+  Relations extends PlainLiteralObject[] = PlainLiteralObject[],
+> {
+  private readonly relationSorts: SortConfiguration<T, Relations>[];
+  private readonly rootSorts: SortConfiguration<T, Relations>[];
+  private readonly drivingRelation?: CrudRelationBindingInterface<
+    T,
+    Relations[number]
+  >;
+
+  constructor(
+    req: CrudRequestInterface<T>,
+    filterAnalyzer: FilterAnalyzer<T>,
+    relations: CrudRelationBindingInterface<T, Relations[number]>[],
+    validatedRelations: Set<string>,
+  ) {
+    const allSorts = req.parsed.sort || [];
+    // Categorize sorts into relation vs root sorts
+    const sortCategories = this.categorizeSorts(
+      allSorts,
+      filterAnalyzer,
+      relations,
+      validatedRelations,
+    );
+    this.relationSorts = sortCategories.relationSorts;
+    this.rootSorts = sortCategories.rootSorts;
+
+    // Identify driving relation (first relation with sort)
+    this.drivingRelation = this.relationSorts[0]?.drivingRelation;
+  }
+
+  /**
+   * Get sorts for relation queries
+   */
+  getRelationSorts(): SortConfiguration<T, Relations>[] {
+    return this.relationSorts;
+  }
+
+  /**
+   * Get sorts for root queries
+   */
+  getRootSorts(): SortConfiguration<T, Relations>[] {
+    return this.rootSorts;
+  }
+
+  /**
+   * Get the driving relation for RELATION_FIRST strategy
+   */
+  getDrivingRelation():
+    | CrudRelationBindingInterface<T, Relations[number]>
+    | undefined {
+    return this.drivingRelation;
+  }
+
+  /**
+   * Check if there are any relation sorts
+   */
+  hasRelationSorts(): boolean {
+    return this.relationSorts.length > 0;
+  }
+
+  /**
+   * Apply root sorts to a request (filters out relation sorts)
+   */
+  applyRootSorts(req: CrudRequestInterface<T>): void {
+    req.parsed.sort = this.rootSorts.map((sort) => ({
+      field: sort.field,
+      order: sort.order,
+    }));
+  }
+
+  /**
+   * Categorize sorts into relation vs root sorts
+   */
+  private categorizeSorts(
+    allSorts: QuerySort<T>[],
+    filterAnalyzer: FilterAnalyzer<T>,
+    relations: CrudRelationBindingInterface<T, Relations[number]>[],
+    validatedRelations: Set<string>,
+  ): {
+    relationSorts: SortConfiguration<T, Relations>[];
+    rootSorts: SortConfiguration<T, Relations>[];
+  } {
+    const relationSorts: SortConfiguration<T, Relations>[] = [];
+    const rootSorts: SortConfiguration<T, Relations>[] = [];
+
+    for (const sortConfig of allSorts) {
+      const sortField = sortConfig.field;
+      const sortOrder = sortConfig.order;
+
+      // Check if sort belongs to a relation
+      const foundRelation = filterAnalyzer.findRelationForSortField(sortConfig);
+      const drivingRelation = findRelationBinding(foundRelation, relations);
+
+      if (drivingRelation) {
+        // Validate relation sort requirements (skip if already validated)
+        this.validateRelationSortRequirements(
+          sortField,
+          drivingRelation,
+          validatedRelations,
+        );
+
+        relationSorts.push({
+          field: sortField,
+          order: sortOrder,
+          isRelationSort: true,
+          drivingRelation,
+        });
+      } else {
+        rootSorts.push({
+          field: sortField,
+          order: sortOrder,
+          isRelationSort: false,
+        });
+      }
+    }
+
+    return { relationSorts, rootSorts };
+  }
+
+  /**
+   * Validate relation sort requirements
+   */
+  private validateRelationSortRequirements(
+    sortField: string,
+    drivingRelation: CrudRelationBindingInterface<T, Relations[number]>,
+    validatedRelations: Set<string>,
+  ): void {
+    const relation = drivingRelation.relation;
+    if (!validatedRelations.has(relation.property)) {
+      validateManyCardinalityDistinctFilter(
+        relation,
+        `Sorting by relation field '${sortField}'`,
+      );
+      validatedRelations.add(relation.property);
+    }
+  }
+}
+
+/**
+ * Determines and manages the execution strategy for CRUD federation queries.
+ * Analyzes filters, sorts, and relations to decide between ROOT_FIRST and RELATION_FIRST strategies.
+ */
+class ExecutionStrategy<
+  T extends PlainLiteralObject,
+  Relations extends PlainLiteralObject[] = PlainLiteralObject[],
+> {
+  private readonly type: JoinStrategyType;
+  public readonly sortAnalyzer: SortAnalyzer<T, Relations>;
+  public readonly filterAnalyzer: FilterAnalyzer<T>;
+  public readonly drivingRelation?: CrudRelationBindingInterface<
+    T,
+    Relations[number]
+  >;
+
+  constructor(
+    req: CrudRequestInterface<T>,
+    relations: CrudRelationBindingInterface<T, Relations[number]>[],
+  ) {
+    // Create filter analyzer with complete filter processing
+    this.filterAnalyzer = new FilterAnalyzer(req);
+
+    // Track validated relations to avoid redundant validation
+    const validatedRelations = new Set<string>();
+
+    // Validate relation filter requirements
+    this.validateRelationFilterRequirements(relations, validatedRelations);
+
+    // Create sort analyzer instance
+    this.sortAnalyzer = new SortAnalyzer(
+      req,
+      this.filterAnalyzer,
+      relations,
+      validatedRelations,
+    );
+
+    // Determine driving relation (considers both sorts and filters)
+    this.drivingRelation = this.determineDrivingRelation(relations);
+
+    // Determine strategy type using sort analyzer
+    const hasRelationFilters =
+      this.filterAnalyzer.hasRelationFilters(relations);
+    this.type =
+      this.sortAnalyzer.hasRelationSorts() || hasRelationFilters
+        ? JoinStrategyType.RELATION_FIRST
+        : JoinStrategyType.ROOT_FIRST;
+  }
+
+  /**
+   * Check if this is a RELATION_FIRST strategy
+   */
+  isRelationFirst(): boolean {
+    return this.type === JoinStrategyType.RELATION_FIRST;
+  }
+
+  /**
+   * Check if this is a ROOT_FIRST strategy
+   */
+  isRootFirst(): boolean {
+    return this.type === JoinStrategyType.ROOT_FIRST;
+  }
+
+  /**
+   * Determine the driving relation based on sorts and filters
+   * Priority: 1) First relation with sort, 2) First relation with filter
+   */
+  private determineDrivingRelation(
+    relations: CrudRelationBindingInterface<T, Relations[number]>[],
+  ): CrudRelationBindingInterface<T, Relations[number]> | undefined {
+    // Priority 1: First relation with a sort
+    const sortDrivingRelation = this.sortAnalyzer.getDrivingRelation();
+    if (sortDrivingRelation) {
+      return sortDrivingRelation;
+    }
+
+    // Priority 2: First relation with a filter
+    for (const relationBinding of relations) {
+      if (this.filterAnalyzer.hasFiltersForRelation(relationBinding.relation)) {
+        return relationBinding;
+      }
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Validate relation filter requirements
+   */
+  private validateRelationFilterRequirements(
+    relations: CrudRelationBindingInterface<T, Relations[number]>[],
+    validatedRelations: Set<string>,
+  ): void {
+    for (const relationBinding of relations) {
+      const relation = relationBinding.relation;
+      const hasFilters = this.filterAnalyzer.hasFiltersForRelation(relation);
+
+      if (hasFilters && !validatedRelations.has(relation.property)) {
+        validateManyCardinalityDistinctFilter(relation, 'Relation filters');
+        validatedRelations.add(relation.property);
+      }
+    }
+  }
+}
+
+/**
+ * Manages offset-based pagination for iterative constraint discovery
+ *
+ * The BufferStrategy addresses the "sparse data problem" in relation-first federation:
+ * When sorting by a relation field, the first page of sorted relations might only
+ * correspond to a few unique root entities. For example, if sorting posts by comment.title,
+ * the first 10 comments might all belong to just 2 posts, leaving the user with only
+ * 2 posts instead of the requested 10.
+ *
+ * Uses offset-based pagination to progressively fetch more relation data until enough
+ * unique root IDs are discovered to satisfy the user's requested limit.
+ */
+class BufferStrategy {
+  private currentOffset: number = 0;
+  private readonly batchSize: number;
+  private readonly maxOffset: number;
+
+  constructor(
+    userLimit: number,
+    options: {
+      batchSize?: number;
+      maxOffset?: number;
+    } = {},
+  ) {
+    const {
+      batchSize = userLimit,
+      maxOffset = CRUD_FEDERATION_MAX_BUFFER_SIZE,
+    } = options;
+
+    this.batchSize = batchSize;
+    // Ensure maxOffset doesn't exceed the constant limit
+    this.maxOffset = Math.min(maxOffset, CRUD_FEDERATION_MAX_BUFFER_SIZE);
+  }
+
+  /**
+   * Advance to next batch and return parameters (limit and offset)
+   */
+  advance(): { limit: number; offset: number } {
+    const limit = this.batchSize;
+    const offset = this.currentOffset;
+
+    // Advance offset for next iteration
+    this.currentOffset += limit;
+
+    return { limit, offset };
+  }
+
+  /**
+   * Check if we've reached the maximum offset limit
+   */
+  hasReachedLimit(): boolean {
+    return this.currentOffset >= this.maxOffset;
+  }
+}
+
 export class CrudFederationService<
   Root extends PlainLiteralObject,
   Relations extends PlainLiteralObject[],
 > {
-  private readonly relationQueryHelper = new CrudQueryHelper<
-    Relations[number]
-  >();
   private readonly rootSearchHelper = new CrudSearchHelper<Root>();
   private readonly relationSearchHelper = new CrudSearchHelper<
     Relations[number]
@@ -52,7 +704,7 @@ export class CrudFederationService<
   ): CrudRelationBindingInterface<Root, Relations[number]>[] {
     const relations = req.options?.query?.relations?.relations;
 
-    if (!relations || relations.length === CRUD_FEDERATION_INITIAL_TOTAL) {
+    if (!relations || relations.length === 0) {
       return [];
     }
 
@@ -71,6 +723,7 @@ export class CrudFederationService<
   /** Validate that search and or filters via query string are not supported */
   private validateUnsupportedQueryFeatures<T extends PlainLiteralObject>(
     req: CrudRequestInterface<T>,
+    executionStrategy: ExecutionStrategy<T, Relations>,
   ): void {
     // check if search conditions exist via query string
     if (req.parsed.search) {
@@ -82,7 +735,7 @@ export class CrudFederationService<
     }
 
     // check if OR conditions exist via query string
-    if (req.parsed.or && req.parsed.or.length > CRUD_FEDERATION_INITIAL_TOTAL) {
+    if (executionStrategy.filterAnalyzer.getRootOrFilters().length > 0) {
       throw new CrudFederationException({
         message:
           'OR filter via query string is not supported in CRUD federation. ' +
@@ -91,46 +744,54 @@ export class CrudFederationService<
     }
   }
 
-  /** Inject CondOperator.NOT_NULL filters for relations with join: 'INNER' to enforce INNER JOIN semantics */
-  private injectInnerJoinFilters<T extends PlainLiteralObject>(
-    req: CrudRequestInterface<T>,
+  /** Create standardized error for unsupported owner relationship operations */
+  private createOwnerRelationshipError(
+    operation: string,
+    relationProperty?: string,
+  ): CrudFederationException {
+    const relationContext = relationProperty
+      ? ` for relationship "${relationProperty}"`
+      : '';
+
+    return new CrudFederationException({
+      message:
+        `${operation} on owner relationships is not supported${relationContext}. ` +
+        'Owner relationships (where owner=true) store the foreign key on the root entity pointing to the relation, ' +
+        'which means constraint propagation cannot extract root IDs from the relation data. ' +
+        'Consider using enrichment-only access for owner relationships, or restructure the query to filter/sort on root fields instead.',
+      messageParams: relationProperty ? [relationProperty] : [],
+    });
+  }
+
+  /** Validate owner relationship configurations for supported scenarios */
+  private validateOwnerRelationships(
     relations: CrudRelationBindingInterface<Root, Relations[number]>[],
+    executionStrategy: ExecutionStrategy<Root, Relations>,
+    allSorts: QuerySort<Root>[],
   ): void {
-    // only process relations that require INNER JOIN
-    const innerJoinRelations = relations.filter(
-      (relationBinding) => relationBinding.relation.join === 'INNER',
-    );
+    for (const relationBinding of relations) {
+      const relation = relationBinding.relation;
 
-    if (innerJoinRelations.length === CRUD_FEDERATION_INITIAL_TOTAL) {
-      return; // No INNER JOIN relations
-    }
+      if (relation.owner) {
+        // Check for relation filters and sorts on owner relationships
+        const hasRelationFilters =
+          executionStrategy.filterAnalyzer.hasFiltersForRelation(relation);
+        const hasRelationSorts = allSorts.some(
+          (sort) => sort.relation === relation.property,
+        );
 
-    // ensure filter array exists
-    if (!req.parsed.filter) {
-      req.parsed.filter = [];
-    }
+        if (hasRelationFilters || hasRelationSorts) {
+          const constraintType = hasRelationFilters
+            ? hasRelationSorts
+              ? 'Filtering and sorting'
+              : 'Filtering'
+            : 'Sorting';
 
-    for (const relationBinding of innerJoinRelations) {
-      const { relation } = relationBinding;
-      const relationProperty = relation.property;
-
-      // determine the foreign key field based on relationship direction
-      const foreignKeyField = relation.foreignKey;
-
-      // check if CondOperator.NOT_NULL filter already exists for this field
-      const existingNotNullFilter = req.parsed.filter.find(
-        (filter) =>
-          filter.field === foreignKeyField &&
-          filter.operator === CondOperator.NOT_NULL,
-      );
-
-      if (!existingNotNullFilter) {
-        // inject CondOperator.NOT_NULL filter to enforce INNER JOIN semantics
-        req.parsed.filter.push({
-          field: foreignKeyField,
-          operator: CondOperator.NOT_NULL,
-          relation: relation.owner ? undefined : relationProperty,
-        });
+          throw this.createOwnerRelationshipError(
+            constraintType,
+            relation.property,
+          );
+        }
       }
     }
   }
@@ -139,9 +800,16 @@ export class CrudFederationService<
    * Main federation method - uses hybrid strategy based on sort and relation requirements
    *
    * Strategy Selection:
-   * - ROOT_SORT with no relations: Direct root fetch
-   * - ROOT_SORT with relations: LEFT JOIN (root-first) vs INNER JOIN (relation-first) based on filters
-   * - RELATION_SORT: Relation-first with sorted constraint propagation
+   * - ROOT_FIRST: Fetch roots first, then relations for those specific roots
+   *   - Efficient for most queries (LEFT JOIN semantics)
+   *   - Used when sorting by root fields or when no relation constraints exist
+   *   - Maintains predictable pagination on root entities
+   *
+   * - RELATION_FIRST: Fetch relations first, extract root IDs, then fetch roots
+   *   - Required for relation field sorting (to maintain sort order)
+   *   - Required for relation filtering (INNER JOIN semantics)
+   *   - Uses BufferStrategy to handle sparse data during iteration
+   *   - More complex but enables relation-driven queries
    *
    * @param req - CRUD request with parsed filters, sorts, and pagination
    * @param options - Optional fetch options including metrics collection
@@ -158,190 +826,128 @@ export class CrudFederationService<
     // extract relation configurations from relations
     const relations = this.getRelationBindings(req);
 
-    // automatically inject CondOperator.NOT_NULL filters for INNER join relations
-    this.injectInnerJoinFilters(req, relations);
+    // Create execution strategy (which creates filterAnalyzer internally)
+    const executionStrategy = new ExecutionStrategy(req, relations);
+
+    // validation: reject unsupported owner relationship scenarios
+    const allSorts = req.parsed.sort || [];
+    this.validateOwnerRelationships(relations, executionStrategy, allSorts);
 
     // validation: reject unsupported search and or filters via query string
-    this.validateUnsupportedQueryFeatures(req);
+    this.validateUnsupportedQueryFeatures(req, executionStrategy);
+
+    let totalFetched = 0;
+    let fetchCalls = 0;
+    let resultRoots: Root[] = [];
+    let allRelationResults: RelationResult<Root, Relations>[] = [];
+    let accurateTotal = 0;
 
     // Cache root key once for this request to avoid repeated validation
-    const rootKey =
-      relations.length > CRUD_FEDERATION_INITIAL_TOTAL
-        ? this.getRootKey(req)
-        : '';
+    const rootKey = relations.length > 0 ? this.getRootKey(req) : '';
 
-    let totalFetched = CRUD_FEDERATION_INITIAL_TOTAL;
-    let fetchCalls = CRUD_FEDERATION_INITIAL_FETCH_COUNT;
-    let resultRoots: Root[] = [];
-    let allRelationResults: Array<{
-      config: CrudRelationBindingInterface<Root, Relations[number]>;
-      data: Relations[number][];
-      total?: number;
-    }> = [];
-    let accurateTotal = CRUD_FEDERATION_INITIAL_TOTAL;
-
-    // Analyze sort requirements to determine optimal strategy
-    const sortAnalysis = this.analyzeSortRequirements(req, relations);
-
-    // Initialize rootReq
-    const rootReq = req;
-
-    switch (sortAnalysis.type) {
-      case SortStrategyType.RELATION_SORT:
-        // Use relation-sort strategy for proper ordering
-        const relationSortResult = await this.fetchWithRelationSort(
-          rootReq,
-          relations,
-          sortAnalysis,
-          rootKey,
-        );
-        resultRoots = relationSortResult.sortedRoots;
-        allRelationResults = relationSortResult.allRelationResults;
-        accurateTotal = relationSortResult.accurateTotal;
-        fetchCalls += relationSortResult.fetchCalls;
-        totalFetched += relationSortResult.totalFetched;
-        break;
-
-      case SortStrategyType.ROOT_SORT:
-      default:
-        // Handle no relations case
-        if (relations.length === CRUD_FEDERATION_INITIAL_TOTAL) {
-          const noRelationResult = await this.handleNoRelationsCase(rootReq);
-          resultRoots = noRelationResult.roots;
-          accurateTotal = noRelationResult.total;
-          fetchCalls += noRelationResult.fetchCalls;
-          totalFetched += noRelationResult.totalFetched;
-          allRelationResults = [];
-        } else {
-          // Determine JOIN behavior based on presence of relation filters
-          const applyInnerJoin = this.shouldApplyInnerJoin(rootReq, relations);
-
-          let shouldFetchRoots = true;
-          let rootIdConstraints: unknown[] = [];
-          allRelationResults = [];
-
-          if (applyInnerJoin) {
-            // INNER JOIN: Use relation-first strategy when relation filters exist
-            const relationDiscovery = await this.fetchAllRelationsForEnrichment(
-              {
-                req: rootReq,
-                relations,
-              },
-            );
-
-            fetchCalls += relationDiscovery.fetchCalls;
-            totalFetched += relationDiscovery.totalFetched;
-            // Extract root IDs from relation discovery, preserving order for INNER JOIN constraints
-            const allRootIds = relationDiscovery.allRelationResults.flatMap(
-              (relationResult) => relationResult.rootIds || [],
-            );
-            rootIdConstraints = this.deduplicatePreservingOrder(allRootIds);
-
-            if (rootIdConstraints.length === CRUD_FEDERATION_INITIAL_TOTAL) {
-              // No matching relations found - return empty result immediately
-              resultRoots = [];
-              accurateTotal = CRUD_FEDERATION_INITIAL_TOTAL;
-              shouldFetchRoots = false;
-            }
-
-            allRelationResults = relationDiscovery.allRelationResults.map(
-              (result) => ({
-                config: result.config,
-                data: result.data,
-                total: result.total,
-              }),
-            );
-          } else {
-            // LEFT JOIN: Use root-first strategy for optimal performance
-            const leftJoinResult = await this.handleLeftJoinCase(
-              rootReq,
-              relations,
-              rootKey,
-            );
-            resultRoots = leftJoinResult.roots;
-            accurateTotal = leftJoinResult.total;
-            fetchCalls += leftJoinResult.fetchCalls;
-            totalFetched += leftJoinResult.totalFetched;
-            allRelationResults.push(...leftJoinResult.relationResults);
-            shouldFetchRoots = false; // Already fetched
-          }
-
-          // Fetch roots if needed (both LEFT JOIN and INNER JOIN with matches)
-          if (shouldFetchRoots) {
-            if (
-              applyInnerJoin &&
-              rootIdConstraints.length > CRUD_FEDERATION_INITIAL_TOTAL
-            ) {
-              // Apply INNER JOIN constraints and get ordered results
-              const constrainedResult = await this.applyInnerJoinConstraints(
-                rootReq,
-                rootKey,
-                rootIdConstraints,
-              );
-              resultRoots = constrainedResult.roots;
-              accurateTotal = constrainedResult.total;
-              fetchCalls += constrainedResult.fetchCalls;
-              totalFetched += constrainedResult.totalFetched;
-            } else {
-              // LEFT JOIN: fetch all roots without constraints
-              this.rootSearchHelper.buildSearch(rootReq);
-
-              const rootResult = await this.rootService.getMany(rootReq);
-              resultRoots = rootResult.data;
-              accurateTotal = rootResult.total || rootResult.count;
-              fetchCalls += 1;
-              totalFetched += resultRoots.length;
-            }
-          }
-        }
-        break;
+    // Execute strategy based on analysis
+    if (executionStrategy.isRelationFirst()) {
+      // RELATION_FIRST: Sequential constraint-building for relation sorts or INNER JOIN
+      const sequentialResult = await this.fetchWithSequentialConstraints({
+        req,
+        relations,
+        rootKey,
+        executionStrategy,
+      });
+      resultRoots = sequentialResult.resultRoots;
+      allRelationResults = sequentialResult.allRelationResults;
+      accurateTotal = sequentialResult.accurateTotal;
+      fetchCalls += sequentialResult.fetchCalls;
+      totalFetched += sequentialResult.totalFetched;
+    } else {
+      // ROOT_FIRST: Handle all root-first scenarios
+      const rootFirstResult = await this.executeRootFirstStrategy({
+        req,
+        relations,
+        rootKey,
+        executionStrategy,
+      });
+      resultRoots = rootFirstResult.resultRoots;
+      allRelationResults = rootFirstResult.allRelationResults;
+      accurateTotal = rootFirstResult.accurateTotal;
+      fetchCalls += rootFirstResult.fetchCalls;
+      totalFetched += rootFirstResult.totalFetched;
     }
 
     // Always return roots even if accurateTotal === 0
     // Empty roots means the root service returned empty, not that relations are empty
 
     // Hydrate relationships using pre-fetched relation data
-    if (
-      resultRoots.length > CRUD_FEDERATION_INITIAL_TOTAL &&
-      allRelationResults.length > CRUD_FEDERATION_INITIAL_TOTAL
-    ) {
+    if (resultRoots.length > 0 && allRelationResults.length > 0) {
       const allRelationArrays = allRelationResults.map((result) => result.data);
 
       this.hydrateRelations(rootKey, resultRoots, relations, allRelationArrays);
-    } else if (resultRoots.length > CRUD_FEDERATION_INITIAL_TOTAL) {
+    } else if (resultRoots.length > 0) {
       // Initialize empty relations for roots when no relations exist
-      this.initializeEmptyRelations(resultRoots, relations);
+      this.initializeRelationProperties(resultRoots, relations);
     }
 
     // Return result with accurate pagination metadata and optional metrics
+    const metrics: FederationMetrics = {
+      totalFetched,
+      fetchCalls,
+      duration: Date.now() - startTime,
+    };
+
     return this.buildFinalResponse(
       resultRoots,
       accurateTotal,
-      rootReq,
+      req,
       includeMetrics,
-      {
-        totalFetched,
-        fetchCalls,
-        duration: Date.now() - startTime,
-      },
+      metrics,
     );
   }
 
   /** Helper: Deduplicate array while preserving order of first occurrences */
   private deduplicatePreservingOrder<T>(items: T[]): T[] {
-    if (items.length <= 1) return items;
+    return [...new Set(items.filter((item) => item != null))];
+  }
 
-    const seen = new Set<T>();
-    const result: T[] = [];
-
-    for (const item of items) {
-      if (item !== null && item !== undefined && !seen.has(item)) {
-        seen.add(item);
-        result.push(item);
+  /** Helper: Merge relation results, deduplicating and preserving order */
+  private mergeRelationResults(
+    allRelationResults: RelationResult<Root, Relations>[],
+    newResults: RelationResult<Root, Relations>[],
+  ): void {
+    for (const newResult of newResults) {
+      const existingIndex = allRelationResults.findIndex(
+        (existing) => existing.config === newResult.config,
+      );
+      if (existingIndex >= 0) {
+        // Merge data, deduplicating while preserving order
+        const combinedData = [
+          ...allRelationResults[existingIndex].data,
+          ...newResult.data,
+        ];
+        allRelationResults[existingIndex].data =
+          this.deduplicatePreservingOrder(combinedData);
+        allRelationResults[existingIndex].total = Math.max(
+          allRelationResults[existingIndex].total || 0,
+          newResult.total || 0,
+        );
+      } else {
+        // First time seeing this relation config
+        allRelationResults.push(newResult);
       }
     }
+  }
 
-    return result;
+  /** Helper: Clone request with parsed overrides */
+  private cloneRequest<T extends PlainLiteralObject>(
+    req: CrudRequestInterface<T>,
+    parsedOverrides: Partial<CrudRequestInterface<T>['parsed']>,
+  ): CrudRequestInterface<T> {
+    return {
+      ...req,
+      parsed: {
+        ...req.parsed,
+        ...parsedOverrides,
+      },
+    };
   }
 
   /** Helper: Re-order roots to match the specified ID order */
@@ -363,6 +969,9 @@ export class CrudFederationService<
     const validRoots: Root[] = mappedRoots.filter(
       (root): root is Root => root !== undefined,
     );
+
+    // Deduplicate in case orderedIds contains duplicate IDs
+    // (though this should be rare since constraint IDs are usually deduplicated)
     return this.deduplicatePreservingOrder(validRoots);
   }
 
@@ -371,17 +980,14 @@ export class CrudFederationService<
     // extract relation configurations from relations
     const relations = this.getRelationBindings(req);
 
-    // create root request
-    const rootReq = req;
-
     // build search conditions before calling service
-    this.rootSearchHelper.buildSearch(rootReq);
+    this.rootSearchHelper.buildSearch(req);
 
     // fetch the root entity first
-    const root = await this.rootService.getOne(rootReq);
+    const root = await this.rootService.getOne(req);
 
     // if no relations requested, return root as-is
-    if (relations.length === CRUD_FEDERATION_INITIAL_TOTAL) {
+    if (relations.length === 0) {
       return root;
     }
 
@@ -392,7 +998,7 @@ export class CrudFederationService<
     );
 
     // hydrate relations for the single root entity
-    const rootKey = this.getRootKey(rootReq);
+    const rootKey = this.getRootKey(req);
     this.hydrateRelations(rootKey, [root], relations, relationArrays);
 
     return root;
@@ -418,121 +1024,69 @@ export class CrudFederationService<
           return [];
         }
 
-        // use the helper method with a single constraint value
-        return this.fetchRelationsWithConstraints(relationBinding, [
-          constraintValue,
-        ]);
+        // Execute relation query with single constraint value
+        const constraintField = relation.owner
+          ? relation.primaryKey
+          : relation.foreignKey;
+
+        const result = await this.executeRelationQuery(relationBinding, {
+          constraintField,
+          constraintValues: [constraintValue],
+        });
+
+        return result.data;
       },
     );
 
     return Promise.all(relationPromises);
   }
 
-  private addConstraintFilter<Entity extends PlainLiteralObject>(
-    req: CrudRequestInterface<Entity>,
-    field: string,
-    values: unknown[],
-    relation?: string,
-  ): void {
-    if (values.length === CRUD_FEDERATION_INITIAL_TOTAL) {
-      return; // No constraints to add
-    }
-
-    if (values.length === CRUD_FEDERATION_DEFAULT_PAGE) {
-      // single value: use CondOperator.EQUALS operator
-      req.parsed.filter.push({
-        field,
-        operator: CondOperator.EQUALS,
-        value: values[0],
-        relation,
-      });
-    } else {
-      // multiple values: use CondOperator.IN operator
-      req.parsed.filter.push({
-        field,
-        operator: CondOperator.IN,
-        value: values,
-        relation,
-      });
-    }
-  }
-
   /**
-   * Fetch relations for a given relationship configuration and constraint values
-   *
-   * @param relationBinding - The relation configuration
-   * @param constraintValues - Values to constrain the query (root IDs for forward, foreign keys for inverse)
-   * @param relationFilters - Filters to apply to the relation query
-   * @param relationOrFilters - OR filters to apply to the relation query
-   * @returns Promise resolving to relation data array
+   * Execute a standardized relation query with filters, constraints and search building
    */
-  private async fetchRelationsWithConstraints(
+  private async executeRelationQuery(
     relationBinding: CrudRelationBindingInterface<Root, Relations[number]>,
-    constraintValues: unknown[] = [],
-    relationFilters: QueryFilter<Root>[] = [],
-    relationOrFilters: QueryFilter<Root>[] = [],
-  ): Promise<Relations[number][]> {
-    if (constraintValues.length === CRUD_FEDERATION_INITIAL_TOTAL) {
-      return [];
-    }
+    options: {
+      executionStrategy?: ExecutionStrategy<Root, Relations>;
+      constraintField?: string;
+      constraintValues?: unknown[];
+      limit?: number;
+      sorts?: SortConfiguration<Root, Relations>[];
+    } = {},
+  ): Promise<{ data: Relations[number][]; total?: number; count?: number }> {
+    const {
+      executionStrategy,
+      constraintField,
+      constraintValues = [],
+      limit,
+      sorts,
+    } = options;
 
-    const relation = relationBinding.relation;
-
-    // create relation request with filters
-    const relationReq = this.createFilteredRelationRequest({
-      filters: relationFilters,
-      orFilters: relationOrFilters,
-      relationProperty: relation.property,
+    // Create relation request with filters
+    const relationReq = this.createRelationRequest({
+      executionStrategy,
+      relationBinding,
+      limit,
+      sorts,
     });
 
-    // add constraint filter based on relationship direction
-    const fieldName = relation.owner
-      ? relation.primaryKey
-      : relation.foreignKey;
-    this.addConstraintFilter(
-      relationReq,
-      fieldName,
-      constraintValues,
-      relation.property,
-    );
+    // Add constraint filter if provided
+    if (constraintField && constraintValues.length > 0) {
+      FilterAnalyzer.addConstraintFilter(
+        relationReq,
+        constraintField,
+        constraintValues,
+        relationBinding.relation.property,
+      );
+    }
 
-    // build search conditions before calling service
+    // Build search conditions
     this.relationSearchHelper.buildSearch(relationReq, {
-      relation: relation,
+      relation: relationBinding.relation,
     });
 
-    // fetch relation data
-    const result = await relationBinding.service.getMany(relationReq);
-    return Array.isArray(result) ? result : result.data;
-  }
-
-  /**
-   * Extract constraint values for a relation from multiple root entities
-   *
-   * @param roots - Root entities to extract values from
-   * @param relationBinding - The relation configuration
-   * @param rootKey - Root entity primary key field name
-   * @returns Array of constraint values (deduplicated for owner relationships)
-   */
-  private extractConstraintValues(
-    roots: Root[],
-    relationBinding: CrudRelationBindingInterface<Root, Relations[number]>,
-    rootKey: string,
-  ): unknown[] {
-    const relation = relationBinding.relation;
-
-    if (relation.owner) {
-      // owner (inverse) relationship: extract foreign keys from roots
-      const foreignKeys = roots
-        .map((root) => root[relation.foreignKey])
-        .filter((fk) => fk != null);
-
-      // deduplicate foreign keys for owner relationships
-      return [...new Set(foreignKeys)];
-    } else {
-      // forward relationship: extract root IDs
-      return roots.map((root) => root[rootKey]);
-    }
+    // Execute relation query
+    return relationBinding.service.getMany(relationReq);
   }
 
   /**
@@ -568,38 +1122,63 @@ export class CrudFederationService<
       }
 
       // initialize empty relations for roots that have no relations
-      this.initializeEmptyRelationProperties(roots, relation);
+      this.initializeRelationProperties(roots, [relationBinding], true);
     }
   }
 
   /**
-   * Hydrate owner (inverse) relationships: root[foreignKey] -\> relation[primaryKey]
+   * Hydrate owner (inverse) relationships: root[foreignKey] : relation[primaryKey]
    */
   private hydrateOwnerRelations(
     roots: Root[],
     relation: QueryRelation<Root, Relations[number]>,
     relationArray: Relations[number][],
   ): void {
-    // create map of relations by their primary key
-    const relationsById = new Map<string, Relations[number]>();
-    for (const relationEntity of relationArray) {
-      relationsById.set(relationEntity[relation.primaryKey], relationEntity);
-    }
+    if (relation.cardinality === CRUD_RELATION_CARDINALITY_MANY) {
+      // For many cardinality, group relations by their primary key to handle multiple entities per key
+      const relationsByKey = new Map<string, Relations[number][]>();
+      for (const relationEntity of relationArray) {
+        const key = relationEntity[relation.primaryKey];
+        if (!relationsByKey.has(key)) {
+          relationsByKey.set(key, []);
+        }
+        relationsByKey.get(key)!.push(relationEntity);
+      }
 
-    // assign relations to roots based on root's foreign key
-    for (const root of roots) {
-      const foreignKeyValue = root[relation.foreignKey];
-      if (foreignKeyValue != null) {
-        const relationEntity = relationsById.get(foreignKeyValue);
-        if (relationEntity) {
-          this.assignRelationToRoot(root, relation, relationEntity);
+      // assign relation arrays to roots based on root's foreign key
+      for (const root of roots) {
+        const foreignKeyValue = root[relation.foreignKey];
+        if (foreignKeyValue != null) {
+          const relationEntities = relationsByKey.get(foreignKeyValue) || [];
+          this.setRelationProperty(root, relation, relationEntities);
+        }
+      }
+    } else {
+      // For one cardinality, use existing single-entity logic
+      const relationsById = new Map<string, Relations[number]>();
+      for (const relationEntity of relationArray) {
+        relationsById.set(relationEntity[relation.primaryKey], relationEntity);
+      }
+
+      // assign relations to roots based on root's foreign key
+      for (const root of roots) {
+        const foreignKeyValue = root[relation.foreignKey];
+        if (foreignKeyValue != null) {
+          const relationEntity = relationsById.get(foreignKeyValue);
+          if (relationEntity) {
+            const value =
+              relation.cardinality === CRUD_RELATION_CARDINALITY_ONE
+                ? relationEntity
+                : [relationEntity];
+            this.setRelationProperty(root, relation, value);
+          }
         }
       }
     }
   }
 
   /**
-   * Hydrate forward relationships: relation[foreignKey] -\> root[primaryKey]
+   * Hydrate forward relationships: relation[foreignKey] : root[primaryKey]
    */
   private hydrateForwardRelations(
     rootMap: Map<string, Root>,
@@ -622,82 +1201,70 @@ export class CrudFederationService<
     for (const [rootKeyValue, relationEntities] of relationsByRootKey) {
       const root = rootMap.get(rootKeyValue);
       if (root) {
-        this.assignRelationsToRoot(root, relation, relationEntities);
+        this.assignRelationToRoot(root, relation, relationEntities);
       }
     }
   }
 
   /**
-   * Assign a single relation entity to a root (for owner relationships)
+   * Assign relation entities to a root (handles single entity or array)
    */
   private assignRelationToRoot(
     root: Root,
     relation: QueryRelation<Root, Relations[number]>,
-    relationEntity: Relations[number],
+    relationData: Relations[number] | Relations[number][],
   ): void {
-    if (relation.cardinality === CRUD_RELATION_CARDINALITY_ONE) {
-      Object.assign(root, { [relation.property]: relationEntity });
-    } else {
-      // for one-to-many root-owned relationships (less common)
-      Object.assign(root, { [relation.property]: [relationEntity] });
-    }
-  }
+    let value: Relations[number] | Relations[number][] | null;
 
-  /**
-   * Assign multiple relation entities to a root (for forward relationships)
-   */
-  private assignRelationsToRoot(
-    root: Root,
-    relation: QueryRelation<Root, Relations[number]>,
-    relationEntities: Relations[number][],
-  ): void {
-    if (relation.cardinality === CRUD_RELATION_CARDINALITY_ONE) {
-      // for one-to-one, set the single relation entity
-      Object.assign(root, {
-        [relation.property]: relationEntities[0] || null,
-      });
+    if (Array.isArray(relationData)) {
+      // Multiple entities provided
+      if (relation.cardinality === CRUD_RELATION_CARDINALITY_ONE) {
+        value = relationData[0] || null; // Take first for one-to-one
+      } else {
+        value = relationData; // Use array for one-to-many
+      }
     } else {
-      // for one-to-many, set the array of relation entities
-      Object.assign(root, { [relation.property]: relationEntities });
-    }
-  }
-
-  /**
-   * Initialize empty relations for roots that have no relations
-   */
-  private initializeEmptyRelationProperties(
-    roots: Root[],
-    relation: QueryRelation<Root, Relations[number]>,
-  ): void {
-    for (const root of roots) {
-      if (!(relation.property in root)) {
-        this.initializeRelationProperty(root, relation);
+      // Single entity provided
+      if (relation.cardinality === CRUD_RELATION_CARDINALITY_ONE) {
+        value = relationData; // Use single entity for one-to-one
+      } else {
+        value = [relationData]; // Wrap in array for one-to-many
       }
     }
+
+    this.setRelationProperty(root, relation, value);
   }
 
-  /** Initialize a single relation property on a root entity */
-  private initializeRelationProperty(
+  /** Set a relation property value on a root entity */
+  private setRelationProperty(
     root: Root,
     relation: QueryRelation<Root, Relations[number]>,
+    value: Relations[number] | Relations[number][] | null,
   ): void {
-    if (relation.cardinality === CRUD_RELATION_CARDINALITY_ONE) {
-      Object.assign(root, { [relation.property]: null });
-    } else {
-      Object.assign(root, { [relation.property]: [] });
-    }
+    Object.assign(root, { [relation.property]: value });
   }
 
-  /** Initialize empty relation properties on roots when no relations exist */
-  private initializeEmptyRelations(
+  /**
+   * Initialize relation properties on roots
+   *
+   * @param roots - Root entities to initialize
+   * @param relations - Relations to initialize (single relation or array)
+   * @param onlyIfMissing - Only initialize if property doesn't exist (default: false)
+   */
+  private initializeRelationProperties(
     roots: Root[],
     relations: CrudRelationBindingInterface<Root, Relations[number]>[],
+    onlyIfMissing: boolean = false,
   ): void {
-    // flatten nested loops: iterate through all root-relation combinations
-    for (const relationBinding of relations) {
-      const relation = relationBinding.relation;
-      for (const root of roots) {
-        this.initializeRelationProperty(root, relation);
+    for (const root of roots) {
+      for (const binding of relations) {
+        const relation = binding.relation;
+
+        if (!onlyIfMissing || !(relation.property in root)) {
+          const defaultValue =
+            relation.cardinality === CRUD_RELATION_CARDINALITY_ONE ? null : [];
+          this.setRelationProperty(root, relation, defaultValue);
+        }
       }
     }
   }
@@ -723,185 +1290,94 @@ export class CrudFederationService<
     return key;
   }
 
-  /**
-   * Analyze sort requirements to determine optimal getMany strategy
-   *
-   * Supports multi-field sorting with proper precedence:
-   * - If any relation sorts exist: use RELATION_SORT strategy (relation-first)
-   * - Otherwise: use ROOT_SORT strategy (normal LEFT JOIN)
-   * - Relation sorts are always applied first, then root sorts as secondary criteria
-   */
-  private analyzeSortRequirements(
-    req: CrudRequestInterface<Root>,
-    relations: CrudRelationBindingInterface<Root, Relations[number]>[],
-  ): SortAnalysis<Root, Relations> {
-    const allSorts = req.parsed.sort || [];
-
-    if (allSorts.length === CRUD_FEDERATION_INITIAL_TOTAL) {
-      return {
-        type: SortStrategyType.ROOT_SORT,
-        relationSorts: [],
-        rootSorts: [],
-      };
-    }
-
-    const relationSorts: SortConfiguration<Root, Relations>[] = [];
-    const rootSorts: SortConfiguration<Root, Relations>[] = [];
-
-    // process each sort field and categorize as relation or root sort
-    for (const sortConfig of allSorts) {
-      const sortField = sortConfig.field;
-      const sortOrder = sortConfig.order;
-
-      // check if sort field belongs to a relation relationship
-      const drivingRelation = this.findRelationForSortField(
-        sortConfig,
-        relations,
-      );
-
-      if (drivingRelation) {
-        // validate relation sort requirements based on cardinality
-        this.validateRelationSortRequirements(req, sortField, drivingRelation);
-
-        relationSorts.push({
-          field: sortField,
-          order: sortOrder,
-          isRelationSort: true,
-          drivingRelation,
-        });
-      } else {
-        rootSorts.push({
-          field: sortField,
-          order: sortOrder,
-          isRelationSort: false,
-        });
-      }
-    }
-
-    // determine strategy type: relation sorts take precedence
-    const type =
-      relationSorts.length > CRUD_FEDERATION_INITIAL_TOTAL
-        ? SortStrategyType.RELATION_SORT
-        : SortStrategyType.ROOT_SORT;
-
-    return {
-      type,
-      relationSorts,
-      rootSorts,
-    };
-  }
-
-  /** Find which relation relationship owns the sort field using QuerySort.relation */
-  private findRelationForSortField(
-    sortConfig: QuerySort<Root>,
-    relations: CrudRelationBindingInterface<Root, Relations[number]>[],
-  ): CrudRelationBindingInterface<Root, Relations[number]> | null {
-    // use the relation property from QuerySort if available
-    if (sortConfig.relation) {
-      return (
-        relations.find(
-          (relationBinding) =>
-            relationBinding.relation.property === sortConfig.relation,
-        ) || null
-      );
-    }
-
-    // no relation specified, assume it belongs to root
-    return null;
-  }
-
-  /** Filter sorts to keep only those that belong to the root entity (no relation property) */
-
-  /** Helper: Create and configure a relation request */
+  /** Helper: Create relation request with optional filters and sorts applied */
   private createRelationRequest(
-    effectiveLimit?: number,
-    page?: number,
+    options: {
+      limit?: number;
+      offset?: number;
+      executionStrategy?: ExecutionStrategy<Root, Relations>;
+      relationBinding?: CrudRelationBindingInterface<Root, Relations[number]>;
+      sorts?: SortConfiguration<Root, Relations>[];
+    } = {},
   ): CrudRequestInterface<Relations[number]> {
-    const relationReq = this.relationQueryHelper.createRequest();
+    const { limit, offset, executionStrategy, relationBinding, sorts } =
+      options;
 
-    // set pagination parameters in a single pass
-    const parsed = relationReq.parsed;
-    if (effectiveLimit !== undefined) parsed.limit = effectiveLimit;
-    if (page !== undefined) parsed.page = page;
-
-    return relationReq;
-  }
-
-  /** Helper: Create relation request with filters and sorts applied */
-  private createFilteredRelationRequest(options: {
-    filters: QueryFilter<Root>[];
-    orFilters: QueryFilter<Root>[];
-    relationProperty: string;
-    limit?: number;
-    page?: number;
-    sorts?: SortConfiguration<Root, Relations>[];
-    drivingRelation?: CrudRelationBindingInterface<Root, Relations[number]>;
-  }): CrudRequestInterface<Relations[number]> {
-    const {
-      filters,
-      orFilters,
-      relationProperty,
-      limit,
-      page,
-      sorts,
-      drivingRelation,
-    } = options;
-    const relationReq = this.createRelationRequest(limit, page);
+    const relationReq: CrudRequestInterface<Relations[number]> = {
+      parsed: {
+        filter: [],
+        or: [],
+        sort: [],
+        limit,
+        page: undefined, // Relation services use limit/offset, never page
+        fields: [],
+        paramsFilter: [],
+        classTransformOptions: {},
+        search: undefined,
+        offset,
+        cache: undefined,
+        includeDeleted: undefined,
+      },
+      options: {},
+    };
 
     // apply relation sorts if provided
-    if (sorts && sorts.length > CRUD_FEDERATION_INITIAL_TOTAL) {
+    if (sorts && sorts.length > 0) {
       relationReq.parsed.sort = sorts.map((sort) => ({
         field: sort.field,
         order: sort.order,
       }));
     }
 
-    // apply relation filters and OR filters
-    this.applyRelationFiltersToRequest(
-      relationReq,
-      filters,
-      orFilters,
-      relationProperty,
-      drivingRelation,
-    );
+    // apply relation filters if provided
+    if (executionStrategy && relationBinding) {
+      executionStrategy.filterAnalyzer.applyRelationFilters(
+        relationReq,
+        relationBinding.relation,
+      );
+    }
 
     return relationReq;
   }
 
-  /** Helper: Create relation result data with consistent structure */
-  private createRelationResult(
-    relationBinding: CrudRelationBindingInterface<Root, Relations[number]>,
-    relationData: Relations[number][],
-    relationTotal: number,
-    includeRootIds: boolean = false,
-  ): RelationResultData<Root, Relations> {
-    const result: RelationResultData<Root, Relations> = {
-      config: relationBinding,
-      data: relationData,
-      total: relationTotal,
-    };
-
-    // extract root IDs if requested and for forward relationships only
-    if (includeRootIds && !relationBinding.relation.owner) {
-      const foreignKeyField = relationBinding.relation.foreignKey;
-      const allRootIds = relationData.map(
-        (relationEntity) => relationEntity[foreignKeyField],
-      );
-      result.rootIds = this.deduplicatePreservingOrder(allRootIds);
+  /** Get root count with optional filter checking */
+  private async getRootTotal(
+    req: CrudRequestInterface<Root>,
+    executionStrategy: ExecutionStrategy<Root, Relations>,
+  ): Promise<number> {
+    // If no root filters exist, return max
+    if (!executionStrategy.filterAnalyzer.hasRootFilters()) {
+      return Number.MAX_SAFE_INTEGER;
     }
 
-    return result;
+    const countReq = this.cloneRequest(req, {
+      limit: 1, // We only need the count
+      page: 1,
+      offset: undefined,
+      sort: [], // No sorting needed for count
+    });
+
+    this.rootSearchHelper.buildSearch(countReq);
+    const rootResult = await this.rootService.getMany(countReq);
+
+    return rootResult.total || rootResult.count || 0;
   }
 
-  /** Handle case when no relations are configured */
-  private async handleNoRelationsCase(
+  /** Consolidated method to fetch roots directly */
+  private async fetchRootsDirectly(
     rootReq: CrudRequestInterface<Root>,
+    executionStrategy?: ExecutionStrategy<Root, Relations>,
   ): Promise<{
     roots: Root[];
     total: number;
     fetchCalls: number;
     totalFetched: number;
   }> {
+    // Apply root sorts if execution strategy is available
+    if (executionStrategy) {
+      executionStrategy.sortAnalyzer.applyRootSorts(rootReq);
+    }
+
     // build search conditions from parsed request
     this.rootSearchHelper.buildSearch(rootReq);
 
@@ -915,44 +1391,89 @@ export class CrudFederationService<
     };
   }
 
+  /** Execute ROOT_FIRST strategy handling all root-first scenarios */
+  private async executeRootFirstStrategy(options: {
+    req: CrudRequestInterface<Root>;
+    relations: CrudRelationBindingInterface<Root, Relations[number]>[];
+    rootKey: string;
+    executionStrategy: ExecutionStrategy<Root, Relations>;
+  }): Promise<{
+    resultRoots: Root[];
+    allRelationResults: Array<{
+      config: CrudRelationBindingInterface<Root, Relations[number]>;
+      data: Relations[number][];
+      total?: number;
+    }>;
+    accurateTotal: number;
+    fetchCalls: number;
+    totalFetched: number;
+  }> {
+    const { req, relations, rootKey, executionStrategy } = options;
+
+    // Handle no relations case
+    if (relations.length === 0) {
+      const noRelationResult = await this.fetchRootsDirectly(
+        req,
+        executionStrategy,
+      );
+      return {
+        resultRoots: noRelationResult.roots,
+        allRelationResults: [],
+        accurateTotal: noRelationResult.total,
+        fetchCalls: noRelationResult.fetchCalls,
+        totalFetched: noRelationResult.totalFetched,
+      };
+    }
+
+    // LEFT JOIN: Use root-first strategy for optimal performance
+    const leftJoinResult = await this.fetchRelationsForLeftJoin(
+      req,
+      relations,
+      rootKey,
+      executionStrategy,
+    );
+
+    return {
+      resultRoots: leftJoinResult.roots,
+      allRelationResults: leftJoinResult.relationResults,
+      accurateTotal: leftJoinResult.total,
+      fetchCalls: leftJoinResult.fetchCalls,
+      totalFetched: leftJoinResult.totalFetched,
+    };
+  }
+
   /** Handle LEFT JOIN case - root-first strategy */
-  private async handleLeftJoinCase(
+  private async fetchRelationsForLeftJoin(
     rootReq: CrudRequestInterface<Root>,
     relations: CrudRelationBindingInterface<Root, Relations[number]>[],
     rootKey: string,
+    executionStrategy: ExecutionStrategy<Root, Relations>,
   ): Promise<{
     roots: Root[];
     total: number;
     fetchCalls: number;
     totalFetched: number;
-    relationResults: Array<{
-      config: CrudRelationBindingInterface<Root, Relations[number]>;
-      data: Relations[number][];
-      total?: number;
-    }>;
+    relationResults: RelationResult<Root, Relations>[];
   }> {
-    // first fetch roots, then relations with root ID constraints
-    // build search conditions from parsed request
-    this.rootSearchHelper.buildSearch(rootReq);
+    // First fetch roots using consolidated method
+    const rootsResult = await this.fetchRootsDirectly(
+      rootReq,
+      executionStrategy,
+    );
+    const fetchedRoots = rootsResult.roots;
 
-    const rootResult = await this.rootService.getMany(rootReq);
-    const fetchedRoots = rootResult.data;
+    let fetchCalls = rootsResult.fetchCalls;
+    let totalFetched = rootsResult.totalFetched;
+    let relationResults: RelationResult<Root, Relations>[] = [];
 
-    let fetchCalls = 1;
-    let totalFetched = fetchedRoots.length;
-    let relationResults: Array<{
-      config: CrudRelationBindingInterface<Root, Relations[number]>;
-      data: Relations[number][];
-      total?: number;
-    }> = [];
-
-    // now fetch relations with root ID constraints
+    // Now fetch relations with root ID constraints
     if (fetchedRoots.length > 0) {
       const relationEnrichment = await this.fetchRelationsForRoots({
         req: rootReq,
         relations,
         roots: fetchedRoots,
         rootKey,
+        executionStrategy,
       });
 
       fetchCalls += relationEnrichment.fetchCalls;
@@ -962,7 +1483,7 @@ export class CrudFederationService<
 
     return {
       roots: fetchedRoots,
-      total: rootResult.total || rootResult.count,
+      total: rootsResult.total,
       fetchCalls,
       totalFetched,
       relationResults,
@@ -975,11 +1496,7 @@ export class CrudFederationService<
     accurateTotal: number,
     rootReq: CrudRequestInterface<Root>,
     includeMetrics: boolean,
-    metrics: {
-      totalFetched: number;
-      fetchCalls: number;
-      duration: number;
-    },
+    metrics: FederationMetrics,
   ): CrudResponsePaginatedInterface<Root> {
     const result: CrudResponsePaginatedInterface<Root> = {
       data: resultRoots,
@@ -1004,404 +1521,21 @@ export class CrudFederationService<
   }
 
   /**
-   * Apply INNER JOIN constraints to root query and return ordered results
+   * Discover root IDs through iterative constraint processing
    *
-   * Handles the common pattern of:
-   * 1. Apply CondOperator.IN constraint filter with root IDs
-   * 2. Build search conditions and execute query
-   * 3. Reorder results to match constraint order
-   *
-   * @param rootReq - Root request to constrain
-   * @param rootKey - Root entity primary key field name
-   * @param constraintIds - Root IDs to constrain query to
-   * @returns Ordered roots matching constraint IDs with fetch metrics
+   * Uses BufferStrategy to handle sparse data by progressively increasing
+   * the fetch limit until enough unique root IDs are discovered to satisfy
+   * the user's requested limit.
    */
-  private async applyInnerJoinConstraints(
-    rootReq: CrudRequestInterface<Root>,
-    rootKey: string,
-    constraintIds: unknown[],
-  ): Promise<{
-    roots: Root[];
-    total: number;
-    fetchCalls: number;
-    totalFetched: number;
-  }> {
-    const constrainedReq = {
-      ...rootReq,
-      parsed: {
-        ...rootReq.parsed,
-        page: 1,
-        limit: constraintIds.length,
-        offset: undefined,
-      },
-    };
-
-    // Apply INNER JOIN constraint
-    this.addConstraintFilter(constrainedReq, rootKey, constraintIds);
-
-    // build search conditions
-    this.rootSearchHelper.buildSearch(constrainedReq);
-
-    const rootResult = await this.rootService.getMany(constrainedReq);
-    const fetchedRoots = rootResult.data;
-
-    // re-order roots to match constraint order
-    const orderedRoots = this.reorderRootsByIds(
-      fetchedRoots,
-      constraintIds,
-      rootKey,
-    );
-
-    return {
-      roots: orderedRoots,
-      total: rootResult.total || rootResult.count,
-      fetchCalls: 1,
-      totalFetched: fetchedRoots.length,
-    };
-  }
-
-  /** Helper: Apply relation filters and OR filters for a specific relation property to a relation request */
-  private applyRelationFiltersToRequest(
-    relationReq: CrudRequestInterface<Relations[number]>,
-    allFilters: QueryFilter<Root>[],
-    allOrFilters: QueryFilter<Root>[],
-    relationProperty: string,
-    drivingRelation?: CrudRelationBindingInterface<Root, Relations[number]>,
-  ): void {
-    // transform and add regular filters first
-    for (const filter of allFilters) {
-      if (filter.relation === relationProperty) {
-        const relationFilter: QueryFilter<Relations[number]> = {
-          ...filter,
-        };
-        relationReq.parsed.filter.push(relationFilter);
-      }
-    }
-
-    // apply distinctFilter after user filters if this is the driving relation for sorting
-    if (drivingRelation?.relation.distinctFilter) {
-      this.applyDistinctFilter(
-        relationReq,
-        drivingRelation.relation.distinctFilter,
-      );
-    }
-
-    // transform and add OR filters
-    for (const filter of allOrFilters) {
-      if (filter.relation === relationProperty) {
-        const relationFilter: QueryFilter<Relations[number]> = {
-          ...filter,
-        };
-        relationReq.parsed.or.push(relationFilter);
-      }
-    }
-  }
-
-  /**
-   * Relation-sort strategy: Handles sorting by relation fields
-   *
-   * Process:
-   * 1. Fetch driving relation with sort + distinctFilter for uniqueness
-   * 2. Extract sorted root IDs from relation results
-   * 3. Fetch other relations for constraint validation
-   * 4. Fetch roots constrained to sorted IDs (INNER JOIN semantics)
-   * 5. Optionally enrich driving relation data if distinctFilter was used
-   *
-   * @param req - Root request with relation sorts
-   * @param relations - All relation bindings
-   * @param sortAnalysis - Analysis of sort requirements
-   * @param rootKey - Root entity primary key field name
-   * @returns Sorted roots with all relation data and accurate totals
-   */
-  private async fetchWithRelationSort(
-    req: CrudRequestInterface<Root>,
-    relations: CrudRelationBindingInterface<Root, Relations[number]>[],
-    sortAnalysis: SortAnalysis<Root, Relations>,
-    rootKey: string,
-  ): Promise<RelationSortResult<Root, Relations>> {
-    let fetchCalls = CRUD_FEDERATION_INITIAL_FETCH_COUNT;
-    let totalFetched = CRUD_FEDERATION_INITIAL_TOTAL;
-
-    // Get the primary driving relation (first relation sort)
-    const primaryRelationSort = sortAnalysis.relationSorts[0];
-    if (!primaryRelationSort || !primaryRelationSort.drivingRelation) {
-      throw new CrudFederationException({
-        message:
-          'Relation sort analysis missing driving relation or sort field',
-      });
-    }
-
-    const { drivingRelation } = primaryRelationSort;
-
-    // 1. Direct pagination with distinctFilter (no iteration needed)
-    const relationLimit = req.parsed.limit || CRUD_FEDERATION_DEFAULT_LIMIT;
-    const relationPage = req.parsed.page || CRUD_FEDERATION_DEFAULT_PAGE;
-
-    // Apply relation filters for this specific relationship
-    const allFilters = req.parsed.filter || [];
-    const allOrFilters = req.parsed.or || [];
-
-    // 2. Single efficient relation query with direct pagination and all relation sorts
-    const sortingRelationReq = this.createFilteredRelationRequest({
-      filters: allFilters,
-      orFilters: allOrFilters,
-      relationProperty: drivingRelation.relation.property,
-      limit: relationLimit,
-      page: relationPage,
-      sorts: sortAnalysis.relationSorts,
-      drivingRelation: drivingRelation, // Pass driving relation to apply distinctFilter
-    });
-
-    // build search conditions
-    this.relationSearchHelper.buildSearch(sortingRelationReq, {
-      relation: drivingRelation.relation,
-    });
-
-    // Single relation fetch (guaranteed unique by distinctFilter)
-    const relationResult = await drivingRelation.service.getMany(
-      sortingRelationReq,
-    );
-
-    const allSortingRelationData = relationResult.data;
-    const sortingRelationTotal = relationResult.total;
-    fetchCalls += 1;
-    totalFetched += allSortingRelationData.length;
-
-    // 3. Extract root IDs from relation data (guaranteed unique by distinctFilter)
-    let sortedRootIds: unknown[] = [];
-
-    if (allSortingRelationData.length === 0) {
-      return {
-        sortedRoots: [],
-        allRelationResults: [],
-        accurateTotal: 0,
-        fetchCalls,
-        totalFetched,
-      };
-    }
-
-    // Extract root IDs in sort order from the driving relation
-    if (drivingRelation.relation.owner) {
-      // Inverse relationship: extract primary keys from relations as root IDs
-      const primaryKeyField = drivingRelation.relation.primaryKey;
-      sortedRootIds = allSortingRelationData
-        .map((relationEntity) => relationEntity[primaryKeyField])
-        .filter((id) => id !== null && id !== undefined);
-    } else {
-      // forward relationship: extract root IDs (distinctFilter ensures uniqueness)
-      const foreignKeyField = drivingRelation.relation.foreignKey;
-      sortedRootIds = allSortingRelationData
-        .map((relationEntity) => relationEntity[foreignKeyField])
-        .filter((rootId) => rootId !== null && rootId !== undefined);
-    }
-
-    // Phase 2: Fetch other relations for constraint checking
-    const otherRelations = relations.filter(
-      (relationBinding) => relationBinding !== drivingRelation,
-    );
-
-    const otherRelationResults = await this.fetchOtherRelationsForConstraint(
-      otherRelations,
-      allFilters,
-      allOrFilters,
-    );
-
-    fetchCalls += otherRelationResults.fetchCalls;
-    totalFetched += otherRelationResults.totalFetched;
-
-    // Phase 3: Fetch roots in sorted order with INNER JOIN constraint
-    let sortedRoots: Root[] = [];
-
-    // INNER JOIN: Only fetch roots that exist in the sorted relation results
-    if (sortedRootIds.length > 0) {
-      // Copy request and overwrite search conditions for INNER JOIN
-      const rootReq = {
-        ...req,
-        parsed: {
-          ...req.parsed,
-          sort: sortAnalysis.rootSorts.map((sort) => ({
-            field: sort.field,
-            order: sort.order,
-          })),
-        },
-      };
-
-      // Apply INNER JOIN constraints and get ordered results
-      const constrainedResult = await this.applyInnerJoinConstraints(
-        rootReq,
-        rootKey,
-        sortedRootIds,
-      );
-      sortedRoots = constrainedResult.roots;
-      fetchCalls += constrainedResult.fetchCalls;
-      totalFetched += constrainedResult.totalFetched;
-    }
-
-    // Additional enrichment fetch for driving relation when distinctFilter is used
-    let enrichmentRelationData = allSortingRelationData;
-    let enrichmentRelationTotal = sortingRelationTotal;
-    if (
-      drivingRelation.relation.distinctFilter &&
-      drivingRelation.relation.cardinality === CRUD_RELATION_CARDINALITY_MANY
-    ) {
-      // Use existing helper method to fetch all relations for discovered root IDs
-      const enrichmentResult = await this.fetchRelationsForRoots({
-        req,
-        relations: [drivingRelation], // only fetch for the driving relation
-        roots: sortedRoots,
-        rootKey: this.getRootKey(req),
-      });
-
-      // Find the enrichment data for the driving relation
-      const drivingRelationResult = enrichmentResult.allRelationResults.find(
-        (result) => result.config === drivingRelation,
-      );
-
-      if (drivingRelationResult) {
-        enrichmentRelationData = drivingRelationResult.data;
-        enrichmentRelationTotal =
-          drivingRelationResult.total || sortingRelationTotal;
-        fetchCalls += enrichmentResult.fetchCalls;
-        totalFetched += enrichmentResult.totalFetched;
-      }
-    }
-
-    // Combine all relation results
-    const allRelationResults = [
-      {
-        config: drivingRelation,
-        data: enrichmentRelationData, // Use enrichment data (all relations) instead of sorting data
-        total: enrichmentRelationTotal, // Use enrichment total (includes all relations, not just unique ones)
-      },
-      ...otherRelationResults.results,
-    ];
-
-    return {
-      sortedRoots,
-      allRelationResults,
-      accurateTotal: sortingRelationTotal, // Use relation total as it represents count of unique matching roots
-      fetchCalls,
-      totalFetched,
-    };
-  }
-
-  /** Phase 1: Fetch all relations for enrichment */
-  private async fetchAllRelationsForEnrichment(options: {
+  private async discoverConstrainedRootIds(options: {
     req: CrudRequestInterface<Root>;
     relations: CrudRelationBindingInterface<Root, Relations[number]>[];
-  }): Promise<RelationEnrichmentResult<Root, Relations>> {
-    const { req, relations } = options;
-    let fetchCalls = CRUD_FEDERATION_INITIAL_FETCH_COUNT;
-    let totalFetched = CRUD_FEDERATION_INITIAL_TOTAL;
-
-    // Collect all relation results for reuse
-    const allRelationResults: RelationResultData<Root, Relations>[] = [];
-
-    // Separate filters into root and relation filters
-    const allFilters = req.parsed.filter || [];
-    const allOrFilters = req.parsed.or || [];
-
-    // Query each relation relationship for enrichment data
-    for (const relationBinding of relations) {
-      const relationReq = this.createFilteredRelationRequest({
-        filters: allFilters,
-        orFilters: allOrFilters,
-        relationProperty: relationBinding.relation.property,
-      });
-
-      // build search conditions before calling service
-      this.relationSearchHelper.buildSearch(relationReq, {
-        relation: relationBinding.relation,
-      });
-
-      const relationQueryResult = await relationBinding.service.getMany(
-        relationReq,
-      );
-      const relationData = relationQueryResult.data;
-      const relationTotal = relationQueryResult.total;
-
-      fetchCalls += 1;
-      totalFetched += relationData.length;
-
-      // Store this relation result for reuse
-      const relationResult = this.createRelationResult(
-        relationBinding,
-        relationData,
-        relationTotal,
-        true, // Include root IDs for enrichment
-      );
-      allRelationResults.push(relationResult);
-    }
-
-    return {
-      allRelationResults,
-      fetchCalls,
-      totalFetched,
-    };
-  }
-
-  /** Helper: Fetch other relations for constraint checking in RELATION_SORT */
-  private async fetchOtherRelationsForConstraint(
-    otherRelations: CrudRelationBindingInterface<Root, Relations[number]>[],
-    allFilters: QueryFilter<Root>[],
-    allOrFilters: QueryFilter<Root>[],
-  ): Promise<{
-    results: Array<{
-      config: CrudRelationBindingInterface<Root, Relations[number]>;
-      data: Relations[number][];
-      total: number;
-    }>;
-    fetchCalls: number;
-    totalFetched: number;
-  }> {
-    const otherRelationResults: Array<{
-      config: CrudRelationBindingInterface<Root, Relations[number]>;
-      data: Relations[number][];
-      total: number;
-    }> = [];
-    let fetchCalls = CRUD_FEDERATION_INITIAL_FETCH_COUNT;
-    let totalFetched = CRUD_FEDERATION_INITIAL_TOTAL;
-
-    for (const relationBinding of otherRelations) {
-      const relationReq = this.createFilteredRelationRequest({
-        filters: allFilters,
-        orFilters: allOrFilters,
-        relationProperty: relationBinding.relation.property,
-      });
-
-      // build search conditions before calling service
-      this.relationSearchHelper.buildSearch(relationReq, {
-        relation: relationBinding.relation,
-      });
-
-      const relationResult = await relationBinding.service.getMany(relationReq);
-      const relationData = relationResult.data;
-      const relationTotal = relationResult.total;
-
-      fetchCalls += 1;
-      totalFetched += relationData.length;
-
-      // Continue even if relation has no results - supports both LEFT and INNER JOIN semantics
-      // For LEFT JOIN: roots returned regardless; for INNER JOIN: constrains discovered root IDs
-      otherRelationResults.push(
-        this.createRelationResult(relationBinding, relationData, relationTotal),
-      );
-    }
-
-    return {
-      results: otherRelationResults,
-      fetchCalls,
-      totalFetched,
-    };
-  }
-
-  /** Fetch relations for given root entities */
-  private async fetchRelationsForRoots(options: {
-    req: CrudRequestInterface<Root>;
-    relations: CrudRelationBindingInterface<Root, Relations[number]>[];
-    roots: Root[];
     rootKey: string;
+    executionStrategy: ExecutionStrategy<Root, Relations>;
+    processedRootIds?: Set<unknown>;
   }): Promise<{
+    rootIds: unknown[];
+    accurateTotal: number;
     allRelationResults: Array<{
       config: CrudRelationBindingInterface<Root, Relations[number]>;
       data: Relations[number][];
@@ -1410,52 +1544,457 @@ export class CrudFederationService<
     fetchCalls: number;
     totalFetched: number;
   }> {
-    const { req, relations, roots, rootKey } = options;
+    const { req, relations, rootKey, executionStrategy, processedRootIds } =
+      options;
+    const userPage = req.parsed.page || 1;
+    const userLimit = req.parsed.limit || CRUD_FEDERATION_DEFAULT_LIMIT;
+
+    let constraintRootIds: unknown[] = [];
+    const accumulatedRootIds: Set<unknown> = new Set(); // Accumulate across all iterations
+    const bufferStrategy = new BufferStrategy(userLimit);
+    let isDrivingRelationExhausted = false;
+    let relationTotal = 0;
+    let fetchCalls = 0;
+    let totalFetched = 0;
+    const allRelationResults: RelationResult<Root, Relations>[] = [];
+
+    // Iterative approach to handle sparse data
+    for (
+      let iteration = 0;
+      iteration < CRUD_FEDERATION_MAX_ITERATIONS;
+      iteration++
+    ) {
+      constraintRootIds = [];
+      const tempRelationResults: typeof allRelationResults = [];
+
+      // Process relations sequentially - each passes constraints to the next
+      const constraintResult = await this.processRelationsSequentially({
+        relations,
+        rootKey,
+        executionStrategy,
+        userPage,
+        bufferStrategy,
+        constraintRootIds,
+      });
+
+      // Update metrics and results
+      fetchCalls += constraintResult.fetchCalls;
+      totalFetched += constraintResult.totalFetched;
+      constraintRootIds = constraintResult.finalConstraintIds;
+      isDrivingRelationExhausted = constraintResult.isDrivingRelationExhausted;
+      relationTotal = constraintResult.relationTotal;
+      tempRelationResults.push(...constraintResult.relationResults);
+
+      // Accumulate root IDs across iterations
+      for (const rootId of constraintRootIds) {
+        accumulatedRootIds.add(rootId);
+      }
+
+      // Filter out already processed root IDs when called from outer loop
+      if (processedRootIds) {
+        constraintRootIds = constraintRootIds.filter(
+          (rootId) => !processedRootIds.has(rootId),
+        );
+        // Also filter from accumulated set
+        for (const rootId of processedRootIds) {
+          accumulatedRootIds.delete(rootId);
+        }
+      }
+
+      // Check if we should stop iterating after processing all relations
+      const haveEnoughRootIds = accumulatedRootIds.size >= userLimit;
+      const noDataFound = constraintRootIds.length === 0;
+
+      if (noDataFound || isDrivingRelationExhausted || haveEnoughRootIds) {
+        // Empty intersection, hit max iterations, driving relation exhausted, or have enough IDs
+        // Accumulate all relation data from this iteration for hydration
+        this.mergeRelationResults(allRelationResults, tempRelationResults);
+        break;
+      }
+
+      // Check if we've reached maximum offset to prevent infinite loops
+      if (bufferStrategy.hasReachedLimit()) {
+        break;
+      }
+
+      // Not enough IDs after processing - try next batch (offset automatically advanced)
+    }
+
+    return {
+      rootIds: Array.from(accumulatedRootIds),
+      accurateTotal: relationTotal, // Return relation total - accurate total calculated in fetchWithSequentialConstraints
+      allRelationResults,
+      fetchCalls,
+      totalFetched,
+    };
+  }
+
+  /**
+   * Fetch root entities for specific root IDs
+   */
+  private async fetchConstrainedRoots(options: {
+    req: CrudRequestInterface<Root>;
+    rootKey: string;
+    rootIds: unknown[];
+    executionStrategy: ExecutionStrategy<Root, Relations>;
+  }): Promise<{
+    roots: Root[];
+    fetchCalls: number;
+    totalFetched: number;
+  }> {
+    const { req, rootKey, rootIds, executionStrategy } = options;
+
+    // Extract root-only filters (preserve root filters, remove relation filters)
+    const constrainedRootReq = this.cloneRequest(req, {
+      filter: executionStrategy.filterAnalyzer.getRootAndFilters(), // Preserve root filters, add constraint filters
+      or: executionStrategy.filterAnalyzer.getRootOrFilters(), // Preserve root or filters
+      page: 1, // Always use page 1 when fetching specific IDs
+      limit: req.parsed.limit || CRUD_FEDERATION_DEFAULT_LIMIT, // Preserve original limit
+      offset: undefined,
+    });
+
+    // Apply root sorts (filters out relation sorts)
+    executionStrategy.sortAnalyzer.applyRootSorts(constrainedRootReq);
+
+    FilterAnalyzer.addConstraintFilter(constrainedRootReq, rootKey, rootIds);
+
+    this.rootSearchHelper.buildSearch(constrainedRootReq);
+
+    const rootResult = await this.rootService.getMany(constrainedRootReq);
+
+    return {
+      roots: rootResult.data,
+      fetchCalls: 1,
+      totalFetched: rootResult.data.length,
+    };
+  }
+
+  /** Sequential constraint-building approach for both INNER JOIN and relation sorts */
+  private async fetchWithSequentialConstraints(options: {
+    req: CrudRequestInterface<Root>;
+    relations: CrudRelationBindingInterface<Root, Relations[number]>[];
+    rootKey: string;
+    executionStrategy: ExecutionStrategy<Root, Relations>;
+  }): Promise<FederationResult<Root, Relations>> {
+    const { req, relations, rootKey, executionStrategy } = options;
+    const userLimit = req.parsed.limit || CRUD_FEDERATION_DEFAULT_LIMIT;
+
+    // Get root filter total if applicable
+    const rootFilterTotal = await this.getRootTotal(req, executionStrategy);
+
+    // Initialize state for iterative processing
+    const state = this.initializeIterationState(req);
+
+    // Process iterations to accumulate roots
+    const iterationResult = await this.processSequentialIterations({
+      req,
+      relations,
+      rootKey,
+      executionStrategy,
+      userLimit,
+      state,
+    });
+
+    // Trim to requested limit and preserve sort order
+    const finalRoots = iterationResult.accumulatedRoots.slice(0, userLimit);
+
+    // Enrich final roots with complete relation data
+    const finalResult = await this.enrichFinalRoots({
+      req,
+      relations,
+      rootKey,
+      finalRoots,
+      executionStrategy,
+      allRelationResults: iterationResult.allRelationResults,
+      totalFetchCalls: iterationResult.totalFetchCalls,
+      totalFetched: iterationResult.totalFetched,
+    });
+
+    // Calculate accurate total using MIN of root and relation constraints
+    const accurateTotal = Math.min(
+      rootFilterTotal,
+      iterationResult.relationTotal,
+    );
+
+    return {
+      resultRoots: finalRoots,
+      allRelationResults: finalResult.allRelationResults,
+      accurateTotal,
+      fetchCalls: finalResult.totalFetchCalls,
+      totalFetched: finalResult.totalFetched,
+    };
+  }
+
+  /** Get root filter total if root filters exist */
+
+  /** Initialize state for iterative processing */
+  private initializeIterationState(req: CrudRequestInterface<Root>) {
+    return {
+      accumulatedRoots: [] as Root[],
+      processedRootIds: new Set<unknown>(),
+      allRelationResults: [] as RelationResult<Root, Relations>[],
+      totalFetchCalls: 0,
+      totalFetched: 0,
+      relationTotal: 0,
+      isExhausted: false,
+      currentRelationPage: req.parsed.page || 1,
+    };
+  }
+
+  /** Process sequential iterations to accumulate roots */
+  private async processSequentialIterations(options: {
+    req: CrudRequestInterface<Root>;
+    relations: CrudRelationBindingInterface<Root, Relations[number]>[];
+    rootKey: string;
+    executionStrategy: ExecutionStrategy<Root, Relations>;
+    userLimit: number;
+    state: {
+      accumulatedRoots: Root[];
+      processedRootIds: Set<unknown>;
+      allRelationResults: RelationResult<Root, Relations>[];
+      totalFetchCalls: number;
+      totalFetched: number;
+      relationTotal: number;
+      isExhausted: boolean;
+      currentRelationPage: number;
+    };
+  }) {
+    const { req, relations, rootKey, executionStrategy, userLimit, state } =
+      options;
+
+    for (
+      let iteration = 0;
+      iteration < CRUD_FEDERATION_MAX_ITERATIONS && !state.isExhausted;
+      iteration++
+    ) {
+      // Process single iteration
+      const iterationComplete = await this.processSingleIteration({
+        req,
+        relations,
+        rootKey,
+        executionStrategy,
+        userLimit,
+        state,
+      });
+
+      if (iterationComplete) {
+        break;
+      }
+
+      // Advance to next relation page
+      state.currentRelationPage++;
+    }
+
+    return state;
+  }
+
+  /** Process a single iteration of root discovery and fetching */
+  private async processSingleIteration(options: {
+    req: CrudRequestInterface<Root>;
+    relations: CrudRelationBindingInterface<Root, Relations[number]>[];
+    rootKey: string;
+    executionStrategy: ExecutionStrategy<Root, Relations>;
+    userLimit: number;
+    state: {
+      accumulatedRoots: Root[];
+      processedRootIds: Set<unknown>;
+      allRelationResults: RelationResult<Root, Relations>[];
+      totalFetchCalls: number;
+      totalFetched: number;
+      relationTotal: number;
+      isExhausted: boolean;
+      currentRelationPage: number;
+    };
+  }): Promise<boolean> {
+    const { req, relations, rootKey, executionStrategy, userLimit, state } =
+      options;
+
+    // Create request with updated pagination
+    const iterationReq = this.cloneRequest(req, {
+      page: state.currentRelationPage,
+    });
+
+    // Discover root IDs
+    const discoveryResult = await this.discoverConstrainedRootIds({
+      req: iterationReq,
+      relations,
+      rootKey,
+      executionStrategy,
+      processedRootIds: state.processedRootIds,
+    });
+
+    // Update metrics
+    state.totalFetchCalls += discoveryResult.fetchCalls;
+    state.totalFetched += discoveryResult.totalFetched;
+    state.relationTotal = Math.max(
+      state.relationTotal,
+      discoveryResult.accurateTotal,
+    );
+
+    // Merge relation results
+    this.mergeRelationResults(
+      state.allRelationResults,
+      discoveryResult.allRelationResults,
+    );
+
+    // Check for exhaustion
+    if (discoveryResult.rootIds.length === 0) {
+      if (state.currentRelationPage > (req.parsed.page || 1)) {
+        state.isExhausted = true;
+      }
+      return true; // Iteration complete
+    }
+
+    if (discoveryResult.rootIds.length < userLimit) {
+      state.isExhausted = true;
+    }
+
+    // Fetch and process roots
+    const newRoots = await this.fetchAndProcessRoots({
+      req,
+      rootKey,
+      rootIds: discoveryResult.rootIds,
+      processedRootIds: state.processedRootIds,
+      executionStrategy,
+    });
+
+    // Update metrics from root fetching
+    state.totalFetchCalls += newRoots.fetchCalls;
+    state.totalFetched += newRoots.totalFetched;
+    state.accumulatedRoots.push(...newRoots.roots);
+
+    // Check completion conditions
+    return (
+      state.accumulatedRoots.length >= userLimit || newRoots.roots.length === 0
+    );
+  }
+
+  /** Fetch and process roots, filtering out already processed ones */
+  private async fetchAndProcessRoots(options: {
+    req: CrudRequestInterface<Root>;
+    rootKey: string;
+    rootIds: unknown[];
+    processedRootIds: Set<unknown>;
+    executionStrategy: ExecutionStrategy<Root, Relations>;
+  }): Promise<{ roots: Root[]; fetchCalls: number; totalFetched: number }> {
+    const { req, rootKey, rootIds, processedRootIds, executionStrategy } =
+      options;
+
+    // Fetch roots for discovered IDs
+    const constrainedRoots = await this.fetchConstrainedRoots({
+      req,
+      rootKey,
+      rootIds,
+      executionStrategy,
+    });
+
+    // Reorder to preserve relation-driven sort order
+    const reorderedRoots = this.reorderRootsByIds(
+      constrainedRoots.roots,
+      rootIds,
+      rootKey,
+    );
+
+    // Filter out already processed roots
+    const newRoots = reorderedRoots.filter((root) => {
+      const rootId = root[rootKey];
+      if (processedRootIds.has(rootId)) {
+        return false;
+      }
+      processedRootIds.add(rootId);
+      return true;
+    });
+
+    return {
+      roots: newRoots,
+      fetchCalls: constrainedRoots.fetchCalls,
+      totalFetched: constrainedRoots.totalFetched,
+    };
+  }
+
+  /** Enrich final roots with complete relation data */
+  private async enrichFinalRoots(options: {
+    req: CrudRequestInterface<Root>;
+    relations: CrudRelationBindingInterface<Root, Relations[number]>[];
+    rootKey: string;
+    finalRoots: Root[];
+    executionStrategy: ExecutionStrategy<Root, Relations>;
+    allRelationResults: RelationResult<Root, Relations>[];
+    totalFetchCalls: number;
+    totalFetched: number;
+  }) {
+    const { req, relations, rootKey, finalRoots, executionStrategy } = options;
+    let { allRelationResults, totalFetchCalls, totalFetched } = options;
+
+    if (finalRoots.length > 0) {
+      const enrichmentResult = await this.fetchRelationsForRoots({
+        req,
+        relations,
+        roots: finalRoots,
+        rootKey,
+        executionStrategy,
+      });
+
+      // Replace constraint-filtered results with complete enrichment data
+      allRelationResults = enrichmentResult.allRelationResults;
+      totalFetchCalls += enrichmentResult.fetchCalls;
+      totalFetched += enrichmentResult.totalFetched;
+    }
+
+    return { allRelationResults, totalFetchCalls, totalFetched };
+  }
+
+  /** Fetch relations for given root entities */
+  private async fetchRelationsForRoots(options: {
+    req: CrudRequestInterface<Root>;
+    relations: CrudRelationBindingInterface<Root, Relations[number]>[];
+    roots: Root[];
+    rootKey: string;
+    executionStrategy: ExecutionStrategy<Root, Relations>;
+    existingRelationResults?: RelationResult<Root, Relations>[];
+  }): Promise<{
+    allRelationResults: RelationResult<Root, Relations>[];
+    fetchCalls: number;
+    totalFetched: number;
+  }> {
+    const { relations, roots, rootKey, executionStrategy } = options;
 
     // extract root IDs from the provided roots
     const rootIds = roots.map((root) => root[rootKey]);
 
-    if (
-      relations.length === CRUD_FEDERATION_INITIAL_TOTAL ||
-      rootIds.length === CRUD_FEDERATION_INITIAL_TOTAL
-    ) {
+    if (relations.length === 0 || rootIds.length === 0) {
       return {
         allRelationResults: [],
-        fetchCalls: CRUD_FEDERATION_INITIAL_FETCH_COUNT,
-        totalFetched: CRUD_FEDERATION_INITIAL_TOTAL,
+        fetchCalls: 0,
+        totalFetched: 0,
       };
     }
-
-    // Separate filters into root and relation filters
-    const allFilters = req.parsed.filter || [];
-    const allOrFilters = req.parsed.or || [];
-
-    // Extract relation filters (with relation property) for this method
-    const relationFilters: QueryFilter<Root>[] = allFilters.filter(
-      (filter) => filter.relation,
-    );
-    const relationOrFilters: QueryFilter<Root>[] = allOrFilters.filter(
-      (filter) => filter.relation,
-    );
 
     const relationPromises = relations.map(
       async (
         relationBinding: CrudRelationBindingInterface<Root, Relations[number]>,
       ) => {
-        // Extract constraint values based on relationship direction
-        const constraintValues = this.extractConstraintValues(
-          roots,
+        // Always make fresh service calls with proper constraints for enrichment
+        // Removed reuse logic to ensure correct constraint application
+
+        // Extract constraint configuration and values based on relationship direction
+        const constraintConfig = this.getConstraintConfig(
           relationBinding,
           rootKey,
         );
-
-        // Use the helper method to fetch relations with constraints
-        return this.fetchRelationsWithConstraints(
-          relationBinding,
-          constraintValues,
-          relationFilters,
-          relationOrFilters,
+        const constraintValues = this.getConstraintValuesFromRoots(
+          roots,
+          constraintConfig,
         );
+
+        // Execute standardized relation query
+        const result = await this.executeRelationQuery(relationBinding, {
+          executionStrategy,
+          constraintField: constraintConfig.field,
+          constraintValues,
+        });
+
+        return result.data;
       },
     );
 
@@ -1466,13 +2005,11 @@ export class CrudFederationService<
     );
 
     // Convert to the expected result structure
-    const allRelationResults = relations.map((config, index) =>
-      this.createRelationResult(
-        config,
-        relationArrays[index],
-        relationArrays[index].length,
-      ),
-    );
+    const allRelationResults = relations.map((config, index) => ({
+      config,
+      data: relationArrays[index],
+      total: relationArrays[index].length,
+    }));
 
     return {
       allRelationResults,
@@ -1481,123 +2018,252 @@ export class CrudFederationService<
     };
   }
 
-  /** Helper: Check if INNER JOIN should be applied - any relation filters imply INNER JOIN semantics */
-  private shouldApplyInnerJoin(
-    req: CrudRequestInterface<Root>,
-    relations: CrudRelationBindingInterface<Root, Relations[number]>[],
-  ): boolean {
-    const allFilters = req.parsed.filter || [];
-    const allOrFilters = req.parsed.or || [];
+  /** Process relations sequentially, passing constraints from one to the next */
+  private async processRelationsSequentially(options: {
+    relations: CrudRelationBindingInterface<Root, Relations[number]>[];
+    rootKey: string;
+    executionStrategy: ExecutionStrategy<Root, Relations>;
+    userPage: number;
+    bufferStrategy: BufferStrategy;
+    constraintRootIds: unknown[];
+  }): Promise<{
+    finalConstraintIds: unknown[];
+    relationResults: RelationResult<Root, Relations>[];
+    fetchCalls: number;
+    totalFetched: number;
+    isDrivingRelationExhausted: boolean;
+    relationTotal: number;
+  }> {
+    const { relations, rootKey, executionStrategy, userPage, bufferStrategy } =
+      options;
 
-    // Any filters on relation relationships imply INNER JOIN semantics
-    // (constraint validation has already been performed at a higher level)
-    for (const filter of [...allFilters, ...allOrFilters]) {
-      if (filter.relation) {
-        const hasMatchingRelation = relations.some(
-          (relationBinding) =>
-            relationBinding.relation.property === filter.relation,
-        );
-        if (hasMatchingRelation) {
-          return true;
-        }
-      }
-    }
+    // Get next batch parameters for offset-based pagination
+    const { limit: drivingRelationRequestedLimit, offset: relationOffset } =
+      bufferStrategy.advance();
 
-    return false;
-  }
+    let constraintRootIds = options.constraintRootIds;
+    let fetchCalls = 0;
+    let totalFetched = 0;
+    let isDrivingRelationExhausted = false;
+    let relationTotal = 0;
+    const relationResults: RelationResult<Root, Relations>[] = [];
 
-  /** Helper: Check if there's a CondOperator.NOT_NULL AND filter on the join key for the driving relation relationship */
-  private hasNotnullFilterOnJoinKey(
-    req: CrudRequestInterface<Root>,
-    drivingRelation: CrudRelationBindingInterface<Root, Relations[number]>,
-  ): boolean {
-    const allFilters = req.parsed.filter || [];
-
-    // Determine the join key based on relationship direction
-    const joinKey = drivingRelation.relation.owner
-      ? drivingRelation.relation.primaryKey
-      : drivingRelation.relation.foreignKey;
-
-    // Check for CondOperator.NOT_NULL AND filter on the join key within this relationship
-    // Only CondOperator.NOT_NULL ensures we get ALL entities with relationships for proper sorting
-    // Other operators like CondOperator.GREATER_THAN, CondOperator.EQUALS may exclude valid relationships
-    for (const filter of allFilters) {
-      if (
-        filter.relation === drivingRelation.relation.property &&
-        filter.field === joinKey &&
-        filter.operator === CondOperator.NOT_NULL
-      ) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  /** Validate relation sort requirements based on cardinality and configuration */
-  private validateRelationSortRequirements(
-    req: CrudRequestInterface<Root>,
-    sortField: string,
-    drivingRelation: CrudRelationBindingInterface<Root, Relations[number]>,
-  ): void {
-    const relation = drivingRelation.relation;
-
-    // One-to-one relationships are always supported (no additional requirements)
-    if (relation.cardinality === CRUD_RELATION_CARDINALITY_ONE) {
-      return;
-    }
-
-    // Many relationships require distinctFilter
-    if (
-      relation.cardinality === CRUD_RELATION_CARDINALITY_MANY &&
-      !relation.distinctFilter
-    ) {
-      throw new CrudFederationException({
-        message:
-          "Sorting by relation field '%s' on many-cardinality relationship '%s' requires a distinctFilter configuration. " +
-          "Add distinctFilter: { fieldName: { [CondOperator.EQUALS]: 'value' } } to the relation configuration to ensure at most one relation row per root entity for consistent sorting.",
-        messageParams: [sortField, relation.property],
-      });
-    }
-
-    // For safety (Option B), still require CondOperator.NOT_NULL filter for INNER JOIN semantics
-    const hasJoinKeyFilter = this.hasNotnullFilterOnJoinKey(
-      req,
-      drivingRelation,
+    // Filter out owner relations from sequential processing - they cannot provide root ID constraints
+    // and will be handled in the enrichment phase after roots are fetched
+    const nonOwnerRelations = relations.filter(
+      (relationBinding) => !relationBinding.relation.owner,
     );
-    if (!hasJoinKeyFilter) {
-      const joinKey = relation.owner
-        ? relation.primaryKey
-        : relation.foreignKey;
-      throw new CrudFederationException({
-        message:
-          "Sorting by '%s' requires a CondOperator.NOT_NULL filter on the join key to ensure consistent results. " +
-          "Add the filter '%s.%s||$notnull' to enable relation property sorting. " +
-          'Only CondOperator.NOT_NULL guarantees all entities with relationships are included for proper sorting.',
-        messageParams: [sortField, relation.property, joinKey],
+
+    for (let i = 0; i < nonOwnerRelations.length; i++) {
+      const relationBinding = nonOwnerRelations[i];
+      const isDriving = relationBinding === executionStrategy.drivingRelation;
+      const isFirstRelation = i === 0;
+
+      // Apply pagination to:
+      // 1. Driving relations (have relation sorts)
+      // 2. First relation when no driving relation exists (relation filters only)
+      const shouldApplyPagination =
+        isDriving || (!executionStrategy.drivingRelation && isFirstRelation);
+
+      // Calculate correct offset for user pagination (page -> offset conversion)
+      // Only apply user pagination offset on the first iteration (relationOffset = 0)
+      // For subsequent iterations, use relationOffset from BufferStrategy
+      const userOffset =
+        isDriving &&
+        isFirstRelation &&
+        userPage &&
+        drivingRelationRequestedLimit &&
+        relationOffset === 0 // Only on first iteration
+          ? (userPage - 1) * drivingRelationRequestedLimit
+          : relationOffset;
+
+      // Create relation request
+      const relationReq = this.createRelationRequest({
+        executionStrategy,
+        relationBinding,
+        limit: shouldApplyPagination
+          ? drivingRelationRequestedLimit
+          : undefined,
+        offset: shouldApplyPagination ? userOffset : undefined,
+        sorts: isDriving
+          ? executionStrategy.sortAnalyzer.getRelationSorts()
+          : undefined,
       });
+
+      // Apply constraints from previous relation
+      if (constraintRootIds.length > 0) {
+        FilterAnalyzer.addConstraintFilter(
+          relationReq,
+          rootKey,
+          constraintRootIds,
+        );
+      }
+
+      // Build search conditions
+      this.relationSearchHelper.buildSearch(relationReq, {
+        relation: relationBinding.relation,
+      });
+
+      // Execute relation query
+      const relationResult = await relationBinding.service.getMany(relationReq);
+      fetchCalls += 1;
+
+      // Handle undefined or missing data
+      if (!relationResult || !relationResult.data) {
+        relationResults.push({
+          config: relationBinding,
+          data: [],
+          total: 0,
+        });
+        constraintRootIds = [];
+        break;
+      }
+
+      totalFetched += relationResult.data.length;
+
+      // Track total from driving relation or first relation for INNER JOIN
+      if (isDriving || (i === 0 && relationTotal === 0)) {
+        relationTotal = relationResult.total || 0;
+      }
+
+      // Check if driving relation or first relation (when no driving relation) is exhausted
+      const hasPaginationApplied =
+        isDriving || (!executionStrategy.drivingRelation && isFirstRelation);
+      if (
+        hasPaginationApplied &&
+        relationResult.data.length < drivingRelationRequestedLimit
+      ) {
+        isDrivingRelationExhausted = true;
+      }
+
+      // Extract root IDs from this relation to pass to next relation
+      // Skip constraint extraction for owner relationships as they cannot provide root IDs
+      if (!relationBinding.relation.owner) {
+        const rootIds = this.getRootIdsFromRelationData(relationResult.data, {
+          field: relationBinding.relation.foreignKey,
+          rootField: '', // Not used for extraction
+          isOwner: false, // Forward relationships only
+        });
+        // Pass these root IDs to the next relation (progressive constraint)
+        constraintRootIds = rootIds;
+      }
+      // For owner relationships, keep existing constraintRootIds unchanged
+
+      // Store relation result
+      relationResults.push({
+        config: relationBinding,
+        data: relationResult.data,
+        total: relationResult.total,
+      });
+
+      // Early exit if no root IDs found
+      if (constraintRootIds.length === 0) {
+        break;
+      }
+    }
+
+    return {
+      finalConstraintIds: constraintRootIds,
+      relationResults,
+      fetchCalls,
+      totalFetched,
+      isDrivingRelationExhausted,
+      relationTotal,
+    };
+  }
+
+  /**
+   * Get constraint configuration for a relation binding
+   */
+  private getConstraintConfig(
+    relationBinding: CrudRelationBindingInterface<Root, Relations[number]>,
+    rootKey: string,
+  ): ConstraintConfig {
+    const relation = relationBinding.relation;
+
+    if (relation.owner) {
+      return {
+        field: relation.primaryKey,
+        rootField: relation.foreignKey,
+        isOwner: true,
+      };
+    } else {
+      return {
+        field: relation.foreignKey,
+        rootField: rootKey,
+        isOwner: false,
+      };
     }
   }
 
-  /** Apply distinctFilter to ensure uniqueness for many-cardinality relation sorting */
-  private applyDistinctFilter(
-    relationReq: CrudRequestInterface<Relations[number]>,
-    distinctFilter: QueryFilter<Relations[number]>,
-  ): void {
-    // Simply add the distinctFilter to the relation request filters
-    relationReq.parsed.filter.push(distinctFilter);
+  /**
+   * Extract constraint values from roots for a specific relation
+   */
+  private getConstraintValuesFromRoots(
+    roots: Root[],
+    constraintConfig: ConstraintConfig,
+  ): unknown[] {
+    if (constraintConfig.isOwner) {
+      // Owner relationship: extract foreign keys from roots and deduplicate
+      const foreignKeys = roots
+        .map((root) => root[constraintConfig.rootField])
+        .filter((fk) => fk != null);
+      return [...new Set(foreignKeys)];
+    } else {
+      // Forward relationship: extract root IDs (primary keys)
+      return roots.map((root) => root[constraintConfig.rootField]);
+    }
+  }
+
+  /**
+   * Extract root IDs from relation data using constraint configuration
+   */
+  private getRootIdsFromRelationData(
+    relationData: Relations[number][],
+    constraintConfig: ConstraintConfig,
+  ): unknown[] {
+    if (constraintConfig.isOwner) {
+      throw new CrudFederationException({
+        message:
+          'ASSERTION ERROR: getRootIdsFromRelationData called with owner relationship. ' +
+          'Caller should filter out owner relationships before calling this method.',
+      });
+    }
+
+    // Forward relationship: Extract foreign keys as root IDs
+    const allRootIds = relationData.map(
+      (relationEntity) => relationEntity[constraintConfig.field],
+    );
+    return [...new Set(allRootIds.filter((item) => item != null))];
   }
 }
 
-// Internal interfaces and types
+// Internal types
 
-/** Sort strategy types for different getMany approaches */
-enum SortStrategyType {
-  ROOT_SORT = 'ROOT_SORT',
-  RELATION_SORT = 'RELATION_SORT',
+/** Join strategy types for different getMany approaches */
+enum JoinStrategyType {
+  ROOT_FIRST = 'ROOT_FIRST',
+  RELATION_FIRST = 'RELATION_FIRST',
 }
 
-/** Individual sort configuration with its target (relation vs root) */
+/** Constraint configuration for root/relation data extraction */
+interface ConstraintConfig {
+  field: string; // Field to use for constraints in relation
+  rootField: string; // Field to use for constraints in root
+  isOwner: boolean; // Whether this is an owner relationship
+}
+
+/** Relation data with its configuration */
+type RelationResult<
+  Root extends PlainLiteralObject,
+  Relations extends PlainLiteralObject[],
+> = {
+  config: CrudRelationBindingInterface<Root, Relations[number]>;
+  data: Relations[number][];
+  total?: number;
+};
+
+/** Sort configuration with its target (relation vs root) */
 interface SortConfiguration<
   Root extends PlainLiteralObject,
   Relations extends PlainLiteralObject[],
@@ -1608,44 +2274,20 @@ interface SortConfiguration<
   drivingRelation?: CrudRelationBindingInterface<Root, Relations[number]>;
 }
 
-/** Analysis result for sort requirements */
-interface SortAnalysis<
-  Root extends PlainLiteralObject,
-  Relations extends PlainLiteralObject[],
-> {
-  type: SortStrategyType;
-  relationSorts: SortConfiguration<Root, Relations>[];
-  rootSorts: SortConfiguration<Root, Relations>[];
-}
-
-/** Interface for relation result data with consistent structure */
-interface RelationResultData<
-  Root extends PlainLiteralObject,
-  Relations extends PlainLiteralObject[],
-> {
-  config: CrudRelationBindingInterface<Root, Relations[number]>;
-  data: Relations[number][];
-  rootIds?: unknown[]; // Optional - not needed for all use cases
-  total: number;
-}
-
-/** Interface for relation enrichment result from fetchAllRelationsForEnrichment */
-interface RelationEnrichmentResult<
-  Root extends PlainLiteralObject,
-  Relations extends PlainLiteralObject[],
-> {
-  allRelationResults: RelationResultData<Root, Relations>[];
-  fetchCalls: number;
+/** Performance metrics for federation operations */
+interface FederationMetrics {
   totalFetched: number;
+  fetchCalls: number;
+  duration: number;
 }
 
-/** Interface for relation sort result from fetchWithRelationSort */
-interface RelationSortResult<
+/** Standard federation result structure */
+interface FederationResult<
   Root extends PlainLiteralObject,
   Relations extends PlainLiteralObject[],
 > {
-  sortedRoots: Root[];
-  allRelationResults: RelationResultData<Root, Relations>[];
+  resultRoots: Root[];
+  allRelationResults: RelationResult<Root, Relations>[];
   accurateTotal: number;
   fetchCalls: number;
   totalFetched: number;

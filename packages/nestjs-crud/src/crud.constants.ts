@@ -110,11 +110,7 @@ export const CRUD_MODULE_DEFAULT_VALIDATION_PIPE_OPTIONS: ValidationPipeOptions 
 // Federation constants
 export const CRUD_FEDERATION_DEFAULT_LIMIT = 10;
 export const CRUD_FEDERATION_DEFAULT_PAGE = 1;
-
-// Cardinality constants
 export const CRUD_RELATION_CARDINALITY_ONE = 'one';
 export const CRUD_RELATION_CARDINALITY_MANY = 'many';
-
-// Initial values
-export const CRUD_FEDERATION_INITIAL_TOTAL = 0;
-export const CRUD_FEDERATION_INITIAL_FETCH_COUNT = 0;
+export const CRUD_FEDERATION_MAX_ITERATIONS = 10;
+export const CRUD_FEDERATION_MAX_BUFFER_SIZE = 1000;
