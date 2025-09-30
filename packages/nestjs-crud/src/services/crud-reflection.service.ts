@@ -36,13 +36,13 @@ import {
   CRUD_MODULE_ROUTE_QUERY_LIMIT_METADATA,
   CRUD_MODULE_ROUTE_QUERY_MAX_LIMIT_METADATA,
   CRUD_MODULE_ROUTE_QUERY_CACHE_METADATA,
-  CRUD_MODULE_ROUTE_QUERY_ALWAYS_PAGINATE_METADATA,
   CRUD_MODULE_ROUTE_QUERY_SOFT_DELETE_METADATA,
   CRUD_MODULE_ROUTE_SERIALIZATION_METADATA,
   CRUD_MODULE_PARAM_BODY_METADATA,
   CRUD_MODULE_API_PARAMS_METADATA,
   CRUD_MODULE_API_RESPONSE_METADATA,
   CRUD_MODULE_API_QUERY_METADATA,
+  CRUD_MODULE_ROUTE_RELATIONS_METADATA,
 } from '../crud.constants';
 import {
   CrudValidationOptions,
@@ -58,7 +58,7 @@ export class CrudReflectionService<
   public getRequestOptions(
     target: ReflectionTargetOrHandler,
     handler: ReflectionTargetOrHandler,
-  ): CrudOptionsInterface<Entity> & { model: CrudModelOptionsInterface } {
+  ): CrudOptionsInterface<Entity> {
     return {
       model: this.getAllModelOptions(target, handler),
 
@@ -142,13 +142,13 @@ export class CrudReflectionService<
           CrudServiceQueryOptionsInterface<Entity>['cache']
         >(CRUD_MODULE_ROUTE_QUERY_CACHE_METADATA, [handler, target]),
 
-        alwaysPaginate: this.reflector.getAllAndOverride<
-          CrudServiceQueryOptionsInterface<Entity>['alwaysPaginate']
-        >(CRUD_MODULE_ROUTE_QUERY_ALWAYS_PAGINATE_METADATA, [handler, target]),
-
         softDelete: this.reflector.getAllAndOverride<
           CrudServiceQueryOptionsInterface<Entity>['softDelete']
         >(CRUD_MODULE_ROUTE_QUERY_SOFT_DELETE_METADATA, [handler, target]),
+
+        relations: this.reflector.getAllAndOverride<
+          CrudServiceQueryOptionsInterface<Entity>['relations']
+        >(CRUD_MODULE_ROUTE_RELATIONS_METADATA, [handler, target]),
       },
     };
   }

@@ -74,7 +74,7 @@ describe('RoleAssignmentController (e2e)', () => {
       .get('/role-assignment/user?limit=10')
       .expect(200)
       .then((res) => {
-        assert.strictEqual(res.body.length, 10);
+        assert.strictEqual(res.body.data.length, 10);
       });
   });
 

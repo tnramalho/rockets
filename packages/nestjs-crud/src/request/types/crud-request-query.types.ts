@@ -1,6 +1,8 @@
-import { PlainLiteralObject } from '@nestjs/common';
+import { PlainLiteralObject, Type } from '@nestjs/common';
 
+import { CrudQueryOptionsInterface } from '../../crud/interfaces/crud-query-options.interface';
 import { CrudEntityColumn } from '../../crud.types';
+import { CrudFetchServiceInterface } from '../../services/interfaces/crud-fetch-service.interface';
 
 export type QueryFields<T extends PlainLiteralObject> = CrudEntityColumn<T>[];
 
@@ -8,6 +10,7 @@ export type QueryFilter<T extends PlainLiteralObject> = {
   field: CrudEntityColumn<T>;
   operator: ComparisonOperator;
   value?: unknown;
+  relation?: string;
 };
 
 export type QueryFilterArr<T extends PlainLiteralObject> = [
@@ -19,6 +22,7 @@ export type QueryFilterArr<T extends PlainLiteralObject> = [
 export type QuerySort<T extends PlainLiteralObject> = {
   field: CrudEntityColumn<T>;
   order: QuerySortOperator;
+  relation?: string;
 };
 
 export type QuerySortArr<T extends PlainLiteralObject> = [
@@ -112,3 +116,83 @@ export type SConditionKey = '$and' | '$or';
 export type SCondition<T extends PlainLiteralObject> =
   | SFields<T>
   | SConditionAND<T>;
+
+export type QueryRelationCardinality = 'one' | 'many';
+
+export type QueryJoinType = 'LEFT' | 'INNER';
+
+type QueryRelationBase<
+  Entity extends PlainLiteralObject,
+  Relation extends PlainLiteralObject = PlainLiteralObject,
+> = {
+  /**
+   * The type of relation multiplicity from root to relation entity.
+   * - 'one': Root has at most one related entity (1:1 or N:1)
+   * - 'many': Root can have multiple related entities (1:N)
+   */
+  cardinality: QueryRelationCardinality;
+  /**
+   * The type of join to use when fetching this relation.
+   * - 'LEFT': Include all roots, even without matching relations (default)
+   * - 'INNER': Only include roots with matching relations
+   */
+  join?: QueryJoinType;
+  /**
+   * The target CRUD service responsible for hydration.
+   */
+  service: Type<CrudFetchServiceInterface<Relation>>;
+  /**
+   * The property name in the root (anchor) entity that holds the relation.
+   */
+  property: CrudEntityColumn<Entity> & string;
+  /**
+   * Filter to ensure uniqueness for many-cardinality relationships when sorting.
+   * Required for relation sorting on 'many' relationships to guarantee at most
+   * one relation row per root entity for consistent sort order.
+   *
+   * Example: `{ field: 'isLatest', operator: '$eq', value: true }`
+   */
+  distinctFilter?: QueryFilter<Relation>;
+  /**
+   *  Options for the relation.
+   */
+  options?: {
+    query: Pick<CrudQueryOptionsInterface<Relation>, 'allow' | 'exclude'>;
+  };
+};
+
+export type QueryRelation<
+  Entity extends PlainLiteralObject,
+  Relation extends PlainLiteralObject = PlainLiteralObject,
+> = QueryRelationBase<Entity, Relation> & {
+  /**
+   * Whether the root entity owns the foreign key.
+   * - false (default): Relation entity stores FK (relation[foreignKey] → root[primaryKey])
+   * - true: Root entity stores FK (root[foreignKey] → relation[primaryKey])
+   */
+  owner?: boolean;
+} & ( // Default ownership: relation[foreignKey] -> root[primaryKey]
+    | {
+        owner?: false | undefined;
+        /**
+         * The primary key field name in the root entity (target of the reference)
+         */
+        primaryKey: CrudEntityColumn<Entity> & string;
+        /**
+         * The foreign key field name in the relation entity (holds the reference)
+         */
+        foreignKey: CrudEntityColumn<Relation> & string;
+      }
+    // Root ownership: root[foreignKey] -> relation[primaryKey]
+    | {
+        owner: true;
+        /**
+         * The primary key field name in the relation entity (target of the reference)
+         */
+        primaryKey: CrudEntityColumn<Relation> & string;
+        /**
+         * The foreign key field name in the root entity (holds the reference)
+         */
+        foreignKey: CrudEntityColumn<Entity> & string;
+      }
+  );

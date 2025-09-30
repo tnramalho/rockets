@@ -48,7 +48,7 @@ describe('RoleController (e2e)', () => {
       const response = await supertest(app.getHttpServer())
         .get('/role?limit=10')
         .expect(200)
-        .expect((res) => res.body.length === 10);
+        .expect((res) => res.body.data.length === 10);
       expect(response);
     });
 
@@ -60,7 +60,7 @@ describe('RoleController (e2e)', () => {
 
       // get one using that id
       await supertest(app.getHttpServer())
-        .get(`/role/${response.body[0].id}`)
+        .get(`/role/${response.body.data[0].id}`)
         .expect(200);
     });
 
@@ -81,7 +81,7 @@ describe('RoleController (e2e)', () => {
 
       // delete one using that id
       await supertest(app.getHttpServer())
-        .delete(`/role/${response.body[0].id}`)
+        .delete(`/role/${response.body.data[0].id}`)
         .expect(200);
     });
   });

@@ -87,7 +87,7 @@ describe('OrgController (e2e)', () => {
       const response = await supertest(app.getHttpServer())
         .get('/org?limit=10')
         .expect(200)
-        .expect((res) => res.body.length === 10);
+        .expect((res) => res.body.data.length === 10);
       expect(response);
     });
 
@@ -99,11 +99,11 @@ describe('OrgController (e2e)', () => {
 
       // get one using that id
       const getOneResponse = await supertest(app.getHttpServer())
-        .get(`/org/${response.body[0].id}`)
+        .get(`/org/${response.body.data[0].id}`)
         .expect(200);
 
       // verify properties match
-      expect(getOneResponse.body).toEqual(response.body[0]);
+      expect(getOneResponse.body).toEqual(response.body.data[0]);
     });
 
     it('POST /org', async () => {
@@ -131,7 +131,7 @@ describe('OrgController (e2e)', () => {
 
       // delete one using that id
       await supertest(app.getHttpServer())
-        .delete(`/org/${response.body[0].id}`)
+        .delete(`/org/${response.body.data[0].id}`)
         .expect(200);
     });
 
@@ -173,7 +173,7 @@ describe('OrgController (e2e)', () => {
         .get('/org')
         .expect(200);
 
-      expect(Array.isArray(response.body)).toBe(true);
+      expect(Array.isArray(response.body.data)).toBe(true);
     });
 
     it('DELETE /org/:id - should return 404 for a non-existent organization', async () => {
@@ -197,10 +197,10 @@ describe('OrgController (e2e)', () => {
         .get('/org?limit=1')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
-      expect(response.body[0]).toHaveProperty('id');
-      expect(response.body[0]).toHaveProperty('name');
-      expect(response.body[0]).toHaveProperty('ownerId');
+      expect(response.body.data).toBeInstanceOf(Array);
+      expect(response.body.data[0]).toHaveProperty('id');
+      expect(response.body.data[0]).toHaveProperty('name');
+      expect(response.body.data[0]).toHaveProperty('ownerId');
     });
 
     it('POST /org - should ensure the owner ID is valid', async () => {
@@ -218,7 +218,7 @@ describe('OrgController (e2e)', () => {
         .get('/org?limit=100') // Assuming the limit is set to 100
         .expect(200);
 
-      expect(response.body.length).toBeLessThanOrEqual(100);
+      expect(response.body.data.length).toBeLessThanOrEqual(100);
     });
   });
 });

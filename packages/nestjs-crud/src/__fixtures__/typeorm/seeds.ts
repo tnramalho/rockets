@@ -6,6 +6,7 @@ import { PlainLiteralObject, Type } from '@nestjs/common';
 import { CompanyEntity } from './company/company.entity';
 import { NoteEntity } from './note/note.entity';
 import { ProjectEntity } from './project/project.entity';
+import { UserProfileEntity } from './user-profile/user-profile.entity';
 import { NameEntity, UserEntity } from './users/user.entity';
 
 export class Seeds implements MigrationInterface {
@@ -29,6 +30,7 @@ export class Seeds implements MigrationInterface {
     const projectsRepo = connection.getRepository(ProjectEntity);
     const usersRepo = connection.getRepository(UserEntity);
     const notesRepo = connection.getRepository(NoteEntity);
+    const userProfilesRepo = connection.getRepository(UserProfileEntity);
 
     // companies
     await this.save(companiesRepo, [
@@ -298,6 +300,28 @@ export class Seeds implements MigrationInterface {
         companyId: 2,
         name,
       },
+    ]);
+
+    // user profiles - creating profiles for most users (1-18 out of 21)
+    await this.save(userProfilesRepo, [
+      { userId: 1, nickName: 'TechGuru', favoriteColor: 'Blue' },
+      { userId: 2, nickName: 'CodeMaster', favoriteColor: 'Green' },
+      { userId: 3, nickName: 'DevNinja', favoriteColor: 'Orange' },
+      { userId: 4, nickName: 'WebWizard', favoriteColor: 'Purple' },
+      { userId: 5, nickName: 'DataDragon', favoriteColor: 'Orange' },
+      { userId: 6, nickName: 'PixelPusher', favoriteColor: 'Yellow' },
+      { userId: 7, nickName: 'ByteBender', favoriteColor: 'Pink' },
+      { userId: 8, nickName: 'LogicLion', favoriteColor: 'Cyan' },
+      { userId: 9, nickName: 'StackStar', favoriteColor: 'Magenta' },
+      { userId: 10, nickName: 'CloudCrafter', favoriteColor: 'Indigo' },
+      { userId: 11, nickName: 'APIAce', favoriteColor: 'Turquoise' },
+      { userId: 12, nickName: 'QueryQueen', favoriteColor: 'Orange' },
+      { userId: 13, nickName: 'ScriptSage', favoriteColor: 'Lime' },
+      { userId: 14, nickName: 'FuncFox', favoriteColor: 'Maroon' },
+      { userId: 15, nickName: 'ReactRanger', favoriteColor: 'Navy' },
+      { userId: 16, nickName: 'NodeNomad', favoriteColor: 'Olive' },
+      { userId: 17, nickName: 'GitGuru', favoriteColor: 'Teal' },
+      { userId: 18, nickName: 'TestTitan', favoriteColor: 'Silver' },
     ]);
 
     // notes

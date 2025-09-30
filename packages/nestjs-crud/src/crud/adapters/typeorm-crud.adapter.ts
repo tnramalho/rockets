@@ -86,10 +86,10 @@ export class TypeOrmCrudAdapter<
    */
   public async getMany(
     req: CrudRequestInterface<Entity>,
-  ): Promise<CrudResponsePaginatedInterface<Entity> | Entity[]> {
+  ): Promise<CrudResponsePaginatedInterface<Entity>> {
     const { parsed, options } = req;
     const builder = await this.createBuilder(parsed, options);
-    return this.doGetMany(builder, parsed, options);
+    return this.doGetMany(builder);
   }
 
   /**
@@ -346,23 +346,15 @@ export class TypeOrmCrudAdapter<
    * @see SelectQueryBuilder#getMany
    * @see SelectQueryBuilder#getManyAndCount
    * @param builder - Select Query Builder for the entity
-   * @param query - Parsed request parameters
-   * @param options - CRUD request options
    */
   protected async doGetMany(
     builder: SelectQueryBuilder<Entity>,
-    query: CrudRequestParsedParamsInterface<Entity>,
-    options: CrudRequestOptionsInterface<Entity>,
-  ): Promise<CrudResponsePaginatedInterface<Entity> | Entity[]> {
-    if (this.decidePagination(query, options)) {
-      const [data, total] = await builder.getManyAndCount();
-      const limit = builder.expressionMap.take;
-      const offset = builder.expressionMap.skip;
+  ): Promise<CrudResponsePaginatedInterface<Entity>> {
+    const [data, total] = await builder.getManyAndCount();
+    const limit = builder.expressionMap.take;
+    const offset = builder.expressionMap.skip;
 
-      return this.createPageInfo(data, total, limit || total, offset || 0);
-    }
-
-    return builder.getMany();
+    return this.createPageInfo(data, total, limit || total, offset || 0);
   }
 
   protected onInitMapEntityColumns() {

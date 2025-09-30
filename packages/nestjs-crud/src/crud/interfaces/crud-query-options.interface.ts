@@ -6,7 +6,12 @@ import {
 } from '../../request/types/crud-request-query.types';
 import { QueryFilterOption } from '../types/query-filter-option.type';
 
-export interface CrudQueryOptionsInterface<T extends PlainLiteralObject> {
+import { CrudRelationsInterface } from './crud-relations.interface';
+
+export interface CrudQueryOptionsInterface<
+  T extends PlainLiteralObject,
+  Relations extends PlainLiteralObject[] = PlainLiteralObject[],
+> {
   allow?: QueryFields<T>;
   exclude?: QueryFields<T>;
   persist?: QueryFields<T>;
@@ -15,6 +20,6 @@ export interface CrudQueryOptionsInterface<T extends PlainLiteralObject> {
   limit?: number;
   maxLimit?: number;
   cache?: number | false;
-  alwaysPaginate?: boolean;
   softDelete?: boolean;
+  relations?: CrudRelationsInterface<T, Relations>;
 }

@@ -6,6 +6,7 @@ import {
 } from 'typeorm';
 
 import { BaseEntity } from '../base-entity';
+import { UserEntity } from '../users/user.entity';
 
 @Entity('companies')
 export class CompanyEntity extends BaseEntity {
@@ -23,4 +24,6 @@ export class CompanyEntity extends BaseEntity {
 
   @DeleteDateColumn({ nullable: true })
   deletedAt?: Date;
+
+  users?: UserEntity[];
 }

@@ -52,13 +52,12 @@ describe(CrudService.name, () => {
     ormService = moduleRef.get<TestCrudService>(TestCrudService);
 
     mockRequest = {
-      options: { query: { alwaysPaginate: true } },
+      options: {},
       parsed: { search: { name: 'apple' } },
     } as unknown as CrudRequestInterface<Thing>;
 
     mockOverrides = {
       filter: { name: 'pear' },
-      alwaysPaginate: false,
     };
   });
 
@@ -84,7 +83,7 @@ describe(CrudService.name, () => {
         expect(spy).toBeCalledTimes(1);
 
         expect(spy).toBeCalledWith({
-          options: { query: { alwaysPaginate: false } },
+          options: { query: {} },
           parsed: {
             search: { $and: [{ name: 'apple' }, { name: 'pear' }] },
           },
@@ -125,7 +124,7 @@ describe(CrudService.name, () => {
 
         expect(spy).toBeCalledWith(
           {
-            options: { query: { alwaysPaginate: false } },
+            options: { query: {} },
             parsed: {
               search: { $and: [{ name: 'apple' }, { name: 'pear' }] },
             },

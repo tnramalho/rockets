@@ -42,10 +42,9 @@ describe('AppController (e2e)', () => {
         .get('/photo?limit=10')
         .expect(200);
 
-      expect(response.body).toBeInstanceOf(Array);
-      expect(response.body.length).toEqual(10);
-
       expect(response.body).toBeInstanceOf(Object);
+      expect(response.body.data).toBeInstanceOf(Array);
+      expect(response.body.data.length).toEqual(10);
     });
 
     it('GET /photo?limit=10&page=1', async () => {
