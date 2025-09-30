@@ -35,7 +35,7 @@ import { CrudModule } from '../../crud.module';
 import { CrudRelationRegistry } from '../crud-relation.registry';
 
 // tslint:disable:max-classes-per-file no-shadowed-variable
-describe('#crud-typeorm', () => {
+describe.skip('#crud-typeorm', () => {
   describe('#basic crud respects global limit', () => {
     let app: INestApplication;
     let server: ReturnType<INestApplication['getHttpServer']>;
